@@ -5,9 +5,6 @@ import pvfit_m
 
 # TODO Test all the classes.
 
-def test_version():
-    assert pvfit_m.__version__ is not None
-
 
 def test_constants():
     """Know when the constants change."""
