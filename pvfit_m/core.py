@@ -1,6 +1,7 @@
 import numpy
 import scipy.constants
 
+# Constants with explicit units.
 q_C = scipy.constants.e
 c_m_per_s = scipy.constants.c
 h_J_s = scipy.constants.h
@@ -14,10 +15,18 @@ class DataCurve:
     """
     def __init__(self, *, x: numpy.ndarray, y: numpy.ndarray):
         # Copies inputs and sorts on increasing x values.
-        x = numpy.asarray_chkfinite(x)
-        y = numpy.asarray_chkfinite(y)
-        x_argsort = numpy.argsort(x)
+        x = numpy.asarray_chkfinite(x, dtype=float)
+        if x.size == 0:
+            raise ValueError("x must have at least one element.")
+        if 1 < x.ndim:
+            raise ValueError("x cannot have dimension greater than one.")
+        x_size = x.size
+        x, x_argsort = numpy.unique(x, return_index=True)
+        if x.size != x_size:
+            raise ValueError("x values must be unique.")
         self.x = x[x_argsort]
+        y = numpy.asarray_chkfinite(y, dtype=float)
+        # This will raise if x and y are mismatched.
         self.y = y[x_argsort]
 
     def __eq__(self, obj):
@@ -107,12 +116,40 @@ class SpectralResponsivity(DataCurvePositiveXNonnegativeY):
         return self.y
 
 
+def compute_m(*, sr_td: SpectralResponsivity, ir_td: SpectralIrradiance, sr_rd: SpectralResponsivity,
+              ir_rd: SpectralIrradiance, ir_0: SpectralIrradiance) -> float:
+    """Compute spectral mismatch correction factor (M) between a reference device (RD) and test device (TD)."""
+    return ((inner_product(dc1=sr_td, dc2=ir_td) * inner_product(dc1=sr_rd, dc2=ir_0)) /
+            (inner_product(dc1=sr_td, dc2=ir_0) * inner_product(dc1=sr_rd, dc2=ir_rd)))
+
+
 def convert_qe_to_sr(*, qe: QuantumEfficiency) -> SpectralResponsivity:
     """Convert quantum efficiency (QE) curve to spectral responsivity (SR) curve."""
     return SpectralResponsivity(lambda_=qe.lambda_, sr=qe.qe * qe.lambda_ * 1.e-9 * q_C / (h_J_s * c_m_per_s))
 
 
-def compute_m(*, sr_td: SpectralResponsivity, ir_td: SpectralIrradiance, sr_rd: SpectralResponsivity,
-              ir_rd: SpectralIrradiance, ir_0: SpectralIrradiance) -> float:
-    """Compute spectral mismatch correction factor (M) between a reference device (RD) and test device (TD)."""
-    raise NotImplementedError
+def inner_product(*, dc1: DataCurve, dc2: DataCurve) -> float:
+    """Compute inner product of two curves as an integral over the common interval of thier domain of defintion."""
+    # TODO Warn if computation appears innacurate due to missing non-zero data at end(s) of common interval,
+    #  which should include when there is no overlap of intervals or only one point of overlap.
+    x_min = numpy.maximum(dc1.x[0], dc2.x[0])
+    x_max = numpy.minimum(dc1.x[-1], dc2.x[-1])
+    x_union = numpy.union1d(dc1.x, dc2.x)
+    x_union = x_union[numpy.logical_and(x_min <= x_union, x_union <= x_max)]
+    y1 = numpy.interp(x_union, dc1.x, dc1.y, left=float('nan'), right=float('nan'))
+    y2 = numpy.interp(x_union, dc2.x, dc2.y, left=float('nan'), right=float('nan'))
+
+    slopes1 = (y1[1:] - y1[:-1]) / (x_union[1:] - x_union[:-1])
+    intercepts1 = y1[:-1] - slopes1 * x_union[:-1]
+    slopes2 = (y2[1:] - y2[:-1]) / (x_union[1:] - x_union[:-1])
+    intercepts2 = y2[:-1] - slopes2 * x_union[:-1]
+
+    A = intercepts1 * intercepts2
+    B = (slopes1 * intercepts2 + slopes2 * intercepts1) / 2
+    C = slopes1 * slopes2 / 3
+
+    x_union_squared = x_union * x_union
+    x_union_cubed = x_union_squared * x_union
+    return float(numpy.sum(C * (x_union_cubed[1:] - x_union_cubed[:-1]) +
+                           B * (x_union_squared[1:] - x_union_squared[:-1]) +
+                           A * (x_union[1:] - x_union[:-1])))
