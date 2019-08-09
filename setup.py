@@ -94,7 +94,12 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        'Intended Audience :: Education',
+        'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Science/Research',
+        'Natural Language :: English',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Software Development :: Libraries',
 
         # Pick your license as you wish
         'License :: OSI Approved :: MIT License',
