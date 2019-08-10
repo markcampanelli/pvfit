@@ -3,7 +3,9 @@ import numpy
 import pvfit_m
 
 
-# TODO Test all the classes.
+# TODO Test all classes.
+# TODO More tests for SR to QE conversion.
+# TODO More tests for QE to SR conversion.
 
 
 def test_constants():
@@ -11,6 +13,31 @@ def test_constants():
     assert pvfit_m.core.q_C == 1.6021766208e-19
     assert pvfit_m.core.c_m_per_s == 299792458.0
     assert pvfit_m.core.h_J_s == 6.62607004e-34
+
+
+def test_DataCurve():
+    """Test DataCurve class."""
+    x = numpy.array([100, 200, 300])
+    y = numpy.array([0, 0.5, 1.])
+    # Indifference to fraction vs. percent representation.
+    dc = pvfit_m.core.DataCurve(x=x, y=y)
+    dc_duplicate = pvfit_m.core.DataCurve(x=x, y=y)
+    assert dc == dc_duplicate
+
+
+def test_QuantumEfficiency():
+    """Test QE class."""
+    lambda_ = numpy.array([100, 200, 300])
+    qe_fraction = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 0.5, 1.]))
+    qe_percent = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 50, 100]), is_percent=True)
+    # Should not alter underlying QE data representation provided by user.
+    assert qe_fraction != qe_percent
+    numpy.testing.assert_equal(qe_fraction.x, qe_percent.x)
+    numpy.testing.assert_equal(numpy.equal(qe_fraction.y, qe_percent.y), numpy.array([True, False, False]))
+    numpy.testing.assert_equal(100*qe_fraction.y, qe_percent.y)
+    numpy.testing.assert_equal(qe_fraction.lambda_, qe_percent.lambda_)
+    numpy.testing.assert_equal(qe_fraction.qe, qe_percent.qe)
+    numpy.testing.assert_equal(qe_fraction.qe_as_percent, qe_percent.qe_as_percent)
 
 
 def test_compute_m():
@@ -27,9 +54,27 @@ def test_compute_m():
 def test_convert_qe_to_sr():
     """Test conversions from QE to SR."""
     lambda_ = numpy.array([100, 200, 300])
-    QE_fraction = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 0.5, 1.]))
-    QE_percent = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 50, 100]), is_percent=True)
-    assert pvfit_m.core.convert_qe_to_sr(qe=QE_fraction) == pvfit_m.core.convert_qe_to_sr(qe=QE_percent)
+    # Indifference to fraction vs. percent representation.
+    qe_fraction = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 0.5, 1.]))
+    qe_percent = pvfit_m.core.QuantumEfficiency(lambda_=lambda_, qe=numpy.array([0, 50, 100]), is_percent=True)
+    assert pvfit_m.core.convert_qe_to_sr(qe=qe_fraction) == pvfit_m.core.convert_qe_to_sr(qe=qe_percent)
+    # Round trip identity function.
+    qe_fraction_round_trip = pvfit_m.core.convert_sr_to_qe(sr=pvfit_m.core.convert_qe_to_sr(qe=qe_fraction))
+    numpy.testing.assert_equal(qe_fraction_round_trip.lambda_, qe_fraction.lambda_)
+    numpy.testing.assert_almost_equal(qe_fraction_round_trip.qe, qe_fraction.qe)
+    qe_percent_round_trip = pvfit_m.core.convert_sr_to_qe(sr=pvfit_m.core.convert_qe_to_sr(qe=qe_percent))
+    numpy.testing.assert_equal(qe_percent_round_trip.lambda_, qe_percent.lambda_)
+    numpy.testing.assert_almost_equal(qe_percent_round_trip.qe, qe_percent.qe)
+
+
+def test_convert_sr_to_qe():
+    """Test conversions from SR to QE."""
+    lambda_ = numpy.array([100, 200, 300])
+    sr = pvfit_m.core.SpectralResponsivity(lambda_=lambda_, sr=numpy.array([0, 0.5, 1.]))
+    # Round trip identity function.
+    sr_round_trip = pvfit_m.core.convert_qe_to_sr(qe=pvfit_m.core.convert_sr_to_qe(sr=sr))
+    numpy.testing.assert_equal(sr_round_trip.lambda_, sr.lambda_)
+    numpy.testing.assert_almost_equal(sr_round_trip.sr, sr.sr)
 
 
 def test_inner_product():

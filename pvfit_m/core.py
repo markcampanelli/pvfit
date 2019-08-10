@@ -128,6 +128,11 @@ def convert_qe_to_sr(*, qe: QuantumEfficiency) -> SpectralResponsivity:
     return SpectralResponsivity(lambda_=qe.lambda_, sr=qe.qe * qe.lambda_ * 1.e-9 * q_C / (h_J_s * c_m_per_s))
 
 
+def convert_sr_to_qe(*, sr: SpectralResponsivity) -> QuantumEfficiency:
+    """Convert spectral responsivity (SR) curve to curve quantum efficiency (QE)."""
+    return QuantumEfficiency(lambda_=sr.lambda_, qe=sr.sr * h_J_s * c_m_per_s / (sr.lambda_ * 1.e-9 * q_C))
+
+
 def inner_product(*, dc1: DataCurve, dc2: DataCurve) -> float:
     """Compute inner product of two curves as an integral over the common interval of thier domain of defintion."""
     # TODO Warn if computation appears innacurate due to missing non-zero data at end(s) of common interval,
