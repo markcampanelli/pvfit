@@ -1,10 +1,9 @@
 import numpy
-import scipy.constants
 
 # Constants with explicit units.
-q_C = scipy.constants.e
-c_m_per_s = scipy.constants.c
-h_J_s = scipy.constants.h
+q_C = 1.6021766208e-19  # From scipy.constants.e
+c_m_per_s = 299792458.0  # From scipy.constants.c
+h_J_s = 6.62607004e-34  # From scipy.constants.h
 
 
 class DataCurve:
@@ -53,13 +52,13 @@ class QuantumEfficiency(DataCurvePositiveXNonnegativeY):
 
     TODO Describe interface and units [nm] and [1] or [%].
     """
-    def __init__(self, *, lambda_: numpy.ndarray, qe: numpy.ndarray, is_percent: bool = False):
-        super().__init__(x=lambda_, y=qe)
+    def __init__(self, *, lambda_nm: numpy.ndarray, qe: numpy.ndarray, is_percent: bool = False):
+        super().__init__(x=lambda_nm, y=qe)
         # Do not convert raw data. Instead track if it is given as a percent.
         self.is_percent = is_percent
 
     @property
-    def lambda_(self):
+    def lambda_nm(self):
         """Return wavelengths."""
         return self.x
 
@@ -72,7 +71,7 @@ class QuantumEfficiency(DataCurvePositiveXNonnegativeY):
             return self.y
 
     @property
-    def qe_as_percent(self):
+    def qe_percent(self):
         """Return QE as percent."""
         if self.is_percent:
             return self.y
@@ -86,15 +85,15 @@ class SpectralIrradiance(DataCurvePositiveXNonnegativeY):
 
     TODO Describe interface and units [nm] and [A/W/m^2].
     """
-    def __init__(self, *, lambda_: numpy.ndarray, ir: numpy.ndarray):
-        super().__init__(x=lambda_, y=ir)
+    def __init__(self, *, lambda_nm: numpy.ndarray, si_W_per_m2_nm: numpy.ndarray):
+        super().__init__(x=lambda_nm, y=si_W_per_m2_nm)
 
     @property
-    def lambda_(self):
+    def lambda_nm(self):
         return self.x
 
     @property
-    def ir(self):
+    def si_W_per_m2_nm(self):
         return self.y
 
 
@@ -104,33 +103,35 @@ class SpectralResponsivity(DataCurvePositiveXNonnegativeY):
 
     TODO Describe interface and units [nm] and [A/W].
     """
-    def __init__(self, *, lambda_: numpy.ndarray, sr: numpy.ndarray):
-        super().__init__(x=lambda_, y=sr)
+    def __init__(self, *, lambda_nm: numpy.ndarray, sr_A_per_W: numpy.ndarray):
+        super().__init__(x=lambda_nm, y=sr_A_per_W)
 
     @property
-    def lambda_(self):
+    def lambda_nm(self):
         return self.x
 
     @property
-    def sr(self):
+    def sr_A_per_W(self):
         return self.y
 
 
-def compute_m(*, sr_td: SpectralResponsivity, ir_td: SpectralIrradiance, sr_rd: SpectralResponsivity,
-              ir_rd: SpectralIrradiance, ir_0: SpectralIrradiance) -> float:
+def compute_m(*, sr_td: SpectralResponsivity, si_td: SpectralIrradiance, sr_rd: SpectralResponsivity,
+              si_rd: SpectralIrradiance, si_0: SpectralIrradiance) -> float:
     """Compute spectral mismatch correction factor (M) between a reference device (RD) and test device (TD)."""
-    return ((inner_product(dc1=sr_td, dc2=ir_td) * inner_product(dc1=sr_rd, dc2=ir_0)) /
-            (inner_product(dc1=sr_td, dc2=ir_0) * inner_product(dc1=sr_rd, dc2=ir_rd)))
+    return ((inner_product(dc1=sr_td, dc2=si_td) * inner_product(dc1=sr_rd, dc2=si_0)) /
+            (inner_product(dc1=sr_td, dc2=si_0) * inner_product(dc1=sr_rd, dc2=si_rd)))
 
 
 def convert_qe_to_sr(*, qe: QuantumEfficiency) -> SpectralResponsivity:
     """Convert quantum efficiency (QE) curve to spectral responsivity (SR) curve."""
-    return SpectralResponsivity(lambda_=qe.lambda_, sr=qe.qe * qe.lambda_ * 1.e-9 * q_C / (h_J_s * c_m_per_s))
+    return SpectralResponsivity(
+        lambda_nm=qe.lambda_nm, sr_A_per_W=qe.qe * qe.lambda_nm * 1.e-9 * q_C / (h_J_s * c_m_per_s))
 
 
 def convert_sr_to_qe(*, sr: SpectralResponsivity) -> QuantumEfficiency:
     """Convert spectral responsivity (SR) curve to curve quantum efficiency (QE)."""
-    return QuantumEfficiency(lambda_=sr.lambda_, qe=sr.sr * h_J_s * c_m_per_s / (sr.lambda_ * 1.e-9 * q_C))
+    return \
+        QuantumEfficiency(lambda_nm=sr.lambda_nm, qe=sr.sr_A_per_W * h_J_s * c_m_per_s / (sr.lambda_nm * 1.e-9 * q_C))
 
 
 def inner_product(*, dc1: DataCurve, dc2: DataCurve) -> float:
