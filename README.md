@@ -65,7 +65,7 @@ si_0 = pvfit_m.data.si_G173_global_tilt
 # This assumes a constant scaling between the spectral responsivity and spectral response of each device. These two scalings are assumed to cancel out between the numerator and denominator in the formula for M. Likewise, the spectral irradiance curves need only be relative (not absolute) curves.
 print(f"M = {pvfit_m.api.compute_m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)}")
 ```
-which should print—
+which should ultimately print—
 ```terminal
 M = 0.9982571553509605
 ```
