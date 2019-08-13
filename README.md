@@ -17,7 +17,7 @@ Verify your installation—
 ```terminal
 python -c "import pvfit_m; print(pvfit_m.__version__)"
 ```
-which should print something like
+which should print something similar to—
 ```terminal
 0.1.dev9+gadf7f38.d20190812
 ```
@@ -38,14 +38,14 @@ print(f"pvfit_m version {pvfit_m.__version__}")
 # See, for example, equation (5) in https://onlinelibrary.wiley.com/doi/full/10.1002/ese3.190
 
 # pvfit_m.data has already created several useful example data objects.
-# For example, assuming one has loaded wavelength and spectral responsivity data as 1D numpy arrays for the NIST test device (a x-Si PV cell), e.g.,
+# For example, assuming one has loaded wavelength and spectral responsivity data as 1D numpy arrays for the NIST test device (a x-Si PV cell)...
 # lambda_nm = numpy.array([...])
 lambda_nm = pvfit_m.data.lambda_nm_td_NIST
 # sr_A_per_W = numpy.array([...])
 sr_A_per_W = pvfit_m.data.sr_A_per_W_td_NIST
-# ...one then create a SpectralResponsivity object—
+# ...one then creates a SpectralResponsivity object—
 sr = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=sr_A_per_W)
-# Get spectral responsivity [A/W] at each wavelength [nm] from the underlying numpy.ndarray and show them stacked together.
+# This gets spectral responsivity [A/W] at each wavelength [nm] from the underlying numpy.ndarray and show them stacked together as rows.
 print(f"sr = {numpy.vstack((sr.lambda_nm, sr.sr_A_per_W))}")
 
 # Instead of re-creating all the necessary data objects for computing M, we use ones already made for demonstration purposes.
@@ -62,7 +62,7 @@ si_rd = pvfit_m.data.si_sim_NIST
 si_0 = pvfit_m.data.si_G173_global_tilt
 
 # Compute spectral mismatch correction factor M.
-# This assumes two constant scalings between the spectral responsivity and spectral response of each device, which are assumed to cancel out between the numerator and denominator in the formula for M.
+# This assumes a constant scaling between the spectral responsivity and spectral response of each device. These two scalings are assumed to cancel out between the numerator and denominator in the formula for M. Likewise, the spectral irradiance curves need only be relative (not absolute) curves.
 print(f"M = {pvfit_m.api.compute_m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)}")
 ```
 which should print—
