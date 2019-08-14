@@ -4,15 +4,14 @@ Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV
 ## Up and Running in 5 Minutes
 This package requires [Python 3.6+](https://www.python.org/) and [numpy](https://www.numpy.org/).
 
-### Download package
-This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo using `pip`—
+### Download and Install Package (non-editable mode)
+This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
+deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo using `pip`—
 ```terminal
 pip install git+https://github.com/markcampanelli/pvfit-m
 ```
-or, for editable (development) mode, including the `pytest` package—
-```terminal
-pip install -e git+https://github.com/markcampanelli/pvfit-m#egg=pvfit-m[dev,test]
-```
+NOTE: You may want to install your own optimized version of [`numpy`](https://www.numpy.org/) first, otherwise this will grab the latest version from [here](https://pypi.org/project/numpy/).
+
 Verify your installation—
 ```terminal
 python -c "import pvfit_m; print(pvfit_m.__version__)"
@@ -24,7 +23,8 @@ which should print something similar to—
 
 ### Load Example Data and Compute a Spectral Mismatch Correction Factor (M)
 
-The `pvfit-m` package comes with some example data, with special thanks to Behrang Hamadani at NIST :). Execute the commands in the following Python script—
+The `pvfit-m` package comes with some example data, with special thanks to Behrang Hamadani at NIST :). Execute the
+commands in the following Python script—
 ```python
 # Python 3.6-7
 import numpy
@@ -71,4 +71,51 @@ M = 0.9982571553509605
 ```
 
 ## How M Is Computed
-`pvfit_m.api.compute_m()` uses a piecewise linear interpolation between data points for each curve to fully define each function on its finite interval domain of definition in the first quadrant. The integration of the product of the two piecewise linear functions is done over the common interval domain of definition of the two curves which can be effeciently accomplished by a closed-form summation formula involving the piecewise-quadratic anti-derivative on each sub-interval of the combined partition of the common domain interval. It is currently assumed that one/both of the curves is sufficiently close to zero at each end of their common interval domain of definition in order to produce an accurate computation.
+_M_ is computed with the function, `pvfit_m.api.compute_m()`, using a piecewise linear interpolation between data points
+for each curve to fully define each function on its finite interval domain of definition in the first quadrant. The
+integration of the product of two piecewise linear functions is done using `pvfit_m.api.inner_product()` over the common
+interval domain of definition of the two curves. This is effeciently accomplished by a closed-form summation formula
+involving the piecewise-quadratic anti-derivative on each sub-interval of the combined partition of the common domain
+interval. It is currently assumed that one/both of the curves is sufficiently close to zero at each end of their common
+interval domain of definition in order to produce an accurate computation.
+
+## Future Plans
+
+- Enable vectorized computations of _M_, e.g., for time-series applications such as
+[captest](https://github.com/pvcaptest/pvcaptest/)
+- Add bad computation detectors/warnings
+- Publish on [PyPI](https://pypi.org/) (this repo may first be subsumed as a sub-package by a larger PV-related open
+source Python repo)
+- Implement different algorithms as requested/contributed by the community
+
+## Developer Notes
+
+### Download and Install Package with Developer and Testing Dependencies
+
+Install `pvfit-m` in editable (development) mode, including the `sphinx`, `pytest` packages, with `pip`—
+```terminal
+pip install -e git+https://github.com/markcampanelli/pvfit-m#egg=pvfit-m[dev,test]
+```
+NOTE: Documentation generation using `sphinx` is not yet implemented.
+
+### Run Tests
+From the root directory—
+```terminal
+pytest
+```
+
+### Dependencies
+
+Currently, [`numpy`](https://www.numpy.org/) is the only runtime dependency (minium version TBD). In order to ensure a
+well-tested, consistent, and straightforward API, a decision has been made to avoid any dependecy on
+[`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward integration with consumers that
+use `pandas`, e.g., time-series computations. To avoid bloat, we also avoid dependency on plotting libraries  such as `matplotlib`. We anticipate the likely addition
+of [`scipy`](https://www.scipy.org/) as a dependency as features are added. Any new dependencies or version ranges
+should be appropriately recorded in [setup.py](setup.py).
+
+### Coding Requirements and Style
+
+- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout
+- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120 character line limit for source code files
+- Unit testing is a must (coverage in CI to be added)
+<!--- FIXME Uncomment after merging https://github.com/markcampanelli/pvfit-m/pull/2 - An 80 character line limit for example code in the [examples](examples) directory --->
