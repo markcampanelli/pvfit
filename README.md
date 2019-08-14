@@ -5,7 +5,7 @@ Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV
 This package requires [Python 3.6+](https://www.python.org/) and [numpy](https://www.numpy.org/).
 
 ### Download package
-This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is deemed stable and sufficiently tested. Meanwhile, install the latest code directly from the GitHub repo using `pip`—
+This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo using `pip`—
 ```terminal
 pip install git+https://github.com/markcampanelli/pvfit-m
 ```
