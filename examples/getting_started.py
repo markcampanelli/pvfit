@@ -7,7 +7,7 @@ import pvfit_m
 print(f"pvfit_m version {pvfit_m.__version__}")
 
 """
-# pvfit_m has several data classes that wrap underlying numpy.ndarray data
+pvfit_m has several data classes that wrap underlying numpy.ndarray data
 represting the various curves appearing in the four integrals in the
 formula for M.
 
@@ -16,8 +16,8 @@ https://onlinelibrary.wiley.com/doi/full/10.1002/ese3.190
 """
 
 """
-# pvfit_m.data has already created several useful example data objects.
-# For example, assuming one has loaded wavelength and spectral responsivity
+pvfit_m.data has already created several useful example data objects.
+For example, assuming one has loaded wavelength and spectral responsivity
 data as 1D numpy arrays for the NIST test device (a x-Si PV cell)...
 """
 # lambda_nm = numpy.array([...])
