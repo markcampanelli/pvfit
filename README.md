@@ -64,6 +64,15 @@ pip install -e .[dev,test]
 ```
 NOTE: Documentation generation using `sphinx` is not yet implemented.
 
+Verify your installation—
+```terminal
+python -c "import pvfit_m; print(pvfit_m.__version__)"
+```
+which should print something similar to—
+```terminal
+0.1.dev9+gadf7f38.d20190812
+```
+
 ### Run Tests
 From the root directory—
 ```terminal
