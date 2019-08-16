@@ -1,4 +1,5 @@
 import numpy
+import pytest
 
 import pvfit_m
 
@@ -18,8 +19,22 @@ def test_constants():
 def test_DataCurve():
     """Test DataCurve class."""
     x = numpy.array([100, 200, 300])
+    # 1D case
     y = numpy.array([0, 0.5, 1.])
-    # Indifference to fraction vs. percent representation.
+    dc = pvfit_m.api.DataCurve(x=x, y=y)
+    dc_duplicate = pvfit_m.api.DataCurve(x=x, y=y)
+    assert dc == dc_duplicate
+    # 2D case
+    y = numpy.array([[0, 0.5, 1.],
+                     [1, 1.5, 2.]])
+    dc = pvfit_m.api.DataCurve(x=x, y=y)
+    dc_duplicate = pvfit_m.api.DataCurve(x=x, y=y)
+    assert dc == dc_duplicate
+    # 3D case
+    y = numpy.array([[[0, 0.5, 1.],
+                      [1, 1.5, 2.]],
+                     [[1, 1.5, 2.],
+                      [0, 0.5, 1.]]])
     dc = pvfit_m.api.DataCurve(x=x, y=y)
     dc_duplicate = pvfit_m.api.DataCurve(x=x, y=y)
     assert dc == dc_duplicate
@@ -40,63 +55,156 @@ def test_QuantumEfficiency():
     numpy.testing.assert_equal(qe.qe_percent, qe_percent.qe_percent)
 
 
-def test_compute_m():
+def test_m():
     """Test computation of M."""
     lambda_nm = numpy.array([100, 200, 300], dtype=float)
+    # Scalar-like computation.
+    shape = ()
     sr_td = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 2))
     si_td = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
     sr_rd = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 0.5))
     si_rd = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
     si_0 = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
-    assert pvfit_m.api.compute_m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0) == 1.
+    m_expected = numpy.ones(shape)
+    m = pvfit_m.api.m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)
+    assert isinstance(m, numpy.ndarray)
+    numpy.testing.assert_equal(m.shape, shape)
+    numpy.testing.assert_almost_equal(m, m_expected)
+
+    # Vectorized computation, time-series like.
+    shape = (2,)
+    sr_td = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 2))
+    si_td = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.ones((2, len(lambda_nm))))
+    sr_rd = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 0.5))
+    si_rd = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    si_0 = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    m_expected = numpy.ones(shape)
+    m = pvfit_m.api.m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)
+    assert isinstance(m, numpy.ndarray)
+    numpy.testing.assert_equal(m.shape, shape)
+    numpy.testing.assert_almost_equal(m, m_expected)
+
+    # Vectorized computation, table like.
+    shape = (2, 2)
+    sr_td = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=2*numpy.ones((2, 2, len(lambda_nm))))
+    si_td = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    sr_rd = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 0.5))
+    si_rd = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    si_0 = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    m_expected = numpy.ones(shape)
+    m = pvfit_m.api.m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)
+    assert isinstance(m, numpy.ndarray)
+    numpy.testing.assert_equal(m.shape, shape)
+    numpy.testing.assert_almost_equal(m, m_expected)
+
+    # Scaling invariance.
+    shape = ()
+    sr_td_1 = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 2))
+    si_td = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    sr_rd = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 0.5))
+    si_rd = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    si_0 = pvfit_m.api.SpectralIrradiance(lambda_nm=lambda_nm, si_W_per_m2_nm=numpy.full_like(lambda_nm, 1))
+    # Scale sr_td_1 by 1/2.
+    sr_td_2 = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.full_like(lambda_nm, 1))
+    m_expected = numpy.ones(shape)
+    m_1 = pvfit_m.api.m(sr_td=sr_td_1, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)
+    m_2 = pvfit_m.api.m(sr_td=sr_td_2, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd, si_0=si_0)
+    numpy.testing.assert_equal(m_1, m_2)
 
 
-def test_convert_qe_to_sr():
+def test_qe_to_sr():
     """Test conversions from QE to SR."""
     lambda_nm = numpy.array([100, 200, 300])
     # Indifference to fraction vs. percent representation.
     qe = pvfit_m.api.QuantumEfficiency(lambda_nm=lambda_nm, qe=numpy.array([0, 0.5, 1.]))
     qe_percent = pvfit_m.api.QuantumEfficiency(lambda_nm=lambda_nm, qe=numpy.array([0, 50, 100]), is_percent=True)
-    assert pvfit_m.api.convert_qe_to_sr(qe=qe) == pvfit_m.api.convert_qe_to_sr(qe=qe_percent)
+    assert pvfit_m.api.qe_to_sr(qe=qe) == pvfit_m.api.qe_to_sr(qe=qe_percent)
     # Round trip identity function.
-    qe_fraction_round_trip = pvfit_m.api.convert_sr_to_qe(sr=pvfit_m.api.convert_qe_to_sr(qe=qe))
+    qe_fraction_round_trip = pvfit_m.api.sr_to_qe(sr=pvfit_m.api.qe_to_sr(qe=qe))
     numpy.testing.assert_equal(qe_fraction_round_trip.lambda_nm, qe.lambda_nm)
     numpy.testing.assert_almost_equal(qe_fraction_round_trip.qe, qe.qe)
-    qe_percent_round_trip = pvfit_m.api.convert_sr_to_qe(sr=pvfit_m.api.convert_qe_to_sr(qe=qe_percent))
+    qe_percent_round_trip = pvfit_m.api.sr_to_qe(sr=pvfit_m.api.qe_to_sr(qe=qe_percent))
     numpy.testing.assert_equal(qe_percent_round_trip.lambda_nm, qe_percent.lambda_nm)
     numpy.testing.assert_almost_equal(qe_percent_round_trip.qe, qe_percent.qe)
 
 
-def test_convert_sr_to_qe():
+def test_sr_to_qe():
     """Test conversions from SR to QE."""
     lambda_nm = numpy.array([100, 200, 300])
     sr = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, sr_A_per_W=numpy.array([0, 0.5, 1.]))
     # Round trip identity function.
-    sr_round_trip = pvfit_m.api.convert_qe_to_sr(qe=pvfit_m.api.convert_sr_to_qe(sr=sr))
+    sr_round_trip = pvfit_m.api.qe_to_sr(qe=pvfit_m.api.sr_to_qe(sr=sr))
     numpy.testing.assert_equal(sr_round_trip.lambda_nm, sr.lambda_nm)
     numpy.testing.assert_almost_equal(sr_round_trip.sr_A_per_W, sr.sr_A_per_W)
 
 
 def test_inner_product():
     """Test computation of inner product of two DataCurves."""
+    # Scalar-like computation, two constant lines.
     x1 = numpy.array([100, 200, 300])
     dc1 = pvfit_m.api.DataCurve(x=x1, y=numpy.ones_like(x1))
     x2 = numpy.array([50, 150, 250])
     dc2 = pvfit_m.api.DataCurve(x=x2, y=numpy.full_like(x2, 2))
     inner_product_expected = 2. * (250 - 100)
     inner_product = pvfit_m.api.inner_product(dc1=dc1, dc2=dc2)
-    assert isinstance(inner_product, float)
-    assert inner_product == inner_product_expected
+    assert isinstance(inner_product, numpy.ndarray)
+    numpy.testing.assert_equal(inner_product.shape, ())
+    numpy.testing.assert_equal(inner_product, inner_product_expected)
     # Commutativity.
-    assert inner_product == pvfit_m.api.inner_product(dc1=dc2, dc2=dc1)
+    numpy.testing.assert_equal(inner_product, pvfit_m.api.inner_product(dc1=dc2, dc2=dc1))
 
+    # Scalar-like computation, two non-constant lines.
     x1 = numpy.array([100, 200, 300])
     dc1 = pvfit_m.api.DataCurve(x=x1, y=numpy.array([0, 1, 2]))
     x2 = numpy.array([50, 150, 250, 350])
     dc2 = pvfit_m.api.DataCurve(x=x2, y=numpy.array([3, 2, 1, 0]))
     inner_product_expected = -(300**3 - 100**3) / 30000 + 45 / 2000 * (300**2 - 100**2) - 35 / 10 * (300 - 100)
     inner_product = pvfit_m.api.inner_product(dc1=dc1, dc2=dc2)
-    assert isinstance(inner_product, float)
+    assert isinstance(inner_product, numpy.ndarray)
+    numpy.testing.assert_equal(inner_product.shape, ())
     numpy.testing.assert_almost_equal(inner_product, inner_product_expected)
     # Commutativity.
-    assert inner_product == pvfit_m.api.inner_product(dc1=dc2, dc2=dc1)
+    numpy.testing.assert_equal(inner_product, pvfit_m.api.inner_product(dc1=dc2, dc2=dc1))
+
+    # Compatible vectorized computation, time-series like.
+    dc1 = pvfit_m.api.DataCurve(x=x1, y=numpy.array([[0, 1, 2],
+                                                     [0, 1, 2]]))
+    dc2 = pvfit_m.api.DataCurve(x=x2, y=numpy.array([[3, 2, 1, 0],
+                                                     [3, 2, 1, 0]]))
+    inner_product = pvfit_m.api.inner_product(dc1=dc1, dc2=dc2)
+    assert isinstance(inner_product, numpy.ndarray)
+    numpy.testing.assert_equal(inner_product.shape, (2,))
+    numpy.testing.assert_almost_equal(inner_product, inner_product_expected)
+    # Commutativity.
+    numpy.testing.assert_equal(inner_product, pvfit_m.api.inner_product(dc1=dc2, dc2=dc1))
+
+    # Compatible vectorized computation, table like.
+    dc1 = pvfit_m.api.DataCurve(x=x1, y=numpy.array([[[0, 1, 2],
+                                                      [0, 1, 2]],
+                                                     [[0, 1, 2],
+                                                      [0, 1, 2]]]))
+    dc2 = pvfit_m.api.DataCurve(x=x2, y=numpy.array([[[3, 2, 1, 0],
+                                                      [3, 2, 1, 0]],
+                                                     [[3, 2, 1, 0],
+                                                      [3, 2, 1, 0]]]))
+    inner_product = pvfit_m.api.inner_product(dc1=dc1, dc2=dc2)
+    assert isinstance(inner_product, numpy.ndarray)
+    numpy.testing.assert_equal(inner_product.shape, (2, 2))
+    numpy.testing.assert_almost_equal(inner_product, inner_product_expected)
+    # Commutativity.
+    numpy.testing.assert_equal(inner_product, pvfit_m.api.inner_product(dc1=dc2, dc2=dc1))
+
+    # Incompatible vectorized computation because of shape mismatch in multi-curves.
+    dc1 = pvfit_m.api.DataCurve(x=x1, y=numpy.array([[[0, 1, 2],
+                                                      [0, 1, 2]],
+                                                     [[0, 1, 2],
+                                                      [0, 1, 2]],
+                                                     [[0, 1, 2],
+                                                      [0, 1, 2]]]))
+    dc2 = pvfit_m.api.DataCurve(x=x2, y=numpy.array([[[3, 2, 1, 0],
+                                                      [3, 2, 1, 0]],
+                                                     [[3, 2, 1, 0],
+                                                      [3, 2, 1, 0]]]))
+    with pytest.raises(ValueError):
+        # Cannot broadcast in computation.
+        inner_product = pvfit_m.api.inner_product(dc1=dc1, dc2=dc2)
