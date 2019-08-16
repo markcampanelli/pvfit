@@ -56,9 +56,11 @@ source Python repo)
 
 ### Download and Install Package with Developer and Testing Dependencies
 
+Clone this git repo using your preferred method, and go to the repo's root directory.
+
 Install `pvfit-m` in editable (development) mode, including the `sphinx`, `pytest` packages, with `pip`—
 ```terminal
-pip install -e git+https://github.com/markcampanelli/pvfit-m#egg=pvfit-m[dev,test]
+pip install -e .[dev,test]
 ```
 NOTE: Documentation generation using `sphinx` is not yet implemented.
 
