@@ -1,3 +1,5 @@
+import warnings
+
 import numpy
 import scipy.interpolate
 
@@ -7,9 +9,10 @@ c_m_per_s = 299792458.0  # From scipy.constants.c
 h_J_s = 6.62607004e-34  # From scipy.constants.h
 
 
-class DataCurve:
-    """
-    Store data representing one/more curves in R^2 with common, monotonic increasing domain values.
+class DataFunction:
+    r"""
+    Store data representing one/more functions in :math:`\mathbb{R}^2`
+    with common, monotonic increasing domain values.
 
     TODO Describe interface.
     """
@@ -30,12 +33,13 @@ class DataCurve:
         self.y = y[..., x_argsort]
 
     def __eq__(self, obj):
-        return isinstance(obj, DataCurve) and numpy.array_equal(self.x, obj.x) and numpy.array_equal(self.y, obj.y)
+        return isinstance(obj, DataFunction) and numpy.array_equal(self.x, obj.x) and numpy.array_equal(self.y, obj.y)
 
 
-class DataCurvePositiveXNonnegativeY(DataCurve):
-    """
-    Store data representing a curve in R^2 with 0<x and 0<=y.
+class DataFunctionPositiveXNonnegativeY(DataFunction):
+    r"""
+    Store data representing a function in :math:`\mathbb{R}^2` with
+    :math:`0 < x` and :math:`0 \leq y`.
 
     TODO Describe interface.
     """
@@ -47,7 +51,7 @@ class DataCurvePositiveXNonnegativeY(DataCurve):
             raise ValueError("y values must all be non-negative.")
 
 
-class QuantumEfficiency(DataCurvePositiveXNonnegativeY):
+class QuantumEfficiency(DataFunctionPositiveXNonnegativeY):
     """
     Store data representing a quantum efficiency (QE) curve.
 
@@ -59,12 +63,12 @@ class QuantumEfficiency(DataCurvePositiveXNonnegativeY):
         self.is_percent = is_percent
 
     @property
-    def lambda_nm(self):
+    def lambda_nm(self) -> numpy.ndarray:
         """Return wavelengths."""
         return self.x
 
     @property
-    def qe(self):
+    def qe(self) -> numpy.ndarray:
         """Return QE as fraction."""
         if self.is_percent:
             return self.y/100
@@ -72,15 +76,26 @@ class QuantumEfficiency(DataCurvePositiveXNonnegativeY):
             return self.y
 
     @property
-    def qe_percent(self):
+    def qe_percent(self) -> numpy.ndarray:
         """Return QE as percent."""
         if self.is_percent:
             return self.y
         else:
             return 100*self.y
 
+    @property
+    def sr_A_per_W(self) -> "SpectralResponsivity":
+        """
+        Convert quantum efficiency (QE) curve to spectral responsivity
+        (SR) curve.
 
-class SpectralIrradiance(DataCurvePositiveXNonnegativeY):
+        TODO Describe interface.
+        """
+        return SpectralResponsivity(
+            lambda_nm=self.lambda_nm, sr_A_per_W=self.qe * self.lambda_nm * 1.e-9 * q_C / (h_J_s * c_m_per_s))
+
+
+class SpectralIrradiance(DataFunctionPositiveXNonnegativeY):
     """
     Store data representing a spectral irradiance curve.
 
@@ -90,15 +105,15 @@ class SpectralIrradiance(DataCurvePositiveXNonnegativeY):
         super().__init__(x=lambda_nm, y=si_W_per_m2_nm)
 
     @property
-    def lambda_nm(self):
+    def lambda_nm(self) -> numpy.ndarray:
         return self.x
 
     @property
-    def si_W_per_m2_nm(self):
+    def si_W_per_m2_nm(self) -> numpy.ndarray:
         return self.y
 
 
-class SpectralResponsivity(DataCurvePositiveXNonnegativeY):
+class SpectralResponsivity(DataFunctionPositiveXNonnegativeY):
     """
     Store data representing a spectral responsivity (SR) curve.
 
@@ -108,30 +123,72 @@ class SpectralResponsivity(DataCurvePositiveXNonnegativeY):
         super().__init__(x=lambda_nm, y=sr_A_per_W)
 
     @property
-    def lambda_nm(self):
+    def lambda_nm(self) -> numpy.ndarray:
         return self.x
 
     @property
-    def sr_A_per_W(self):
+    def sr_A_per_W(self) -> numpy.ndarray:
         return self.y
 
+    @property
+    def qe(self) -> "QuantumEfficiency":
+        """
+        Convert spectral responsivity (SR) curve to quantum efficiency
+        (QE) curve.
 
-def inner_product(*, dc1: DataCurve, dc2: DataCurve) -> numpy.ndarray:
-    """
-    Compute inner product of two curves as an integral over the common interval of thier domain of defintion.
+        TODO Describe interface.
+        """
+        return QuantumEfficiency(
+            lambda_nm=self.lambda_nm, qe=self.sr_A_per_W * h_J_s * c_m_per_s / (self.lambda_nm * 1.e-9 * q_C))
 
-    TODO Describe interface.
+
+def inner_product(*, df1: DataFunction, df2: DataFunction) -> numpy.ndarray:
+    r"""
+    Compute inner product of two data functions.
+
+    The inner product of two data functions is the integral of the product
+    of the two functions over their common domain of defintion. Because
+    the data function model is piecewise linear, an algebraic solution
+    exists and is used for the computation.  See the :class:`DataFunction`
+    class for details on the model that informs the computation.
+
+    Parameters
+    ----------
+    df1
+        First data function.
+    df2
+        Second data function.
+
+    Returns
+    -------
+    inner_product : np.ndarray
+        Integral of the product of the two data functions over their
+        common domain.
+
+    Warns
+    ------
+    UserWarning
+        If `inner_product` is non-finite or is zero due to no domain overlap.
+
+    Notes
+    -----
+    The inner product is computed as--
+
+    .. math:: \int_{x=x_1}^{x_2} f_1(x) \, f_{2}(x) \, \mathrm{d}x,
+
+    where the interval of integration :math:`[x_1, x_2]` is the common
+    domain of the two data functions. If the domains do not overlap, then
+    zero is returned.
     """
-    # TODO Warn if computation appears innacurate due to missing non-zero data at end(s) of common interval,
-    #  which should include when there is no overlap of intervals or only one point of overlap.
-    x_min = numpy.maximum(dc1.x[0], dc2.x[0])
-    x_max = numpy.minimum(dc1.x[-1], dc2.x[-1])
+    x_min = numpy.maximum(df1.x[0], df2.x[0])
+    x_max = numpy.minimum(df1.x[-1], df2.x[-1])
     if x_max <= x_min:
-        raise ValueError("DataCurve domains do not overlap sufficiently.")
-    x_union = numpy.union1d(dc1.x, dc2.x)
+        warnings.warn("DataFunction domains do not overlap.")
+        return numpy.zeros(numpy.broadcast(df1.y, df2.y).shape)
+    x_union = numpy.union1d(df1.x, df2.x)
     x_union = x_union[numpy.logical_and(x_min <= x_union, x_union <= x_max)]
-    y1 = scipy.interpolate.interp1d(dc1.x, dc1.y, copy=False, assume_sorted=True)(x_union)
-    y2 = scipy.interpolate.interp1d(dc2.x, dc2.y, copy=False, assume_sorted=True)(x_union)
+    y1 = scipy.interpolate.interp1d(df1.x, df1.y, copy=False, assume_sorted=True)(x_union)
+    y2 = scipy.interpolate.interp1d(df2.x, df2.y, copy=False, assume_sorted=True)(x_union)
 
     slopes1 = (y1[..., 1:] - y1[..., :-1]) / (x_union[1:] - x_union[:-1])
     intercepts1 = y1[..., :-1] - slopes1 * x_union[:-1]
@@ -144,37 +201,80 @@ def inner_product(*, dc1: DataCurve, dc2: DataCurve) -> numpy.ndarray:
     x_union_squared = x_union * x_union
     x_union_cubed = x_union_squared * x_union
 
-    return numpy.array(numpy.sum(C * (x_union_cubed[1:] - x_union_cubed[:-1]) +
-                                 B * (x_union_squared[1:] - x_union_squared[:-1]) +
-                                 A * (x_union[1:] - x_union[:-1]), axis=-1))
+    inner_product = numpy.array(numpy.sum(C * (x_union_cubed[1:] - x_union_cubed[:-1]) +
+                                          B * (x_union_squared[1:] - x_union_squared[:-1]) +
+                                          A * (x_union[1:] - x_union[:-1]), axis=-1))
+    if not numpy.all(numpy.isfinite(inner_product)):
+        warnings.warn("Non-finite inner product detected.")
+
+    return inner_product
 
 
 def m(*, sr_td: SpectralResponsivity, si_td: SpectralIrradiance, sr_rd: SpectralResponsivity,
       si_rd: SpectralIrradiance, si_0: SpectralIrradiance) -> numpy.ndarray:
+    r"""
+    Compute spectral mismatch correction factor (:math:`M`).
+
+    The spectral mismatch is between a photovoltaic (PV) test device (TD)
+    and a PV reference device (RD), each illuminated by a (possibly
+    different) spectral irradiance. The correction is to a particular
+    reference spectrum. The spectral responsivities are each at a
+    particular (non-explicit) temperature, which may not be the reference
+    condition. M should be strictly positive, but could evalute to be
+    zero, infinite, or NaN depending on possible zero values of the
+    component integrals. See the :class:`SpectralIrradiance` and
+    :class:`SpectralResponsivity` classes for details on the data function
+    models that inform the computation, which includes vectorized
+    computations.
+
+    Parameters
+    ----------
+    sr_td
+        Spectral responsivity of TD [A/W].
+    si_td
+        Spectral irradiance illuminating TD [W/m2/nm].
+    sr_rd
+        Spectral responsivity of RD [A/W].
+    si_rd
+        Spectral irradiance illuminating RD [W/m2/nm].
+    si_0
+        Spectral irradiance at reference conditions [W/m2/nm].
+
+    Returns
+    -------
+    M : np.ndarray
+        Spectral mismatch correction factor (:math:`M`).
+
+    Warns
+    ------
+    UserWarning
+        If :math:`M` is computed as zero, infinite, or NaN.
+
+    Notes
+    -----
+    M is computed as--
+
+    .. math:: M = \frac{
+        \int_{\lambda=0}^\infty S_\mathrm{TD}(\lambda) \,
+        E_\mathrm{TD}(\lambda) \, \mathrm{d}\lambda \,
+        \int_{\lambda=0}^\infty S_\mathrm{RD}(\lambda) \,
+        E_\mathrm{0}(\lambda) \, \mathrm{d}\lambda}
+        {\int_{\lambda=0}^\infty S_\mathrm{TD}(\lambda) \,
+        E_\mathrm{0}(\lambda) \, \mathrm{d}\lambda \,
+        \int_{\lambda=0}^\infty S_\mathrm{RD}(\lambda) \,
+        E_\mathrm{RD}(\lambda) \, \mathrm{d}\lambda}.
+
+    See Also
+    --------
+    inner_product : The function used to compute the integrals of the
+        products of two data functions.
     """
-    Compute spectral mismatch correction factor (M) between a reference device (RD) and test device (TD).
+    # TODO Warn if computation appears innacurate due to missing non-zero data at end(s) of common domain intervals.
+    M = numpy.array((inner_product(df1=sr_td, df2=si_td) * inner_product(df1=sr_rd, df2=si_0)) /
+                    (inner_product(df1=sr_td, df2=si_0) * inner_product(df1=sr_rd, df2=si_rd)))
+    if not numpy.all(numpy.isfinite(M)):
+        warnings.warn("Non-finite M detected.")
+    if not numpy.all(M != 0):
+        warnings.warn("Zero M detected.")
 
-    TODO Describe interface.
-    """
-    return numpy.array((inner_product(dc1=sr_td, dc2=si_td) * inner_product(dc1=sr_rd, dc2=si_0)) /
-                       (inner_product(dc1=sr_td, dc2=si_0) * inner_product(dc1=sr_rd, dc2=si_rd)))
-
-
-def qe_to_sr(*, qe: QuantumEfficiency) -> SpectralResponsivity:
-    """
-    Convert quantum efficiency (QE) curve to spectral responsivity (SR) curve.
-
-    TODO Describe interface.
-    """
-    return SpectralResponsivity(
-        lambda_nm=qe.lambda_nm, sr_A_per_W=qe.qe * qe.lambda_nm * 1.e-9 * q_C / (h_J_s * c_m_per_s))
-
-
-def sr_to_qe(*, sr: SpectralResponsivity) -> QuantumEfficiency:
-    """
-    Convert spectral responsivity (SR) curve to curve quantum efficiency (QE).
-
-    TODO Describe interface.
-    """
-    return \
-        QuantumEfficiency(lambda_nm=sr.lambda_nm, qe=sr.sr_A_per_W * h_J_s * c_m_per_s / (sr.lambda_nm * 1.e-9 * q_C))
+    return M

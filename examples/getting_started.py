@@ -1,6 +1,4 @@
 # Python 3.6-7
-import numpy
-
 # This imports `pvfit_m.api` and `pvfit_m.data`.
 import pvfit_m
 
@@ -28,8 +26,9 @@ sr_A_per_W = pvfit_m.data.sr_A_per_W_td_NIST
 sr = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm,
                                       sr_A_per_W=sr_A_per_W)
 # This gets spectral responsivity [A/W] at each wavelength [nm] from the
-# underlying numpy.ndarray and show them stacked together as rows.
-print(f"sr = {numpy.vstack((sr.lambda_nm, sr.sr_A_per_W))}")
+# underlying numpy.ndarray and shows the domain and range.
+print(f"sr.lambda_nm = {sr.lambda_nm}")
+print(f"sr.sr_A_per_W = {sr.sr_A_per_W}")
 
 # Instead of re-creating all the necessary data objects for computing M,
 # we use ones already made for demonstration purposes.

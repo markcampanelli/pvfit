@@ -107,7 +107,8 @@ dependencies or version ranges should be appropriately recorded in [setup.py](se
 ### Coding Requirements and Style
 
 - [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout
-- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120 character line limit for source code files
-- An 80 character line limit for example code in the [examples](examples) directory
+- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120-character line limit for source code files
+- A 75-character line limit for all docstrings, following the [numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html)
+- An 80-character line limit for example code in the [examples](examples) directory
 - There is no character line limit for data in Python code, such as in [data.py](pvfit_m/data.py).
-- Unit testing is a must (coverage in CI to be added)
+- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory (coverage in CI to be added)
