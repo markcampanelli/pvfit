@@ -2,6 +2,8 @@
 
 Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications.
 
+[![Documentation Status](https://readthedocs.org/projects/pvfit-m/badge/?version=latest)](https://pvfit-m.readthedocs.io/en/latest/?badge=latest)
+
 ## Up and Running in 5 Minutes
 
 This package requires [Python 3.6+](https://www.python.org/), [numpy](https://www.numpy.org/), and
