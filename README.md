@@ -22,7 +22,7 @@ NOTE: You may want to install your own optimized versions of [`numpy`](https://w
 
 Verify your installation—
 ```terminal
-python -c "import pvfit_m; print(pvfit_m.__version__)"
+python -c "from pkg_resources import get_distribution; import pvfit_m; print(get_distribution('pvfit-m').version)"
 ```
 which should print something similar to—
 ```terminal
@@ -81,7 +81,7 @@ NOTE: Documentation generation using `sphinx` is not yet implemented.
 
 Verify your installation—
 ```terminal
-python -c "import pvfit_m; print(pvfit_m.__version__)"
+python -c "from pkg_resources import get_distribution; import pvfit_m; print(get_distribution('pvfit-m').version)"
 ```
 which should print something similar to—
 ```terminal
