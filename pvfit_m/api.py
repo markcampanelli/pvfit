@@ -1,12 +1,13 @@
 import warnings
 
 import numpy
+import scipy.constants
 import scipy.interpolate
 
-# Constants with explicit units.
-q_C = 1.6021766208e-19  # From scipy.constants.e
-c_m_per_s = 299792458.0  # From scipy.constants.c
-h_J_s = 6.62607004e-34  # From scipy.constants.h
+# Constants from scipy with explicit units.
+q_C = scipy.constants.e
+c_m_per_s = scipy.constants.c
+h_J_s = scipy.constants.h
 
 
 class DataFunction:

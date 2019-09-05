@@ -8,7 +8,7 @@ import pvfit_m
 
 
 def test_constants():
-    """Know when the constants change."""
+    """Know when constants change."""
     assert pvfit_m.api.q_C == 1.6021766208e-19
     assert pvfit_m.api.c_m_per_s == 299792458.0
     assert pvfit_m.api.h_J_s == 6.62607004e-34
@@ -83,9 +83,9 @@ def test_inner_product():
 
     # Compatible vectorized computation, time-series like.
     df1 = pvfit_m.api.DataFunction(x=x1, y=numpy.array([[0, 1, 2],
-                                                     [0, 1, 2]]))
+                                                        [0, 1, 2]]))
     df2 = pvfit_m.api.DataFunction(x=x2, y=numpy.array([[3, 2, 1, 0],
-                                                     [3, 2, 1, 0]]))
+                                                        [3, 2, 1, 0]]))
     inner_product = pvfit_m.api.inner_product(df1=df1, df2=df2)
     assert isinstance(inner_product, numpy.ndarray)
     numpy.testing.assert_equal(inner_product.shape, (2,))
@@ -95,13 +95,13 @@ def test_inner_product():
 
     # Compatible vectorized computation, table like.
     df1 = pvfit_m.api.DataFunction(x=x1, y=numpy.array([[[0, 1, 2],
-                                                      [0, 1, 2]],
-                                                     [[0, 1, 2],
-                                                      [0, 1, 2]]]))
+                                                        [0, 1, 2]],
+                                                       [[0, 1, 2],
+                                                        [0, 1, 2]]]))
     df2 = pvfit_m.api.DataFunction(x=x2, y=numpy.array([[[3, 2, 1, 0],
-                                                      [3, 2, 1, 0]],
-                                                     [[3, 2, 1, 0],
-                                                      [3, 2, 1, 0]]]))
+                                                        [3, 2, 1, 0]],
+                                                       [[3, 2, 1, 0],
+                                                        [3, 2, 1, 0]]]))
     inner_product = pvfit_m.api.inner_product(df1=df1, df2=df2)
     assert isinstance(inner_product, numpy.ndarray)
     numpy.testing.assert_equal(inner_product.shape, (2, 2))
@@ -111,15 +111,15 @@ def test_inner_product():
 
     # Incompatible vectorized computation because of shape mismatch in multi-curves.
     df1 = pvfit_m.api.DataFunction(x=x1, y=numpy.array([[[0, 1, 2],
-                                                      [0, 1, 2]],
-                                                     [[0, 1, 2],
-                                                      [0, 1, 2]],
-                                                     [[0, 1, 2],
-                                                      [0, 1, 2]]]))
+                                                        [0, 1, 2]],
+                                                       [[0, 1, 2],
+                                                        [0, 1, 2]],
+                                                       [[0, 1, 2],
+                                                        [0, 1, 2]]]))
     df2 = pvfit_m.api.DataFunction(x=x2, y=numpy.array([[[3, 2, 1, 0],
-                                                      [3, 2, 1, 0]],
-                                                     [[3, 2, 1, 0],
-                                                      [3, 2, 1, 0]]]))
+                                                        [3, 2, 1, 0]],
+                                                       [[3, 2, 1, 0],
+                                                        [3, 2, 1, 0]]]))
     with pytest.raises(ValueError):
         # Cannot broadcast in computation.
         inner_product = pvfit_m.api.inner_product(df1=df1, df2=df2)
