@@ -24,9 +24,14 @@ steps:
 - script: |
     python -m pip install --upgrade pip setuptools
     pip install .
-  displayName: 'Install dependencies'
+  displayName: 'Install package'
 
 - script: |
-    pip install pytest pytest-azurepipelines
-    pytest
-  displayName: 'pytest'
+    pip install pytest pytest-azurepipelines pytest-cov
+    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=pvfit_m --cov-report=xml --cov-report=html
+  displayName: 'Test with coverage'
+
+# - script: |
+#     python -m pip install flake8
+#     flake8 .
+#   displayName: 'Run lint tests'

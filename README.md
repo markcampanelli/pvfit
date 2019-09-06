@@ -2,6 +2,7 @@
 
 Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications.
 
+[![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit-m?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/pvfit-m/badge/?version=latest)](https://pvfit-m.readthedocs.io/en/latest/?badge=latest)
 
 ## Up and Running in 5 Minutes
@@ -87,12 +88,13 @@ which should print something similar to—
 0.1.dev9+gadf7f38.d20190812
 ```
 
-### Run Tests Locally
+### Run Tests with Coverage Locally
 
 From the root directory—
 ```terminal
-pytest
+pytest --doctest-modules --cov=pvfit_m --cov-report=html
 ```
+and the root of the generated coverage report is at `htmlcov/index.html`. 
 
 ### Build Documentation Locally
 

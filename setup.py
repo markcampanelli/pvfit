@@ -155,7 +155,7 @@ setup(
     # projects.
     extras_require={  # Optional
         'dev': ['check-manifest', 'flake8', 'sphinx', 'sphinx_rtd_theme'],
-        'test': ['pytest'],
+        'test': ['pytest', 'pytest-cov'],
     },
 
     # If there are data files included in your packages that need to be
