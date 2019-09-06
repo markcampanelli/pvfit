@@ -104,7 +104,7 @@ then—
 ```terminal
 build html
 ```
-and the documentation root is at `docs/_build/html/pvfit_m.html`. 
+and the root of the generated documentation is at `docs/_build/html/pvfit_m.html`. 
 
 ### Dependencies
 

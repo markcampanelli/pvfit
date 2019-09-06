@@ -6,6 +6,8 @@
 Welcome to pvfit-m's documentation!
 ===================================
 
+The code is pre-release, and so the API can (and will) change without warning!
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
