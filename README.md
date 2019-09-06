@@ -3,6 +3,7 @@
 Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications.
 
 [![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit-m?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
+[![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/1.svg?logo=azuredevops)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/pvfit-m/badge/?version=latest)](https://pvfit-m.readthedocs.io/en/latest/?badge=latest)
 
 ## Up and Running in 5 Minutes
