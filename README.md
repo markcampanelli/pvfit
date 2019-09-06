@@ -50,7 +50,7 @@ M = 0.9982571553509605
 
 ## How M Is Computed
 
-_M_ is computed with the function, [`pvfit_m.api.m()`](pvfit_m/api.py), using a piecewise linear interpolation
+_M_ is computed with the function, [`pvfit_m.api.M()`](pvfit_m/api.py), using a piecewise linear interpolation
 between data points for each curve to fully define each function on its finite interval domain of definition in the
 first quadrant. The integration of the product of two piecewise linear functions is done using
 [`pvfit_m.api.inner_product()`](pvfit_m/api.py) over the common interval domain of definition of the two curves. This is effeciently accomplished by a closed-form summation formula involving the piecewise-quadratic anti-derivative on each sub-interval of the combined partition of the common domain interval. It is currently assumed that one/both of the
@@ -77,7 +77,6 @@ Install `pvfit-m` in editable (development) mode, including the `sphinx`, `pytes
 ```terminal
 pip install -e .[dev,test]
 ```
-NOTE: Documentation generation using `sphinx` is not yet implemented.
 
 Verify your installation—
 ```terminal
@@ -88,12 +87,24 @@ which should print something similar to—
 0.1.dev9+gadf7f38.d20190812
 ```
 
-### Run Tests
+### Run Tests Locally
 
 From the root directory—
 ```terminal
 pytest
 ```
+
+### Build Documentation Locally
+
+From the `docs` directory—
+```terminal
+sphinx-apidoc -f -o . ../pvfit_m ../*_test.py
+```
+then—
+```terminal
+build html
+```
+and the documentation root is at `docs/_build/html/pvfit_m.html`. 
 
 ### Dependencies
 

@@ -1,81 +1,84 @@
 # Python 3.6-7
+from pkg_resources import get_distribution
+
 # This imports `pvfit_m.api` and `pvfit_m.data`.
 import pvfit_m
 
-print(f"pvfit_m version {pvfit_m.__version__}")
+print(f"pvfit_m version {get_distribution('pvfit-m').version}")
 
 """
 pvfit_m has several data classes that wrap underlying numpy.ndarray data
-represting the various curves appearing in the four integrals in the
-formula for M.
+represting the various curves appearing in the four integrals in the formula
+for M. See, for example, equation (5) in https://doi.org/10.1002/ese3.190
 
-See, for example, equation (5) in
-https://onlinelibrary.wiley.com/doi/full/10.1002/ese3.190
+pvfit_m.data has already created several useful example data objects. For
+example, assuming one has loaded wavelength and spectral responsivity data as
+1D numpy arrays for the NIST test device (a x-Si PV cell)...
 """
-
-"""
-pvfit_m.data has already created several useful example data objects.
-For example, assuming one has loaded wavelength and spectral responsivity
-data as 1D numpy arrays for the NIST test device (a x-Si PV cell)...
-"""
-# lambda_nm = numpy.array([...])
-lambda_nm = pvfit_m.data.lambda_nm_td_NIST
-# sr_A_per_W = numpy.array([...])
-sr_A_per_W = pvfit_m.data.sr_A_per_W_td_NIST
-# ...one then creates a SpectralResponsivity object—
-sr = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm,
-                                      sr_A_per_W=sr_A_per_W)
-# This gets spectral responsivity [A/W] at each wavelength [nm] from the
-# underlying numpy.ndarray and shows the domain and range.
-print(f"sr.lambda_nm = {sr.lambda_nm}")
-print(f"sr.sr_A_per_W = {sr.sr_A_per_W}")
-
-# Instead of re-creating all the necessary data objects for computing M,
-# we use ones already made for demonstration purposes.
+lambda_nm = pvfit_m.data.lambda_nm_TD_NIST  # lambda_nm = numpy.array([...])
+S_A_per_W = pvfit_m.data.S_A_per_W_TD_NIST  # S_A_per_W = numpy.array([...])
 
 """
-Load spectral responsivity of test device (here, a Si PV cell at 25degC) as a
-SpectralResponsivity object from wavelength [nm] and spectral responsivity
-[A/W] data (each an underlying numpy.ndarray).
+...one then creates a SpectralResponsivity object—
 """
-sr_td = pvfit_m.data.sr_td_NIST
+S = pvfit_m.api.SpectralResponsivity(lambda_nm=lambda_nm, S_A_per_W=S_A_per_W)
+"""
+This gets spectral responsivity [A/W] at each wavelength [nm] from the
+underlying numpy.ndarray and shows the domain and range—
+"""
+print(f"S.lambda_nm = {S.lambda_nm}")
+print(f"S.S_A_per_W = {S.S_A_per_W}")
 
 """
-Load spectral irradiance illuminating test device (here, a Xenon solar
-simulator) as a SpectralIrradiance object containing wavelength [nm] and
-spectral irradiance [W/m2/nm] data (each an underlying numpy.ndarray).
+Instead of re-creating all the necessary data objects for computing M, we use
+ones already made for demonstration purposes.
+
+Load spectral responsivity of test device at operating conditions and at
+reference conditions (here, a Si PV cell at 25degC) as a SpectralResponsivity
+object containing wavelength [nm] and spectral responsivity [A/W] data
+(each an underlying numpy.ndarray).
 """
-si_td = pvfit_m.data.si_sim_NIST
+S_TD_OC = pvfit_m.data.S_TD_NIST
+S_TD_RC = pvfit_m.data.S_TD_NIST
 
 """
-Load spectral responsivity of reference device (here, a Si PV cell at at
-25degC) as a SpectralResponsivity object containing wavelength [nm] and
-spectral responsivity [A/W] data (each an underlying numpy.ndarray).
+Load spectral irradiance illuminating test device at operating conditions
+(here, a Xenon solar simulator) as a SpectralIrradiance object containing
+wavelength [nm] and spectral irradiance [W/m2/nm] data (each an underlying
+numpy.ndarray).
 """
-sr_rd = pvfit_m.data.sr_rd_NIST
+E_TD_OC = pvfit_m.data.E_sim_NIST
 
 """
-Load spectral irradiance illuminating the reference device (here, a Xenon solar
-simulator) as a SpectralIrradiance object containing wavelength [nm] and
-spectral irradiance [W/m2/nm] data (each an underlying numpy.ndarray).
+Load spectral responsivity of reference device at operating conditions and at
+reference conditions (here, a Si PV cell at at 25degC) as a
+SpectralResponsivity object containing wavelength [nm] and spectral
+responsivity [A/W] data (each an underlying numpy.ndarray).
 """
-si_rd = pvfit_m.data.si_sim_NIST
-
-
-"""
-Load reference spectral irradiance (here, ASTM G173 Global Tilt) as a
-SpectralIrradiance object containing wavelength [nm] and spectral irradiance
-[W/m2/nm] data (each an underlying numpy.ndarray).
-"""
-si_0 = pvfit_m.data.si_G173_global_tilt
+S_RD_OC = pvfit_m.data.S_RD_NIST
+S_RD_RC = pvfit_m.data.S_RD_NIST
 
 """
-Compute spectral mismatch correction factor M.
-This assumes a constant scaling between the spectral responsivity and
-spectral response of each device. These two scalings are assumed to cancel
-out between the numerator and denominator in the formula for M. Likewise,
-the spectral irradiance curves need only be relative (not absolute) curves.
+Load spectral irradiance illuminating reference device at operating conditions
+(here, a Xenon solar simulator) as a SpectralIrradiance object containing
+wavelength [nm] and spectral irradiance [W/m2/nm] data (each an underlying
+numpy.ndarray).
 """
-m = pvfit_m.api.m(sr_td=sr_td, si_td=si_td, sr_rd=sr_rd, si_rd=si_rd,
-                  si_0=si_0)
-print('M = {}'.format(m))
+E_RD_OC = pvfit_m.data.E_sim_NIST
+
+"""
+Load spectral irradiance illuminating both test device and reference device at
+reference conditions (here, ASTM G173 Global Tilt) as a SpectralIrradiance
+object containing wavelength [nm] and spectral irradiance [W/m2/nm] data (each
+an underlying numpy.ndarray).
+"""
+E_TD_RC = pvfit_m.data.E_G173_global_tilt
+E_RD_RC = pvfit_m.data.E_G173_global_tilt
+
+"""
+Compute spectral mismatch correction factor M. See the function docstring for
+details.
+"""
+M = pvfit_m.api.M(S_TD_OC=S_TD_OC, E_TD_OC=E_TD_OC, S_TD_RC=S_TD_RC, E_TD_RC=E_TD_RC,
+                  S_RD_OC=S_RD_OC, E_RD_OC=E_RD_OC, S_RD_RC=S_RD_RC, E_RD_RC=E_RD_RC)
+print('M = {}'.format(M))
