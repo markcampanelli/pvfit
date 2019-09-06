@@ -365,22 +365,21 @@ def test_M():
     with pytest.warns(Warning) as record:
         M = pvfit_m.api.M(S_TD_OC=S_TD, E_TD_OC=E_TD, S_TD_RC=S_TD, E_TD_RC=E_RC, S_RD_OC=S_RD, E_RD_OC=E_RD,
                           S_RD_RC=S_RD, E_RD_RC=E_RC)
+    assert record[0].message.args[0] == "overflow encountered in multiply"
+    assert record[1].message.args[0] == "Non-finite inner product detected."
+    assert record[2].message.args[0] == "overflow encountered in multiply"
+    assert record[3].message.args[0] == "Non-finite inner product detected."
+    assert record[4].message.args[0] == "invalid value encountered in double_scalars"
+    assert record[5].message.args[0] == "Non-finite M detected."
     if os.name != 'nt':
-        # Not Windows
-        assert len(record) == 7
-        assert record[0].message.args[0] == "overflow encountered in multiply"
-        assert record[1].message.args[0] == "Non-finite inner product detected."
-        assert record[2].message.args[0] == "overflow encountered in multiply"
-        assert record[3].message.args[0] == "Non-finite inner product detected."
-        assert record[4].message.args[0] == "invalid value encountered in double_scalars"
-        assert record[5].message.args[0] == "Non-finite M detected."
+        # Not running on Windows.
         assert record[6].message.args[0] == "Non-positive M detected."
-        assert isinstance(M, numpy.ndarray)
-        numpy.testing.assert_equal(M.shape, shape)
-        numpy.testing.assert_almost_equal(M, numpy.nan)
+        assert len(record) == 7
     else:
         # An extra warning on Windows!
-        for rec in record:
-            print(rec.message.args[0])
-        # Should fail.
-        assert len(record) == 7
+        assert record[6].message.args[0] == "invalid value encountered in greater"
+        assert record[7].message.args[0] == "Non-positive M detected."
+        assert len(record) == 8
+    assert isinstance(M, numpy.ndarray)
+    numpy.testing.assert_equal(M.shape, shape)
+    numpy.testing.assert_almost_equal(M, numpy.nan)
