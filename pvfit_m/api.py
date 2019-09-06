@@ -28,9 +28,10 @@ class DataFunction:
         x, x_argsort = numpy.unique(x, return_index=True)
         if x.size != x_size:
             raise ValueError("x values must be unique.")
-        self.x = x[x_argsort]
+        if y.shape[-1] != x_size:
+            raise ValueError("last dimension of y must equal size of x.")
+        self.x = x
         y = numpy.asarray_chkfinite(y, dtype=float)
-        # This will raise if x and y are not broadcast compatible.
         self.y = y[..., x_argsort]
 
     def __eq__(self, obj):
@@ -185,7 +186,7 @@ def inner_product(*, f1: DataFunction, f2: DataFunction) -> numpy.ndarray:
     x_max = numpy.minimum(f1.x[-1], f2.x[-1])
     if x_max <= x_min:
         warnings.warn("DataFunction domains do not overlap.")
-        return numpy.zeros(numpy.broadcast(f1.y, f2.y).shape)
+        return numpy.zeros(numpy.broadcast(f1.y, f2.y).shape[:-1])
     x_union = numpy.union1d(f1.x, f2.x)
     x_union = x_union[numpy.logical_and(x_min <= x_union, x_union <= x_max)]
     y1 = scipy.interpolate.interp1d(f1.x, f1.y, copy=False, assume_sorted=True)(x_union)
