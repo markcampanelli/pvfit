@@ -9,7 +9,7 @@ Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV
 ## Up and Running in 5 Minutes
 
 This package requires [Python 3.6+](https://www.python.org/), [numpy](https://www.numpy.org/), and
-[scipy](https://www.scipy.org/).
+[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
 
 ### Download and Install Package (non-editable mode)
 
