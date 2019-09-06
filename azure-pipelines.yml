@@ -39,56 +39,56 @@ jobs:
   #     flake8 .
   #   displayName: 'Run lint tests'
 
-  - job: Windows
-    timeoutInMinutes: 5
-    pool:
-      vmImage: 'windows-latest'
-    strategy:
-      matrix:
-        Python36:
-          python.version: '3.6'
-        Python37:
-          python.version: '3.7'
+- job: Windows
+  timeoutInMinutes: 5
+  pool:
+    vmImage: 'windows-latest'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
 
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(python.version)'
-      displayName: 'Use Python $(python.version)'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
 
-    - script: |
-        python -m pip install --upgrade pip setuptools
-        pip install .
-      displayName: 'Install package'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install .
+    displayName: 'Install package'
 
-    - script: |
-        pip install pytest pytest-azurepipelines
-        pytest
-      displayName: 'Test'
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'Test'
 
-  - job: macOS
-    timeoutInMinutes: 5
-    pool:
-      vmImage: 'macOS-latest'
-    strategy:
-      matrix:
-        Python36:
-          python.version: '3.6'
-        Python37:
-          python.version: '3.7'
+- job: macOS
+  timeoutInMinutes: 5
+  pool:
+    vmImage: 'macOS-latest'
+  strategy:
+    matrix:
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
 
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '$(python.version)'
-      displayName: 'Use Python $(python.version)'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
 
-    - script: |
-        python -m pip install --upgrade pip setuptools
-        pip install .
-      displayName: 'Install package'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install .
+    displayName: 'Install package'
 
-    - script: |
-        pip install pytest pytest-azurepipelines
-        pytest
-      displayName: 'Test'
+  - script: |
+      pip install pytest pytest-azurepipelines
+      pytest
+    displayName: 'Test'
