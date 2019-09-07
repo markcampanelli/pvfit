@@ -1,5 +1,5 @@
 **NOTE:** The `pvfit-m` repo now redirects here, with its contents in
-[this subpackage](pvfit/measurement/spectral_correction/README.md).
+[this subpackage](pvfit/measurement/spectral_correction).
 
 # pvfit
 
@@ -75,7 +75,7 @@ which should print something similar to—
 
 ### Run Tests with Coverage Locally
 
-From the [root](.) directory—
+From the repo's root directory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
