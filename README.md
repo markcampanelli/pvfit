@@ -1,9 +1,12 @@
-**IMPORTANT:** The `pvfit-m` repo now redirects here. Its contents are found in
+**NOTE:** The `pvfit-m` repo now redirects here, with its contents in
 [this subpackage](pvfit/measurement/spectral_correction/README.md).
 
 # pvfit
 
-PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling
+**PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling**
+
+**IMPORTANT:** This code is pre-release, and so the code organiztion and Application Programming Interface (API) should
+be expected to change without warning.
 
 [![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/1.svg?logo=azuredevops)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
