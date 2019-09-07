@@ -1,7 +1,7 @@
-pvfit_m
-=======
+pvfit
+=====
 
 .. toctree::
    :maxdepth: 4
 
-   pvfit_m
+   pvfit

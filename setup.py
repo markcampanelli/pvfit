@@ -1,4 +1,4 @@
-"""A setuptools based setup module for pvfit-m.
+"""A setuptools based setup module for pvfit.
 Derived from:
 https://packaging.python.org/guides/distributing-packages-using-setuptools/
 https://github.com/pypa/sampleproject
@@ -29,7 +29,7 @@ setup(
     # There are some restrictions on what makes a valid project name
     # specification here:
     # https://packaging.python.org/specifications/core-metadata/#name
-    name='pvfit-m',  # Required
+    name='pvfit',  # Required
 
     # Versions should comply with PEP 440:
     # https://www.python.org/dev/peps/pep-0440/
@@ -44,7 +44,7 @@ setup(
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications',  # Optional
+    description='PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling',  # Optional
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -72,7 +72,7 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/markcampanelli/pvfit-m',  # Optional
+    url='https://github.com/markcampanelli/pvfit',  # Optional
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -116,7 +116,7 @@ setup(
     # project page. What does your project relate to?
     #
     # Note that this is a string of words separated by whitespace, not a list.
-    keywords='photovoltaic spectral mismatch correction factor',  # Optional
+    keywords='PV measurement modeling photovoltaic solar',  # Optional
 
     # You can just specify package directories manually here if your project is
     # simple. Or you can use find_packages().
@@ -197,9 +197,10 @@ setup(
     # maintainers, and where to support the project financially. The key is
     # what's used to render the link text on PyPI.
     project_urls={  # Optional
-        'Bug Reports': 'https://github.com/markcampanelli/pvfit-m/issues',
+        'Bug Reports': 'https://github.com/markcampanelli/pvfit/issues',
         # 'Funding': 'https://donate.pypi.org',
         # 'Say Thanks!': 'http://saythanks.io/to/example',
-        'Source': 'https://github.com/markcampanelli/pvfit-m/',
+        'Source': 'https://github.com/markcampanelli/pvfit/',
+        'Web App': 'https://pvfit.app',
     },
 )

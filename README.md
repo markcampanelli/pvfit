@@ -1,15 +1,19 @@
-# pvfit-m
+**IMPORTANT:** The `pvfit-m` repo now redirects here. Its contents are found in
+[this subpackage](pvfit/measurement/spectral_correction/README.md).
 
-Computes the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications.
+# pvfit
 
-[![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit-m?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
+PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling
+
+[![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/1.svg?logo=azuredevops)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
-[![Documentation Status](https://readthedocs.org/projects/pvfit-m/badge/?version=latest)](https://pvfit-m.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
 
 ## Up and Running in 5 Minutes
 
-This package requires [Python 3.6+](https://www.python.org/), [numpy](https://www.numpy.org/), and
-[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
+`pvfit` requires [Python 3.6+](https://www.python.org/),
+[numpy](https://www.numpy.org/), and [scipy](https://www.scipy.org/). It is
+tested on recent versions of Ubuntu, macOS, and Windows.
 
 ### Download and Install Package (non-editable mode)
 
@@ -17,14 +21,15 @@ This package will not be available on [PyPI](https://pypi.org/) until the applic
 deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
 using `pip`—
 ```terminal
-pip install git+https://github.com/markcampanelli/pvfit-m
+pip install git+https://github.com/markcampanelli/pvfit
 ```
 NOTE: You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
-[`scipy`](https://www.scipy.org/), otherwise this setup will grab the default versions from [PyPI](https://pypi.org/).
+[`scipy`](https://www.scipy.org/) (e.g., [conda](https://docs.conda.io/en/latest/)), otherwise this setup will grab the
+default versions from [PyPI](https://pypi.org/).
 
 Verify your installation—
 ```terminal
-python -c "from pkg_resources import get_distribution; import pvfit_m; print(get_distribution('pvfit-m').version)"
+python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
 ```
 which should print something similar to—
 ```terminal
@@ -33,41 +38,17 @@ which should print something similar to—
 
 Stay up to date with code changes using—
 ```terminal
-pip install --upgrade git+https://github.com/markcampanelli/pvfit-m
+pip install --upgrade git+https://github.com/markcampanelli/pvfit
 ```
 
-### Load Example Data and Compute a Spectral Mismatch Correction Factor (M)
+## So What Can PVfit Do for Me?
 
-The `pvfit-m` package comes with some example data, with special thanks to
-[Behrang Hamadani at NIST](https://www.nist.gov/people/behrang-hamadani) :). Get started using this example data by
-reading through and executing the script [examples/getting_started.py](examples/getting_started.py) from within the
-`examples` directory—
-```terminal
-python getting_started.py
-```
-which should ultimately print out—
-```terminal
-M = 0.9982571553509605
-```
+PVfit is currently restricted to direct-current (DC) PV performance measurement and modeling. See the README's for
+individual subpackages to get started with specific functionalities.
 
-## How M Is Computed
+TODO: List subpackages with links to READMEs.
 
-_M_ is computed with the function, [`pvfit_m.api.M()`](pvfit_m/api.py), using a piecewise linear interpolation
-between data points for each curve to fully define each function on its finite interval domain of definition in the
-first quadrant. The integration of the product of two piecewise linear functions is done using
-[`pvfit_m.api.inner_product()`](pvfit_m/api.py) over the common interval domain of definition of the two curves. This is effeciently accomplished by a closed-form summation formula involving the piecewise-quadratic anti-derivative on each sub-interval of the combined partition of the common domain interval. It is currently assumed that one/both of the
-curves is sufficiently close to zero at each end of their common interval domain of definition in order to produce an
-accurate computation. Vectorized computations are possible on mutil-curve data arrays, so long as the wavelength
-domain of each multi-curve is a one-dimensional constant. The last dimension of the multi-curve's data array must always
-index wavelength to allow proper [broadcasting](https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html).
-
-## Future Plans
-
-- Add bad computation detectors/warnings
-- Publish on [PyPI](https://pypi.org/) (this repo may first be subsumed as a sub-package by a larger PV-related open
-source Python repo)
-- Implement different algorithms as requested/contributed by the community, such as interpolation of a set of
-temperature-dependent quantum efficiency curves
+TODO: Describe association with Intelligent Measurement Systems LLC and [https://pvfit.app](https://pvfit.app).
 
 ## Developer Notes
 
@@ -75,14 +56,14 @@ temperature-dependent quantum efficiency curves
 
 Clone this repo using your preferred git method, and go to the repo's root directory.
 
-Install `pvfit-m` in editable (development) mode, including the `sphinx`, `pytest` packages, with `pip`—
+Install `pvfit` in editable (development) mode, including the `sphinx`, `pytest` packages, with `pip`—
 ```terminal
 pip install -e .[dev,test]
 ```
 
 Verify your installation—
 ```terminal
-python -c "from pkg_resources import get_distribution; import pvfit_m; print(get_distribution('pvfit-m').version)"
+python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
 ```
 which should print something similar to—
 ```terminal
@@ -91,23 +72,23 @@ which should print something similar to—
 
 ### Run Tests with Coverage Locally
 
-From the root directory—
+From the [root](.) directory—
 ```terminal
-pytest --doctest-modules --cov=pvfit_m --cov-report=html
+pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
 and the root of the generated coverage report is at `htmlcov/index.html`. 
 
 ### Build Documentation Locally
 
-From the `docs` directory—
+From the [docs](docs) directory—
 ```terminal
-sphinx-apidoc -f -o . ../pvfit_m ../*_test.py
+sphinx-apidoc -f -o . ../pvfit ../*_test.py
 ```
 then—
 ```terminal
 build html
 ```
-and the root of the generated documentation is at `docs/_build/html/pvfit_m.html`. 
+and the root of the generated documentation is at `docs/_build/html/pvfit.html`. 
 
 ### Dependencies
 
@@ -124,7 +105,9 @@ dependencies or version ranges should be appropriately recorded in [setup.py](se
 
 - [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout
 - [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120-character line limit for source code files
-- A 75-character line limit for all docstrings, following the [numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html)
-- An 80-character line limit for example code in the [examples](examples) directory
-- There is no character line limit for data in Python code, such as in [data.py](pvfit_m/data.py).
-- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory (coverage in CI to be added)
+- A 75-character line limit for all docstrings, following the
+[numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html)
+- An 80-character line limit for example code in `examples` directories
+- There is no character line limit for data in Python code, such as in
+[data.py](pvfit/measurement/spectral_correction/data.py).
+- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory

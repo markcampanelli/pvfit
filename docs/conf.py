@@ -13,14 +13,13 @@
 import os
 from pkg_resources import get_distribution
 import sys
-sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
 
 # Versioning
-project = 'pvfit-m'
+project = 'pvfit'
 copyright = '2019, Mark Campanelli'
 author = 'Mark Campanelli'
 version = get_distribution(project).version
