@@ -25,8 +25,8 @@ M = 0.9982571553509605
 _M_ is computed with the function, [`pvfit.measurement.spectral_correction.api.M()`](api.py), using a piecewise linear
 interpolation between data points for each curve to fully define each function on its finite interval domain of
 definition in the first quadrant. The integration of the product of two piecewise linear functions is done using
-[`pvfit.measurement.spectral_correction.api.inner_product()`](api.py) over the common interval domain of definition of the two
-curves. This is effeciently accomplished by a closed-form summation formula involving the piecewise-quadratic
+[`pvfit.measurement.spectral_correction.api.inner_product()`](api.py) over the common interval domain of definition of
+the two curves. This is effeciently accomplished by a closed-form summation formula involving the piecewise-quadratic
 anti-derivative on each sub-interval of the combined partition of the common domain interval. It is currently assumed
 that one/both of the curves is sufficiently close to zero at each end of their common interval domain of definition in
 order to produce an accurate computation. Vectorized computations are possible on mutil-curve data arrays, so long as
@@ -36,8 +36,6 @@ array must always index wavelength to allow proper
 
 ## Future Plans
 
-- Add bad computation detectors/warnings
-- Publish on [PyPI](https://pypi.org/) (this repo may first be subsumed as a sub-package by a larger PV-related open
-source Python repo)
+- Add detectors/warnings for (potentially) bad computations
 - Implement different algorithms as requested/contributed by the community, such as interpolation of a set of
 temperature-dependent quantum efficiency curves
