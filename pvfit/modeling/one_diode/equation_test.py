@@ -21,6 +21,7 @@ import pvfit.modeling.one_diode.equation as equation
             'T_degC': T_degC_stc,
             'I_sum_A_expected': 7. - 6.e-7 * np.expm1(
                 q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * (0.5 + 3. * 0.1) - 3.,
+            'T_K_expected': T_K_stc,
             'V_diode_V_expected': np.float64(0.5 + 3. * 0.1),
             'n_mod_V_expected': np.float64((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
@@ -36,6 +37,7 @@ import pvfit.modeling.one_diode.equation as equation
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array(7. - 6.e-7 * np.expm1(
                 q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * (0.5 + 3. * 0.1) - 3.),
+            'T_K_expected': np.array(T_K_stc),
             'V_diode_V_expected': np.array(0.5 + 3. * 0.1),
             'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
 
@@ -52,6 +54,7 @@ import pvfit.modeling.one_diode.equation as equation
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array([7. - 6.e-7 * np.expm1(
                 q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * (0.5 + 3. * 0.1) - 3.]),
+            'T_K_expected': np.array([T_K_stc]),
             'V_diode_V_expected': np.array([0.5 + 3. * 0.1]),
             'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
@@ -72,6 +75,7 @@ import pvfit.modeling.one_diode.equation as equation
                 7. - 6.e-7 * np.expm1(q_C * 3. * 0.1 / (96 * 1.25 * k_B_J_per_K * convert_temperature(
                     2 * T_degC_stc, 'Celsius', 'Kelvin'))) - 0.005 * 3. * 0.1 - 3.
             ]),
+            'T_K_expected': np.array([273.15 + T_degC_stc / 2, T_K_stc, 273.15 + 2 * T_degC_stc]),
             'V_diode_V_expected': np.array([0.5, 0., 3. * 0.1]),
             'n_mod_V_expected': (np.array([1, 60, 96]) * 1.25 * k_B_J_per_K * convert_temperature(
                 np.array([T_degC_stc / 2, T_degC_stc, 2 * T_degC_stc]), 'Celsius', 'Kelvin')) / q_C
@@ -91,6 +95,7 @@ import pvfit.modeling.one_diode.equation as equation
                 7.,
                 7. - 6.e-7 * np.expm1(q_C * 3. * 0.1 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * 3. * 0.1 - 3.
             ]),
+            'T_K_expected': np.array([T_K_stc, T_K_stc, T_K_stc]),
             'V_diode_V_expected': np.array([0.5, 0., 3. * 0.1]),
             'n_mod_V_expected': (np.array([1, 1, 1]) * 1.25 * k_B_J_per_K * T_K_stc) / q_C
         },
@@ -112,6 +117,8 @@ import pvfit.modeling.one_diode.equation as equation
                  7.,
                  7. - 6.e-7 * np.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * 0.5]
             ]),
+            'T_K_expected': np.array([[T_K_stc, T_K_stc, T_K_stc],
+                                      [T_K_stc, T_K_stc, T_K_stc]]),
             'V_diode_V_expected': np.array(
                 [[0.5, 0., 0.], [0., 0., 0.5]]) + np.array([[0., 0., 3.], [3., 0., 0.]]) * np.array([0.1]),
             'n_mod_V_expected': (1 * np.full((2, 3), 1.25) * k_B_J_per_K * T_K_stc) / q_C
@@ -128,6 +135,7 @@ import pvfit.modeling.one_diode.equation as equation
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array(
                 7. - 6.e-7 * np.expm1(q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 3.),
+            'T_K_expected': np.array(T_K_stc),
             'V_diode_V_expected': np.array(0.5 + 3 * 0.1),
             'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
@@ -142,6 +150,7 @@ import pvfit.modeling.one_diode.equation as equation
             'N_s': 1,
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array([7. - 6.e-7 * np.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 3.]),
+            'T_K_expected': np.array([T_K_stc]),
             'V_diode_V_expected': np.array([0.5]),
             'n_mod_V_expected': (1 * np.array([1.25]) * k_B_J_per_K * T_K_stc) / q_C
         }])
@@ -163,6 +172,7 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     N_s = current_sum_at_diode_node_fixture['N_s']
     T_degC = current_sum_at_diode_node_fixture['T_degC']
     I_sum_A_expected = current_sum_at_diode_node_fixture['I_sum_A_expected']
+    T_K_expected = current_sum_at_diode_node_fixture['T_K_expected']
     V_diode_V_expected = current_sum_at_diode_node_fixture['V_diode_V_expected']
     n_mod_V_expected = current_sum_at_diode_node_fixture['n_mod_V_expected']
 
@@ -172,6 +182,10 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     assert isinstance(result['I_sum_A'], type(I_sum_A_expected))
     assert result['I_sum_A'].dtype == I_sum_A_expected.dtype
     np.testing.assert_array_almost_equal(result['I_sum_A'], I_sum_A_expected)
+
+    assert isinstance(result['T_K'], type(T_K_expected))
+    assert result['T_K'].dtype == T_K_expected.dtype
+    np.testing.assert_array_almost_equal(result['T_K'], T_K_expected)
 
     assert isinstance(result['V_diode_V'], type(V_diode_V_expected))
     assert result['V_diode_V'].dtype == V_diode_V_expected.dtype
