@@ -1,6 +1,6 @@
 # pvfit.measurement.spectral_correction
 
-Compute the spectral mismatch correction factor (M), e.g., for photovoltaic (PV) applications.
+**Spectral mismatch correction factors (M) for photovoltaic (PV) devices**
 
 ## Up and Running in 5 Minutes
 
