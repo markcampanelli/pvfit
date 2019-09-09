@@ -35,12 +35,11 @@ import pvfit.modeling.one_diode.equation as equation
             'G_p_S': np.array(0.005),
             'N_s': 1,
             'T_degC': T_degC_stc,
-            'I_sum_A_expected': np.array(7. - 6.e-7 * np.expm1(
+            'I_sum_A_expected': np.float64(7. - 6.e-7 * np.expm1(
                 q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * (0.5 + 3. * 0.1) - 3.),
-            'T_K_expected': np.array(T_K_stc),
-            'V_diode_V_expected': np.array(0.5 + 3. * 0.1),
-            'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
-
+            'T_K_expected': np.float64(T_K_stc),
+            'V_diode_V_expected': np.float64(0.5 + 3. * 0.1),
+            'n_mod_V_expected': np.float64((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
         {  # Can handle all rank-1 singleton array inputs.
             'V_V': np.array([0.5]),
@@ -54,9 +53,9 @@ import pvfit.modeling.one_diode.equation as equation
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array([7. - 6.e-7 * np.expm1(
                 q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * (0.5 + 3. * 0.1) - 3.]),
-            'T_K_expected': np.array([T_K_stc]),
+            'T_K_expected': np.float64(T_K_stc),
             'V_diode_V_expected': np.array([0.5 + 3. * 0.1]),
-            'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
+            'n_mod_V_expected': np.array([(1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C])
         },
         {  # Can handle all rank-1 non-singleton array inputs.
             'V_V': np.array([0.5, 0., 0.]),
@@ -95,9 +94,9 @@ import pvfit.modeling.one_diode.equation as equation
                 7.,
                 7. - 6.e-7 * np.expm1(q_C * 3. * 0.1 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * 3. * 0.1 - 3.
             ]),
-            'T_K_expected': np.array([T_K_stc, T_K_stc, T_K_stc]),
+            'T_K_expected': np.float64(T_K_stc),
             'V_diode_V_expected': np.array([0.5, 0., 3. * 0.1]),
-            'n_mod_V_expected': (np.array([1, 1, 1]) * 1.25 * k_B_J_per_K * T_K_stc) / q_C
+            'n_mod_V_expected': np.float64((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
         {  # Can handle mixed inputs with rank-2 arrays.
             'V_V': np.array([[0.5, 0., 0.], [0., 0., 0.5]]),
@@ -117,11 +116,10 @@ import pvfit.modeling.one_diode.equation as equation
                  7.,
                  7. - 6.e-7 * np.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * 0.5]
             ]),
-            'T_K_expected': np.array([[T_K_stc, T_K_stc, T_K_stc],
-                                      [T_K_stc, T_K_stc, T_K_stc]]),
+            'T_K_expected': np.float64(T_K_stc),
             'V_diode_V_expected': np.array(
                 [[0.5, 0., 0.], [0., 0., 0.5]]) + np.array([[0., 0., 3.], [3., 0., 0.]]) * np.array([0.1]),
-            'n_mod_V_expected': (1 * np.full((2, 3), 1.25) * k_B_J_per_K * T_K_stc) / q_C
+            'n_mod_V_expected': np.float64(1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C
         },
         {  # Can handle mixed inputs and zero shunt conductance with positive series resistance.
             'V_V': 0.5,
@@ -133,11 +131,11 @@ import pvfit.modeling.one_diode.equation as equation
             'G_p_S': 0.,
             'N_s': 1,
             'T_degC': T_degC_stc,
-            'I_sum_A_expected': np.array(
+            'I_sum_A_expected': np.float64(
                 7. - 6.e-7 * np.expm1(q_C * (0.5 + 3. * 0.1) / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 3.),
-            'T_K_expected': np.array(T_K_stc),
-            'V_diode_V_expected': np.array(0.5 + 3 * 0.1),
-            'n_mod_V_expected': np.array((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
+            'T_K_expected': np.float64(T_K_stc),
+            'V_diode_V_expected': np.float64(0.5 + 3 * 0.1),
+            'n_mod_V_expected': np.float64((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)
         },
         {  # Can handle mixed inputs and zero shunt conductance with zero series resistance
             'V_V': 0.5,
@@ -150,9 +148,9 @@ import pvfit.modeling.one_diode.equation as equation
             'N_s': 1,
             'T_degC': T_degC_stc,
             'I_sum_A_expected': np.array([7. - 6.e-7 * np.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 3.]),
-            'T_K_expected': np.array([T_K_stc]),
-            'V_diode_V_expected': np.array([0.5]),
-            'n_mod_V_expected': (1 * np.array([1.25]) * k_B_J_per_K * T_K_stc) / q_C
+            'T_K_expected': np.float64(T_K_stc),
+            'V_diode_V_expected': np.float64(0.5),
+            'n_mod_V_expected': np.array([(1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C])
         }])
 def current_sum_at_diode_node_fixture(request):
     return request.param
@@ -227,7 +225,7 @@ def test_I_at_V_implicit():
     G_p_S = 0.001
     N_s = 1
     T_degC = T_degC_stc
-    I_A_type_expected = np.ndarray
+    I_A_type_expected = np.float64
     V_V_expected = V_V
 
     I_A = equation.I_at_V(
@@ -251,14 +249,14 @@ def test_V_at_I_explicit():
     G_p_S = 0.
     N_s = 1
     T_degC = T_degC_stc
-    v_V_expected = \
+    V_V_expected = \
         N_s * n * k_B_J_per_K * T_K_stc / q_C * (np.log(I_ph_A - I_A + I_rs_A) - np.log(I_rs_A)) - I_A * R_s_Ohm
 
     V_V = equation.V_at_I(
         I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)['V_V']
-    assert isinstance(V_V, type(v_V_expected))
-    assert V_V.dtype == v_V_expected.dtype
-    np.testing.assert_array_equal(V_V, v_V_expected)
+    assert isinstance(V_V, type(V_V_expected))
+    assert V_V.dtype == V_V_expected.dtype
+    np.testing.assert_array_equal(V_V, V_V_expected)
 
 
 def test_V_at_I_implicit():
@@ -272,18 +270,18 @@ def test_V_at_I_implicit():
     G_p_S = 0.001
     N_s = 1
     T_degC = T_degC_stc
-    v_V_type_expected = np.ndarray
-    i_A_expected = I_A
+    V_V_type_expected = np.float64
+    I_A_expected = I_A
 
     V_V = equation.V_at_I(
         I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)['V_V']
-    assert isinstance(V_V, v_V_type_expected)
+    assert isinstance(V_V, V_V_type_expected)
     assert V_V.dtype == I_A.dtype
 
-    i_A_inv_comp = equation.I_at_V(
+    I_A_inv_comp = equation.I_at_V(
         V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)['I_A']
 
-    np.testing.assert_array_almost_equal(i_A_inv_comp, i_A_expected)
+    np.testing.assert_array_almost_equal(I_A_inv_comp, I_A_expected)
 
 
 def test_V_at_I_d1_explicit():
@@ -297,14 +295,14 @@ def test_V_at_I_d1_explicit():
     G_p_S = 0.
     N_s = 1
     T_degC = T_degC_stc
-    v_V_expected = np.array(
+    V_V_expected = np.float64(
         N_s * n * k_B_J_per_K * T_K_stc / q_C * (np.log(I_ph_A - I_A + I_rs_A) - np.log(I_rs_A)) - I_A * R_s_Ohm)
 
     result = equation.V_at_I_d1(
         I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    assert isinstance(result['V_V'], type(v_V_expected))
-    assert result['V_V'].dtype == v_V_expected.dtype
-    np.testing.assert_array_equal(result['V_V'], v_V_expected)
+    assert isinstance(result['V_V'], type(V_V_expected))
+    assert result['V_V'].dtype == V_V_expected.dtype
+    np.testing.assert_array_equal(result['V_V'], V_V_expected)
 
 
 def test_P_at_V_explicit():
@@ -318,14 +316,14 @@ def test_P_at_V_explicit():
     G_p_S = 0.001
     N_s = 1
     T_degC = T_degC_stc
-    P_W_expected = np.array(
+    P_W_expected = np.float64(
         V_V * (I_ph_A - I_rs_A * np.expm1(q_C * V_V / (N_s * n * k_B_J_per_K * T_K_stc)) - G_p_S * V_V))
 
     P_W = equation.P_at_V(
         V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)['P_W']
     assert isinstance(P_W, type(P_W_expected))
     assert P_W.dtype == P_W_expected.dtype
-    np.testing.assert_array_almost_equal(P_W, P_W_expected)
+    np.testing.assert_array_equal(P_W, P_W_expected)
 
 
 def test_P_mp_no_convergence():
@@ -367,7 +365,7 @@ def test_P_mp_no_convergence():
             'G_p_S': np.array(0.005),
             'N_s': 1,
             'T_degC': T_degC_stc,
-            'type_expected': np.ndarray,
+            'type_expected': np.float64,
             'dtype_expected': np.dtype('float64'),
         },
         {  # Happy path for a function that touches many others, array case.
@@ -408,4 +406,10 @@ def test_derived_params(derived_params_fixture):
     for key, value in result.items():
         assert isinstance(value, derived_params_fixture['type_expected'])
         assert value.dtype == derived_params_fixture['dtype_expected']
-        assert np.all(np.isfinite(value))
+        if key == 'FF':
+            # Zero power cases.
+            assert np.all(np.isnan(value[derived_params_fixture['I_ph_A'] == 0.]))
+            # Non-zero power cases.
+            assert np.all(np.isfinite(value[derived_params_fixture['I_ph_A'] != 0.]))
+        else:
+            assert np.all(np.isfinite(value))

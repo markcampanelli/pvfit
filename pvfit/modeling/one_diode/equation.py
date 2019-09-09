@@ -4,6 +4,7 @@ from scipy.optimize import minimize_scalar, newton
 
 from pvfit.common.constants import (k_B_J_per_K, minimize_scalar_maxiter_default, minimize_scalar_xatol_default,
                                     newton_maxiter_default, newton_tol_default, q_C)
+from pvfit.common.utils import ensure_numpy_scalars
 
 
 def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S):
@@ -27,6 +28,7 @@ def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_O
     Outputs (device-level, at each combination of broadcast inputs, return type is np.float64 when all scalar inputs):
         dict containing:
             I_sum_A sum of currents at high-voltage diode node
+            T_K effective diode-junction temperature
             V_diode_V voltage at high-voltage diode node
             n_mod_V modified ideality factor
     """
@@ -43,23 +45,9 @@ def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_O
     # Sum of currents at diode node. np.expm1() returns a np.float64 when arguments are all python/numpy scalars.
     I_sum_A = I_ph_A - I_rs_A * np.expm1(V_diode_V / n_mod_V) - G_p_S * V_diode_V - I_A
 
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if isinstance(I_sum_A, np.float64) and \
-            any(map(lambda x: isinstance(x, np.ndarray), [V_V, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S])):
-        I_sum_A = np.array(I_sum_A)
-        T_K = np.array(T_K)
-        V_diode_V = np.array(V_diode_V)
-        n_mod_V = np.array(n_mod_V)
-    elif isinstance(I_sum_A, np.float64):
-        T_K = np.float64(T_K)
-        V_diode_V = np.float64(V_diode_V)
-        n_mod_V = np.float64(n_mod_V)
-    else:  # np.ndarray
-        T_K = np.ones_like(I_sum_A) * T_K
-        V_diode_V = np.ones_like(I_sum_A) * V_diode_V
-        n_mod_V = np.ones_like(I_sum_A) * n_mod_V
+    result = {'I_sum_A': I_sum_A, 'T_K': T_K, 'V_diode_V': V_diode_V, 'n_mod_V': n_mod_V}
 
-    return {'I_sum_A': I_sum_A, 'T_K': T_K, 'V_diode_V': V_diode_V, 'n_mod_V': n_mod_V}
+    return ensure_numpy_scalars(dictionary=result)
 
 
 def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_tol_default,
@@ -105,17 +93,11 @@ def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=ne
     # Solve for I_A using Newton's method.
     I_A = newton(func, I_A_ic, fprime=fprime, tol=newton_tol, maxiter=newton_maxiter)
 
-    # Verify convergence. newton() documentation says that this should be checked.
+    # Verify convergence, because newton() documentation says that this should be checked.
     result = current_sum_at_diode_node(
         V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
     np.testing.assert_array_almost_equal(result['I_sum_A'], 0)
-
-    # Make sure to return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(I_A, np.ndarray) and \
-            any(map(lambda x: isinstance(x, np.ndarray), [V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S])):
-        I_A = np.array(I_A)
-
-    result.update({'I_A': I_A})
+    result.update(ensure_numpy_scalars(dictionary={'I_A': I_A}))
 
     return result
 
@@ -143,12 +125,7 @@ def I_at_V_d1(*, V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol
     # Compute first derivative of current with respect to voltage at specified voltage.
     expr1 = I_rs_A / result['n_mod_V'] * np.exp(result['V_diode_V'] / result['n_mod_V']) + G_p_S
     I_d1_V_S = -expr1 / (1. + R_s_Ohm * expr1)
-
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(I_d1_V_S, np.ndarray) and isinstance(result['I_A'], np.ndarray):
-        I_d1_V_S = np.array(I_d1_V_S)
-
-    result.update({'I_d1_V_S': I_d1_V_S})
+    result.update(ensure_numpy_scalars(dictionary={'I_d1_V_S': I_d1_V_S}))
 
     return result
 
@@ -190,21 +167,14 @@ def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=ne
     # def fprime2(V_V):
     #     return -I_rs_A / n_mod_V**2. * np.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
 
-    # Solve for v_V using Newton's method.
+    # Solve for V_V using Newton's method.
     V_V = newton(func, V_V_ic, fprime=fprime, tol=newton_tol, maxiter=newton_maxiter)
 
     # Verify convergence. newton() documentation says that this should be checked.
     result = current_sum_at_diode_node(
         V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    # assert not np.any(np.isnan(result['I_sum_A']))
-    # np.testing.assert_array_almost_equal(result['I_sum_A'], 0.)
-
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(V_V, np.ndarray) and \
-            any(map(lambda x: isinstance(x, np.ndarray), [N_s, T_degC, I_A, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S])):
-        V_V = np.array(V_V)
-
-    result.update({'V_V': V_V})
+    np.testing.assert_array_almost_equal(result['I_sum_A'], 0.)
+    result.update(ensure_numpy_scalars(dictionary={'V_V': V_V}))
 
     return result
 
@@ -232,12 +202,7 @@ def V_at_I_d1(*, I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol
     # Compute first derivative of voltage with respect to current at specified current.
     expr1 = I_rs_A / result['n_mod_V'] * np.exp(result['V_diode_V'] / result['n_mod_V']) + G_p_S
     V_d1_I_Ohm = -1. / expr1 - R_s_Ohm
-
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(V_d1_I_Ohm, np.ndarray) and isinstance(result['V_V'], np.ndarray):
-        V_d1_I_Ohm = np.array(V_d1_I_Ohm)
-
-    result.update({'V_d1_I_Ohm': V_d1_I_Ohm})
+    result.update(ensure_numpy_scalars(dictionary={'V_d1_I_Ohm': V_d1_I_Ohm}))
 
     return result
 
@@ -259,12 +224,7 @@ def P_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=ne
     result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                     newton_tol=newton_tol, newton_maxiter=newton_maxiter)
     P_W = V_V * result['I_A']
-
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(P_W, np.ndarray) and isinstance(result['I_A'], np.ndarray):
-        P_W = np.array(P_W)
-
-    result.update({'P_W': P_W})
+    result.update(ensure_numpy_scalars(dictionary={'P_W': P_W}))
 
     return result
 
@@ -276,7 +236,7 @@ def P_mp(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_to
     Compute maximum terminal power.
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Same as power_from_voltage(), but with removal of V_V.
+        Same as P_at_V(), but with removal of V_V.
 
     Outputs (device-level, at each combination of broadcast inputs, return type is np.float64 when all scalar inputs):
         dict containing:
@@ -310,23 +270,14 @@ def P_mp(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_to
     if not np.all(np.array(np.frompyfunc(lambda res: res.success, 1, 1)(res_array), dtype=bool)):
         raise ValueError(f"mimimize_scalar() with method='bounded' did not converge for options={options}.")
 
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
+    # Collect results. Casting with np.float64() creates numpy.ndarray if needed.
     V_mp_V = np.float64(np.frompyfunc(lambda res: res.x, 1, 1)(res_array))
-    if not isinstance(V_mp_V, np.ndarray) and isinstance(V_oc_V, np.ndarray):
-        V_mp_V = np.array(V_mp_V)
-
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
     P_mp_W = np.float64(np.frompyfunc(lambda res: -res.fun, 1, 1)(res_array))
-    if not isinstance(P_mp_W, np.ndarray) and isinstance(V_oc_V, np.ndarray):
-        P_mp_W = np.array(P_mp_W)
-
-    # Make sure we return an np.float64 if all inputs were that type, because np.where() always produces np.ndarray.
     with np.errstate(divide='ignore', invalid='ignore'):
-        I_mp_A = np.where(V_mp_V != 0, P_mp_W / V_mp_V, 0.)
-    if not isinstance(V_oc_V, np.ndarray):
-        I_mp_A = np.float64(I_mp_A)
+        # numpy.where() does not respect types, always giving numpy.ndarray, so cast with np.float64().
+        I_mp_A = np.float64(np.where(V_mp_V != 0., P_mp_W / V_mp_V, 0.))
 
-    return {'P_mp_W': P_mp_W, 'I_mp_A': I_mp_A, 'V_mp_V': V_mp_V, 'V_oc_V': V_oc_V}
+    return ensure_numpy_scalars(dictionary={'P_mp_W': P_mp_W, 'I_mp_A': I_mp_A, 'V_mp_V': V_mp_V, 'V_oc_V': V_oc_V})
 
 
 def FF(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_tol_default,
@@ -344,23 +295,20 @@ def FF(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_tol_
             I_sc_A short-circuit current
     """
 
-    # Compute Isc.
-    I_sc_A = I_at_V(V_V=0., N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_tol=newton_tol, newton_maxiter=newton_maxiter)['I_A']
     # Compute Pmp.
     result = P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                   newton_tol=newton_tol, newton_maxiter=newton_maxiter, minimize_scalar_xatol=minimize_scalar_xatol,
                   minimize_scalar_maxiter=minimize_scalar_maxiter)
+    # Compute Isc.
+    I_sc_A = I_at_V(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
+                    newton_tol=newton_tol, newton_maxiter=newton_maxiter)['I_A']
+    result.update({'I_sc_A': I_sc_A})
     # Compute FF.
     denominator = I_sc_A * result['V_oc_V']
     with np.errstate(divide='ignore', invalid='ignore'):
-        FF = np.where(denominator != 0, result['P_mp_W'] / denominator, 0.)
-
-    # Make sure we return an np.float64 if all inputs were that type, because np.where() always produces np.ndarray.
-    if not isinstance(I_sc_A, np.ndarray):
-        FF = np.float64(FF)
-
-    result.update({'FF': FF, 'I_sc_A': I_sc_A})
+        # numpy.where() does not respect types, always giving numpy.ndarray, so cast with np.float64()
+        FF = np.float64(np.where(denominator != 0, result['P_mp_W'] / denominator, np.nan))
+    result.update(ensure_numpy_scalars(dictionary={'FF': FF}))
 
     return result
 
@@ -390,11 +338,7 @@ def R_at_oc(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton
     # Compute resistance at Voc.
     R_oc_Ohm = -1 / result['I_d1_V_S']
 
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(R_oc_Ohm, np.ndarray) and isinstance(V_oc_V, np.ndarray):
-        R_oc_Ohm = np.array(R_oc_Ohm)
-
-    return {'R_oc_Ohm': R_oc_Ohm, 'V_oc_V': V_oc_V}
+    return ensure_numpy_scalars(dictionary={'R_oc_Ohm': R_oc_Ohm, 'V_oc_V': V_oc_V})
 
 
 def R_at_sc(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_tol_default,
@@ -419,11 +363,7 @@ def R_at_sc(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton
     # Compute resistance at Isc.
     R_sc_Ohm = -1 / result['I_d1_V_S']
 
-    # Make sure we return an np.ndarray if any input was that type (undoes casting of rank-0 np.ndarray to np.float64).
-    if not isinstance(R_sc_Ohm, np.ndarray) and isinstance(I_sc_A, np.ndarray):
-        R_sc_Ohm = np.array(R_sc_Ohm)
-
-    return {'R_sc_Ohm': R_sc_Ohm, 'I_sc_A': I_sc_A}
+    return ensure_numpy_scalars(dictionary={'R_sc_Ohm': R_sc_Ohm, 'I_sc_A': I_sc_A})
 
 
 def derived_params(*, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S, newton_tol=newton_tol_default,
