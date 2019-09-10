@@ -17,7 +17,7 @@ be expected to change without warning.
 [numpy](https://www.numpy.org/), and [scipy](https://www.scipy.org/). It is
 tested on recent versions of Ubuntu, macOS, and Windows.
 
-### Download and Install Package (non-editable mode)
+### Download, Install, and Verify Package (non-editable mode)
 
 This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
 deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
@@ -74,7 +74,7 @@ Intelligent Measurement Systems LLC (IMS), in Bozeman, MT, USA. Your
 
 ## Developer Notes
 
-### Download and Install Package with Developer and Testing Dependencies
+### Download, Install, and Verify Package with Developer and Testing Dependencies (editable mode)
 
 Clone this repo using your preferred git method, and go to the repo's root directory.
 
