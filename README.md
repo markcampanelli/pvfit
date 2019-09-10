@@ -9,7 +9,6 @@
 be expected to change without warning.
 
 [![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
-[![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/1.svg?logo=azuredevops)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
 
 ## Up and Running in 5 Minutes
@@ -51,8 +50,8 @@ technical approach of most accredited PV calibration laboratories for measuring 
 PVfit makes considerable use of the effective irradiance ratio (F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the
 *effective* irradiance on a PV device, in contrast to the common use of MET-station data
 ([poster](https://pvpmc.sandia.gov/download/7302/)). See [this paper](https://doi.org/10.1002/ese3.190) for a more
-detailed introduction and/or email [Mark Campanelli](mark.campanelli@gmail.com) to be added to the
-[PVfit Slack channel](https://app.slack.com), where you can chat realtime about your quesitons. This open-source code
+detailed introduction and/or email [Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
+[PVfit Slack channel](https://pvfit.slack.com), where you can chat realtime about your quesitons. This open-source code
 supports and complements a closed-source model calibration service (e.g., single-diode model parameter fitting from I-V
 curve data) available at [https://pvfit.app](https://pvfit.app) and via a REST API.
 
@@ -79,7 +78,7 @@ Intelligent Measurement Systems LLC (IMS), in Bozeman, MT, USA. Your
 
 Clone this repo using your preferred git method, and go to the repo's root directory.
 
-Install `pvfit` in editable (development) mode, including the `sphinx`, `pytest` packages, with `pip`—
+Install `pvfit` in editable (development) mode, including the `pytest` and `sphinx` packages, with `pip`—
 ```terminal
 pip install -e .[dev,test]
 ```
@@ -99,7 +98,7 @@ From the repo's root directory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
-and the root of the generated coverage report is at `htmlcov/index.html`. 
+and the root of the generated coverage report (uncommitted) is at `htmlcov/index.html`. 
 
 ### Build Documentation Locally
 
@@ -111,7 +110,7 @@ then—
 ```terminal
 build html
 ```
-and the root of the generated documentation is at `docs/_build/html/pvfit.html`. 
+and the root of the generated documentation (uncommitted) is at `docs/_build/html/pvfit.html`. 
 
 ### Dependencies
 
