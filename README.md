@@ -46,12 +46,32 @@ pip install --upgrade git+https://github.com/markcampanelli/pvfit
 
 ## So What Can PVfit Do for Me?
 
-PVfit is currently restricted to direct-current (DC) PV performance measurement and modeling. See the README's for
-individual subpackages to get started with specific functionalities.
+PVfit is currently restricted to direct-current (DC) PV performance measurement and modeling. Following the standardized
+technical approach of most accredited PV calibration laboratories for measuring I-V curves using PV reference devices,
+PVfit makes considerable use of the effective irradiance ratio (F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the
+*effective* irradiance on a PV device, in contrast to the common use of MET-station data
+([poster](https://pvpmc.sandia.gov/download/7302/)). See [this paper](https://doi.org/10.1002/ese3.190) for a more
+detailed introduction and/or email [Mark Campanelli](mark.campanelli@gmail.com) to be added to the
+[PVfit Slack channel](https://app.slack.com), where you can chat realtime about your quesitons. This open-source code
+supports and complements a closed-source model calibration service (e.g., single-diode model parameter fitting from I-V
+curve data) available at [https://pvfit.app](https://pvfit.app) and via a REST API.
 
-TODO: List subpackages with links to READMEs.
+See the README's for individual subpackages to get started with specific functionalities—
 
-TODO: Describe association with Intelligent Measurement Systems LLC and [https://pvfit.app](https://pvfit.app).
+- [Measurement](pvfit/measurement)
+  - [Spectral Mismatch Correction Factor M](pvfit/measurement/spectral_correction)
+  - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
+- [Modeling](pvfit/modeling)
+  - [Single Diode](pvfit/modeling/one_diode)
+      - [Equation](pvfit/modeling/one_diode/equation.py)
+      - [Model](pvfit/modeling/one_diode/model.py)
+
+## About the Maintainer
+
+The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
+Intelligent Measurement Systems LLC (IMS), in Bozeman, MT, USA. Your
+[bug reports/suggestions](https://github.com/markcampanelli/pvfit/issues) and
+[contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.
 
 ## Developer Notes
 
