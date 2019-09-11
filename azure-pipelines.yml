@@ -63,8 +63,8 @@ jobs:
     displayName: 'Install package'
 
   - script: |
-      pytest
-    displayName: 'Test'
+      pytest --doctest-modules --junitxml=junit/test-results.xml --cov=pvfit --cov-report=xml --cov-report=html
+    displayName: 'Test with coverage'
 
 - job: macOS
   timeoutInMinutes: 5
@@ -90,5 +90,5 @@ jobs:
     displayName: 'Install package'
 
   - script: |
-      pytest
-    displayName: 'Test'
+      pytest --doctest-modules --junitxml=junit/test-results.xml --cov=pvfit --cov-report=xml --cov-report=html
+    displayName: 'Test with coverage'
