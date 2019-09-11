@@ -11,38 +11,6 @@ be expected to change without warning.
 [![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
 
-## Up and Running in 5 Minutes
-
-`pvfit` requires [Python 3.6+](https://www.python.org/),
-[numpy](https://www.numpy.org/), and [scipy](https://www.scipy.org/). It is
-tested on recent versions of Ubuntu, macOS, and Windows.
-
-### Download, Install, and Verify Package (non-editable mode)
-
-This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
-deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
-using `pip`—
-```terminal
-pip install git+https://github.com/markcampanelli/pvfit
-```
-NOTE: You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
-[`scipy`](https://www.scipy.org/) (e.g., [conda](https://docs.conda.io/en/latest/)), otherwise this setup will grab the
-default versions from [PyPI](https://pypi.org/).
-
-Verify your installation—
-```terminal
-python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
-```
-which should print something similar to—
-```terminal
-0.1.dev9+gadf7f38.d20190812
-```
-
-Stay up to date with code changes using—
-```terminal
-pip install --upgrade git+https://github.com/markcampanelli/pvfit
-```
-
 ## So What Can PVfit Do for Me?
 
 PVfit is currently restricted to direct-current (DC) PV performance measurement and modeling. Following the standardized
@@ -61,9 +29,44 @@ See the README's for individual subpackages to get started with specific functio
   - [Spectral Mismatch Correction Factor M](pvfit/measurement/spectral_correction)
   - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
 - [Modeling](pvfit/modeling)
-  - [Single Diode](pvfit/modeling/one_diode)
-      - [Equation](pvfit/modeling/one_diode/equation.py)
-      - [Model](pvfit/modeling/one_diode/model.py)
+  - [Single Diode](pvfit/modeling/single_diode)
+      - [Equation](pvfit/modeling/single_diode/equation.py)
+      - [Model](pvfit/modeling/single_diode/model.py)
+
+## Up and Running in 5 Minutes
+
+`pvfit` minimally requires [Python 3.6+](https://www.python.org/) with [numpy](https://www.numpy.org/) and
+[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
+
+### Download, Install, and Verify Package (non-editable mode)
+
+This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
+deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
+using `pip`—
+```terminal
+pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+```
+NOTES:
+- You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
+[`scipy`](https://www.scipy.org/) (e.g., using [conda](https://docs.conda.io/en/latest/)), otherwise this setup will
+grab the default versions from [PyPI](https://pypi.org/).
+- The `demo` option adds the [matplotlib](https://matplotlib.org/) and
+[requests](https://2.python-requests.org/en/master/) packages in order to run all the provided demonstrations in the
+`demos` directories.
+
+Verify your installation—
+```terminal
+python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
+```
+which should print something similar to—
+```terminal
+0.1.dev9+gadf7f38.d20190812
+```
+
+Stay up to date with code changes using—
+```terminal
+pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+```
 
 ## About the Maintainer
 
@@ -125,11 +128,11 @@ dependencies or version ranges should be appropriately recorded in [setup.py](se
 
 ### Coding Requirements and Style
 
-- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout
-- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120-character line limit for source code files
+- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout.
+- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120-character line limit for source code files.
 - A 75-character line limit for all docstrings, following the
-[numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html)
-- An 80-character line limit for example code in `examples` directories
+[numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html).
+- An 80-character line limit for demonstration code in `demos` directories.
 - There is no character line limit for data in Python code, such as in
 [data.py](pvfit/measurement/spectral_correction/data.py).
-- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory
+- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory.

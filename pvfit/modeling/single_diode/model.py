@@ -4,7 +4,7 @@ from scipy.constants import convert_temperature
 from pvfit.common.constants import (k_B_J_per_K, k_B_eV_per_K, minimize_scalar_maxiter_default,
                                     minimize_scalar_xatol_default, newton_maxiter_default, newton_tol_default, q_C)
 from pvfit.common.utils import ensure_numpy_scalars
-import pvfit.modeling.one_diode.equation as equation
+import pvfit.modeling.single_diode.equation as equation
 
 
 def current_sum_at_diode_node(

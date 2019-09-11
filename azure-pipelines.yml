@@ -26,12 +26,11 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install .
+      pip install .[ci]
       pip list
     displayName: 'Install package'
 
   - script: |
-      pip install pytest pytest-azurepipelines pytest-cov
       pytest --doctest-modules --junitxml=junit/test-results.xml --cov=pvfit --cov-report=xml --cov-report=html
     displayName: 'Test with coverage'
 
@@ -59,12 +58,11 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install .
+      pip install .[ci]
       pip list
     displayName: 'Install package'
 
   - script: |
-      pip install pytest pytest-azurepipelines
       pytest
     displayName: 'Test'
 
@@ -87,11 +85,10 @@ jobs:
 
   - script: |
       python -m pip install --upgrade pip setuptools
-      pip install .
+      pip install .[ci]
       pip list
     displayName: 'Install package'
 
   - script: |
-      pip install pytest pytest-azurepipelines
       pytest
     displayName: 'Test'

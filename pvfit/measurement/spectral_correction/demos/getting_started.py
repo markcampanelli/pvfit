@@ -1,8 +1,9 @@
-# Python 3.6-7
+# Python 3.6+
 from pkg_resources import get_distribution
 
 import pvfit.measurement.spectral_correction.api
 import pvfit.measurement.spectral_correction.data
+
 
 print(f"pvfit version {get_distribution('pvfit').version}")
 

@@ -4,14 +4,15 @@
 
 ## Up and Running in 5 Minutes
 
-First, make sure that you have followed the instructions [here](../../../README.md#Up-and-Running-in-5-Minutes).
+First, make sure that you have followed the package setup instructions
+[here](../../../README.md#Up-and-Running-in-5-Minutes).
 
 ### Load Example Data and Compute a Spectral Mismatch Correction Factor (M)
 
 The `pvfit.measurement.spectral_correction` package comes with some example data, with special thanks to
 [Behrang Hamadani at NIST](https://www.nist.gov/people/behrang-hamadani) :). Get started using this example data by
-reading through and executing the script [getting_started.py](examples/getting_started.py) from within the
-[examples](examples) directory—
+reading through and executing the script [getting_started.py](demos/getting_started.py) from within the
+[demos](demos) directory—
 ```terminal
 python getting_started.py
 ```
