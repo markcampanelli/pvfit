@@ -10,6 +10,8 @@ be expected to change without warning.
 
 [![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
+[![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/2.svg)](https://dev.azure.com/markcampanelli/markcampanelli/definitionId=2&branchName=master)
+
 
 ## So What Can PVfit Do for Me?
 
@@ -35,8 +37,8 @@ See the README's for individual subpackages to get started with specific functio
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [Python 3.6+](https://www.python.org/) with [numpy](https://www.numpy.org/) and
-[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
+`pvfit` minimally requires [Python 3.6+](https://www.python.org/) with [numpy 1.8.2+](https://www.numpy.org/) and
+[scipy 1.2.0+](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
 
 ### Download, Install, and Verify Package (non-editable mode)
 
@@ -117,10 +119,9 @@ and the root of the generated documentation (uncommitted) is at `docs/_build/htm
 
 ### Dependencies
 
-Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are the only runtime dependencies
-(minium versions TBD). In order to ensure a straightforward, consistent, and well-tested API, the decision has been made
-to avoid any dependecy on [`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward
-integration with consumers that use `pandas`, e.g., integrating computations with
+Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are the only runtime dependencies. In
+order to ensure a straightforward, consistent, and well-tested API, the decision has been made to avoid any dependecy on [`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward integration with consumers that
+use `pandas`, e.g., integrating computations with
 [Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html) and
 [DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) objects. To avoid
 bloat, we also avoid dependency on plotting libraries such as [`matplotlib`](https://matplotlib.org/). Any new

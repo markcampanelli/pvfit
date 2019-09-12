@@ -44,7 +44,8 @@ setup(
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling',  # Optional
+    description='PVfit: Photovoltaic (PV) Device Performance Measurement and \
+Modeling',  # Optional
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -142,8 +143,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # FIXME Determine any minimum requirements.
-    install_requires=['numpy', 'scipy'],  # Optional
+    install_requires=['numpy>=1.8.2', 'scipy>=1.2.0'],  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
@@ -154,7 +154,8 @@ setup(
     # Similar to `install_requires` above, these must be valid existing
     # projects.
     extras_require={  # Optional
-        'ci': ['matplotlib', 'pytest', 'pytest-azurepipelines', 'pytest-cov', 'requests'],
+        'ci': ['matplotlib', 'pytest', 'pytest-azurepipelines', 'pytest-cov',
+               'requests'],
         'demo': ['matplotlib', 'requests'],
         'dev': ['check-manifest', 'flake8', 'sphinx', 'sphinx_rtd_theme'],
         'test': ['pytest', 'pytest-cov'],
