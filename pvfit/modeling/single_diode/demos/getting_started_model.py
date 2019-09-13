@@ -21,7 +21,7 @@ print(f"pvfit version {get_distribution('pvfit').version}")
 # bill.marion@nrel.gov for the complete data set.
 filename, N_s, material = os.path.join(os.path.dirname(__file__), "HIT05667.csv"), 72, 'x-Si'
 data_table = pandas.read_csv(filename, skiprows=22, nrows=18, encoding='utf-8')
-data_table.sort_values(['Irradiance Corrected to (W/m2)', 'Temperature Corrected to (°C)'], inplace=True)
+data_table.sort_values(['Irradiance Corrected to (W/m2)', 'Temperature Corrected to (degC)'], inplace=True)
 print(data_table)
 
 # We will flatten all channels from data table into vectors for model fitting.
