@@ -20,7 +20,7 @@ print(f"pvfit version {get_distribution('pvfit').version}")
 # irradiance and temperature. See https://www.nrel.gov/docs/fy14osti/61610.pdf and
 # bill.marion@nrel.gov for the complete data set.
 filename, N_s, material = os.path.join(os.path.dirname(__file__), "HIT05667.csv"), 72, 'x-Si'
-data_table = pandas.read_csv(filename, skiprows=22, nrows=18)
+data_table = pandas.read_csv(filename, skiprows=22, nrows=18, encoding='utf-8')
 data_table.sort_values(['Irradiance Corrected to (W/m2)', 'Temper-ature Corrected to (°C)'], inplace=True)
 print(data_table)
 
