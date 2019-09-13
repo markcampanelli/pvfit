@@ -134,7 +134,7 @@ for idx, (F, T_degC) in enumerate(zip(F_data_minimal, T_degC_data_minimal)):
 # Plot the LIC.
 color = next(ax._get_lines.prop_cycler)['color']
 ax.plot([0., derived_params_alt['V_mp_V'], derived_params_alt['V_oc_V']],
-        [derived_params_alt['I_sc_A'], derived_params_alt['I_mp_A'], 0.], 'o', color=color)
+        [derived_params_alt['I_sc_A'], derived_params_alt['I_mp_A'], 0.], '*', color=color)
 V_V = numpy.linspace(0, derived_params_alt['V_oc_V'], 101)
 ax.plot(V_V, sdm.I_at_V_F_T(V_V=V_V, F=F_alt, T_degC=T_degC_alt, **model_params_fit)['I_A'], '--',
         label=f"F={F_alt:.2f} suns, T={T_degC_alt:.0f} °C", color=color)
