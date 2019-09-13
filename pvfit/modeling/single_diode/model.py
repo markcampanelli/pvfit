@@ -162,8 +162,7 @@ def derived_params(*, F, T_degC, N_s, T_degC_0, I_sc_A_0, I_rs_A_0, n_0, R_s_Ohm
     result = equation.FF(**params, newton_tol=newton_tol, newton_maxiter=newton_maxiter,
                          minimize_scalar_xatol=minimize_scalar_xatol, minimize_scalar_maxiter=minimize_scalar_maxiter)
 
-    # In SDM-G I_sc_A is a model parameter and I_ph_A is a derived parameter.
-    result.pop('I_sc_A')
+    # In SDM-G, I_ph_A is also a derived parameter.
     result['I_ph_A'] = params['I_ph_A']
 
     # Compute the additional resistances.

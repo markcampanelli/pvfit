@@ -52,7 +52,7 @@ NOTES:
 - You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
 [`scipy`](https://www.scipy.org/) (e.g., using [conda](https://docs.conda.io/en/latest/)), otherwise this setup will
 grab the default versions from [PyPI](https://pypi.org/).
-- The `demo` option adds the [matplotlib](https://matplotlib.org/) and
+- The `demo` option adds the [matplotlib](https://matplotlib.org/), [pandas](https://pandas.pydata.org/), and
 [requests](https://2.python-requests.org/en/master/) packages in order to run all the provided demonstrations in the
 `demos` directories.
 

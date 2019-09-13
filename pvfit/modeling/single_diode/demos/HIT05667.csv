@@ -1,0 +1,51 @@
+PV Module: HIT05667,,,,,,,,,,,,,,,,
+Technology: Amorphous silicon/crystalline silicon (HIT)   ,,,,,,,,,,,,,,,,
+Construction: Glass front/Tedlar back,,,,,,,,,,,,,,,,
+"Deployment:  Cocoa, FL – January 21, 2011 through March 4, 2012; and  Eugene, OR – December 20, 2012 through January 20, 2014",,,,,,,,,,,,,,,,
+"History: New when deployed in Cocoa, FL",,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+NREL Measurements on a Spire 5600SLP Solar Simulator using IEC 60904-3 Edition 2 Global Reference Spectrum,,,,,,,,,,,,,,,,
+Date,E (W/m2),T (⁰C),Voc (V),Isc (A),FF (%),Vmp (V),Imp (A),Pm (W),Eff (%),,,,,,,
+1/31/2014,1000,25.2,50.11,5.456,77.6,41.58,5.1,212,17.6,,,,,,,
+1/31/2014,200,25.5,46.75,1.1,79.9,39.84,1.031,41.09,17.1,,,,,,,
+"Notes: Efficiency is based on aperture area, estimated uncertainty is ± 5% (relative)",,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+CFV Solar Test Laboratory Temperature Coefficient Measurements per IEC 61215 or IEC 61646,,,,,,,,,,,,,,,,
+Date,"α Isc 
+(%/°C)","α Imp
+(%/°C)",β Voc (%/°C),β Vmp (%/°C),δ Pm (%/°C),,,,,,,,,,,
+4/9/2014,0.03,-0.01,-0.27,-0.34,-0.35,,,,,,,,,,,
+Notes:,1. For an irradiance of 1000 W/m2 and relative to 25⁰C,,,,,,,,,,,,,,,
+,2. Measured with a h.a.l.m. flash solar simulator from 25⁰C to 65⁰C at 2⁰C intervals,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+CFV Solar Test Laboratory Measurements per IEC 61853-1 section 8,,,,,,,,,,,,,,,,
+Date Tested,Time Tested,Temper-ature Corrected to (°C),Irradiance Corrected to (W/m2),Isc Corrected (A),Voc Corrected (V),Imp Corrected (A),Vmp Corrected (V),Pm Corrected (W),FF Corrected (%),Module Temper-ature (°C) ,Irradiance Measured (W/m2),Isc Raw (A),Voc Raw (V),Imp Raw (A),Vmp Raw (V),Pm Raw (W)
+4/17/2014,8:30 PM,15,100,0.558,46.74,0.510,40.10,20.47,78.5,14.4,100.9,0.562,46.82,0.516,40.18,20.72
+4/16/2014,3:12 PM,25,100,0.570,45.37,0.526,38.39,20.19,78.1,25.0,98.7,0.563,45.37,0.519,38.39,19.91
+4/17/2014,8:31 PM,15,200,1.111,48.23,1.013,41.70,42.25,78.9,15.3,202.4,1.124,48.19,1.026,41.66,42.76
+4/16/2014,3:01 PM,25,200,1.126,46.90,1.041,40.15,41.79,79.1,25.0,201.0,1.132,46.89,1.046,40.15,42.01
+4/16/2014,2:51 PM,25,400,2.232,48.34,2.076,41.01,85.16,78.9,25.0,400.8,2.237,48.33,2.081,41.01,85.33
+4/16/2014,6:39 PM,50,400,2.234,44.89,2.059,37.23,76.65,76.4,50.0,400.7,2.238,44.90,2.063,37.23,76.81
+4/16/2014,2:41 PM,25,600,3.334,49.17,3.114,41.30,128.58,78.4,25.0,599.0,3.329,49.16,3.108,41.29,128.32
+4/16/2014,6:33 PM,50,600,3.329,45.81,3.081,37.77,116.35,76.3,50.3,600.4,3.332,45.77,3.083,37.73,116.30
+4/16/2014,7:48 PM,65,600,3.349,43.77,3.074,35.63,109.53,74.7,65.0,601.0,3.354,43.77,3.079,35.63,109.72
+4/16/2014,2:31 PM,25,800,4.433,49.76,4.151,41.38,171.76,77.9,25.0,801.0,4.438,49.75,4.156,41.37,171.97
+4/16/2014,6:26 PM,50,800,4.441,46.42,4.115,37.94,156.15,75.8,50.1,798.5,4.433,46.40,4.107,37.93,155.77
+4/16/2014,7:42 PM,65,800,4.459,44.43,4.106,35.83,147.12,74.3,64.9,800.4,4.461,44.44,4.108,35.84,147.25
+4/16/2014,2:05 PM,25,1000,5.532,50.21,5.177,41.43,214.48,77.2,24.9,1001.0,5.537,50.23,5.182,41.45,214.79
+4/16/2014,6:15 PM,50,1000,5.539,46.90,5.112,38.10,194.79,75.0,50.5,1001.4,5.548,46.83,5.120,38.03,194.68
+4/16/2014,7:34 PM,65,1000,5.566,44.92,5.119,35.93,183.92,73.6,64.7,999.5,5.563,44.96,5.117,35.97,184.05
+4/16/2014,2:17 PM,25,1100,6.079,50.39,5.632,41.52,233.84,76.3,25.0,1102.3,6.092,50.40,5.645,41.52,234.39
+4/16/2014,6:54 PM,50,1100,6.101,47.11,5.639,37.87,213.58,74.3,50.1,1099.8,6.100,47.10,5.638,37.86,213.43
+4/16/2014,7:24 PM,65,1100,6.129,45.16,5.604,35.99,201.73,72.9,64.6,1103.6,6.148,45.21,5.625,36.05,202.78
+Notes:,1. Measured with a h.a.l.m. flash solar simulator ,,,,,,,,,,,,,,,
+,2. Because of equipment limitations the maximum temperature for measurements was 65⁰C instead of 75⁰C,,,,,,,,,,,,,,,
+,"3. Measurements for 15⁰C and irradiances of 400, 600, 800, and 1000 W/m2 were not performed because of equipment limitations and infrequent occurrence of those conditions at the Cocoa, Eugene, and Golden sites.",,,,,,,,,,,,,,,
+,"4. Raw Isc and Imp data corrected for temperature and irradiance using equation 1 of  IEC 60891, raw Voc and Vmp corrected for temperature",,,,,,,,,,,,,,,
+,"5. Uncertainty for crystalline silicon modules: Pm = ± 2.8%,  Isc = ± 2.3%, Imp = ± 2.3%, Voc = ± 0.3%, Vmp = ± 0.7%",,,,,,,,,,,,,,,
+,"6. At 15°C, measured only with forward I-V curve and not reverse sweep, which may have underestimated performance for this module with high capacitance. Only forward sweep was used because the module was in a transient state having come out of climate chamber and was warming to ambient temperature.",,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,
+"For Sandia model coefficients, open the file SandiaModelCoefficients.xlsx",,,,,,,,,,,,,,,,

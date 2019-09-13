@@ -17,7 +17,8 @@ through and executing the script [getting_started_equation.py](demos/getting_sta
 ```terminal
 python getting_started_equation.py
 ```
-which should ultimately print out this pretty graph—
+which should print out some interesting information and ultimately this pretty graph—
+
 ![](demos/equation.png)
 
 
@@ -25,7 +26,16 @@ which should ultimately print out this pretty graph—
 
 #### Load Measurement Data, Calibrate, and Compute an I-V Curve
 
-TODO
+The [pvfit.modeling.single_diode.model](model.py) module comes with a demonstration. Get started by reading
+through and executing the script [getting_started_model.py](demos/getting_started_model.py) from within the
+[demos](demos) directory—
+```terminal
+python getting_started_model.py
+```
+which should print out some interesting information and ultimately this pretty graph—
+
+![](demos/model.png)
+
 
 ## API Notes
 

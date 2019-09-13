@@ -156,7 +156,7 @@ Modeling',  # Optional
     extras_require={  # Optional
         'ci': ['matplotlib', 'pytest', 'pytest-azurepipelines', 'pytest-cov',
                'requests'],
-        'demo': ['matplotlib', 'requests'],
+        'demo': ['matplotlib', 'pandas', 'requests'],
         'dev': ['check-manifest', 'flake8', 'sphinx', 'sphinx_rtd_theme'],
         'test': ['pytest', 'pytest-cov'],
     },
