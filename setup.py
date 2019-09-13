@@ -154,8 +154,8 @@ Modeling',  # Optional
     # Similar to `install_requires` above, these must be valid existing
     # projects.
     extras_require={  # Optional
-        'ci': ['matplotlib', 'pytest', 'pytest-azurepipelines', 'pytest-cov',
-               'requests'],
+        'ci': ['matplotlib', 'pandas', 'pytest', 'pytest-azurepipelines',
+               'pytest-cov', 'requests'],
         'demo': ['matplotlib', 'pandas', 'requests'],
         'dev': ['check-manifest', 'flake8', 'sphinx', 'sphinx_rtd_theme'],
         'test': ['pytest', 'pytest-cov'],
