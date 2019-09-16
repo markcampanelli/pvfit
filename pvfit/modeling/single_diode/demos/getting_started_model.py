@@ -121,6 +121,14 @@ derived_params_alt = sdm.derived_params(F=F_alt, T_degC=T_degC_alt, **model_para
 print(f"Alternative operating condition: F={F_alt}, T={T_degC_alt} °C")
 pprint.pprint(derived_params_alt)
 
+# F and/or T_degC can be vectorized, such as for a time-series of weather data.
+F_series = numpy.array([0.95, 0.97, 0.99, 1.01, 0.97, 0.98])
+T_degC_series = 35.  # This scalar value will be approapriately broadcast.
+# Note that the maximum power vector is picked out from the result dictionary.
+P_mp_W_series = sdm.derived_params(
+    F=F_series, T_degC=T_degC_series, **model_params_fit)['P_mp_W']
+print(f"P_mp_W_series = {P_mp_W_series}")
+
 # Now make a nice plot.
 fig, ax = plt.subplots(figsize=(8, 6))
 # Plot the data fits.

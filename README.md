@@ -85,8 +85,9 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` in editable (development) mode, including the `pytest` and `sphinx` packages, with `pip`—
 ```terminal
-pip install -e .[dev,test]
+pip install -e .[demo,dev,test]
 ```
+This also installs the libraries needed to develop the code demonstrations.
 
 Verify your installation—
 ```terminal
