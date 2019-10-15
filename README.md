@@ -73,8 +73,8 @@ pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo
 ## About the Maintainer
 
 The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
-Intelligent Measurement Systems LLC (IMS), in Bozeman, MT, USA. Your
-[bug reports/suggestions](https://github.com/markcampanelli/pvfit/issues) and
+[Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com), in Bozeman, MT, USA. Your
+[suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues) and
 [contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.
 
 ## Developer Notes
