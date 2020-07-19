@@ -10,13 +10,6 @@ import pvfit.measurement.spectral_correction.api
 # TODO Test all classes, including more tests for SR->QE and QE->SR conversions.
 
 
-def test_constants():
-    """Know when constants change."""
-    assert pvfit.measurement.spectral_correction.api.q_C == 1.6021766208e-19
-    assert pvfit.measurement.spectral_correction.api.c_m_per_s == 299792458.0
-    assert pvfit.measurement.spectral_correction.api.h_J_s == 6.62607004e-34
-
-
 def test_DataFunction():
     """Test DataFunction class."""
     # Invaid data cases.

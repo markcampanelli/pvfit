@@ -44,8 +44,7 @@ setup(
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='PVfit: Photovoltaic (PV) Device Performance Measurement and \
-Modeling',  # Optional
+    description='PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling',  # Optional
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -111,6 +110,7 @@ Modeling',  # Optional
         # 'python_requires' below.
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 
     # This field adds keywords for your project which will appear on the
@@ -143,7 +143,7 @@ Modeling',  # Optional
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['numpy>=1.8.2', 'scipy>=1.2.0'],  # Optional
+    install_requires=['scipy~=1.5.0'],  # This grabs numpy with some minimum version
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"

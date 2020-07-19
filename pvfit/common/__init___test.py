@@ -1,3 +1,2 @@
-"""Package tests."""
-
-import pvfit.common  # NOQA
+def test_import_package():
+    import pvfit.common  # noqa

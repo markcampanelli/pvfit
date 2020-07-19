@@ -26,7 +26,7 @@ N_s = 72
 T_degC = 25.
 
 # Use the PVfit REST API to fit the data. (Requires internet connection!)
-response = requests.post('https://api.pv-fit.com/v2/sdm/local',
+response = requests.post('https://api.pvfit.app/v2/sdm/local',
                          headers={'Content-Type': 'application/json'},
                          json={'V_V': V_V_data.tolist(),
                                'I_A': I_A_data.tolist(),

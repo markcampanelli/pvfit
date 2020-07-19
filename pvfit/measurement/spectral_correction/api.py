@@ -4,10 +4,7 @@ import numpy
 import scipy.constants
 import scipy.interpolate
 
-# Constants from scipy with explicit units.
-q_C = scipy.constants.e
-c_m_per_s = scipy.constants.c
-h_J_s = scipy.constants.h
+from pvfit.common.constants import c_m_per_s, h_J_s, q_C
 
 
 class DataFunction:
@@ -163,7 +160,7 @@ def inner_product(*, f1: DataFunction, f2: DataFunction) -> numpy.ndarray:
 
     Returns
     -------
-    inner_product : np.ndarray
+    inner_product : numpy.ndarray
         Integral of the product of the two data functions over their
         common domain.
 
@@ -251,7 +248,7 @@ def M(*, S_TD_OC: SpectralResponsivity, E_TD_OC: SpectralIrradiance, S_TD_RC: Sp
 
     Returns
     -------
-    M : np.ndarray
+    M : numpy.ndarray
         Spectral mismatch correction factor (:math:`M`).
 
     Warns

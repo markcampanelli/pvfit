@@ -1,4 +1,5 @@
 import pvfit.measurement.spectral_correction.api
+import pvfit.measurement.spectral_correction.data
 
 
 def test_nist_M():

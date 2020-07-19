@@ -1,3 +1,2 @@
-"""Package tests."""
-
-import pvfit.modeling  # NOQA
+def test_import_package():
+    import pvfit.modeling  # noqa

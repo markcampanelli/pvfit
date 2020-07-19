@@ -1,7 +1,7 @@
 import numpy
 import pytest
 
-from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C, materials
+from pvfit.common.constants import T_stc_K, T_stc_degC, k_B_J_per_K, q_C, materials
 import pvfit.modeling.single_diode.model as model
 
 
@@ -11,22 +11,22 @@ import pvfit.modeling.single_diode.model as model
         'V_V': numpy.array([0.5, 0., 0.]),
         'I_A': numpy.array([0., 0., 3.]),
         'F': 1.,
-        'T_degC': T_degC_stc,
+        'T_degC': T_stc_degC,
         'N_s': 1,
-        'T_degC_0': T_degC_stc,
-        'I_sc_A_0': 7.,
-        'I_rs_A_0': 6.e-7,
+        'T_0_degC': T_stc_degC,
+        'I_sc_0_A': 7.,
+        'I_rs_0_A': 6.e-7,
         'n_0': 1.25,
-        'R_s_Ohm_0': 0.,  # Zero series resistance gives exact solution.
-        'G_p_S_0': 0.005,
-        'E_g_eV_0': materials['x-Si']['E_g_eV_stc'],
+        'R_s_0_Ohm': 0.,  # Zero series resistance gives exact solution.
+        'G_p_0_S': 0.005,
+        'E_g_0_eV': materials['x-Si']['E_g_stc_eV'],
         'I_sum_A_expected': numpy.array([
-            7. - 6.e-7 * numpy.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_K_stc)) - 0.005 * 0.5,
+            7. - 6.e-7 * numpy.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_stc_K)) - 0.005 * 0.5,
             7.,
             7. - 3.]),
-        'T_K_expected': numpy.float64(T_K_stc),
+        'T_K_expected': numpy.float64(T_stc_K),
         'V_diode_V_expected': numpy.array([0.5, 0., 0.]),
-        'n_mod_V_expected': numpy.float64((1 * 1.25 * k_B_J_per_K * T_K_stc) / q_C)}])
+        'n_mod_V_expected': numpy.float64((1 * 1.25 * k_B_J_per_K * T_stc_K) / q_C)}])
 def current_sum_at_diode_node_fixture(request):
     return request.param
 
@@ -38,21 +38,21 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     F = current_sum_at_diode_node_fixture['F']
     T_degC = current_sum_at_diode_node_fixture['T_degC']
     N_s = current_sum_at_diode_node_fixture['N_s']
-    T_degC_0 = current_sum_at_diode_node_fixture['T_degC_0']
-    I_sc_A_0 = current_sum_at_diode_node_fixture['I_sc_A_0']
-    I_rs_A_0 = current_sum_at_diode_node_fixture['I_rs_A_0']
+    T_0_degC = current_sum_at_diode_node_fixture['T_0_degC']
+    I_sc_0_A = current_sum_at_diode_node_fixture['I_sc_0_A']
+    I_rs_0_A = current_sum_at_diode_node_fixture['I_rs_0_A']
     n_0 = current_sum_at_diode_node_fixture['n_0']
-    R_s_Ohm_0 = current_sum_at_diode_node_fixture['R_s_Ohm_0']
-    G_p_S_0 = current_sum_at_diode_node_fixture['G_p_S_0']
-    E_g_eV_0 = current_sum_at_diode_node_fixture['E_g_eV_0']
+    R_s_0_Ohm = current_sum_at_diode_node_fixture['R_s_0_Ohm']
+    G_p_0_S = current_sum_at_diode_node_fixture['G_p_0_S']
+    E_g_0_eV = current_sum_at_diode_node_fixture['E_g_0_eV']
     I_sum_A_expected = current_sum_at_diode_node_fixture['I_sum_A_expected']
     T_K_expected = current_sum_at_diode_node_fixture['T_K_expected']
     V_diode_V_expected = current_sum_at_diode_node_fixture['V_diode_V_expected']
     n_mod_V_expected = current_sum_at_diode_node_fixture['n_mod_V_expected']
 
     result = model.current_sum_at_diode_node(
-        V_V=V_V, I_A=I_A, F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_A_0=I_rs_A_0, n_0=n_0,
-        R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
+        V_V=V_V, I_A=I_A, F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A, n_0=n_0,
+        R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
 
     assert isinstance(result['I_sum_A'], type(I_sum_A_expected))
     assert result['I_sum_A'].dtype == I_sum_A_expected.dtype
@@ -75,17 +75,17 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     # Not necessarily I-V curve solutions.
     params=[{  # Can handle all python scalar inputs.
         'F': 1.25,
-        'T_degC': T_degC_stc,
+        'T_degC': T_stc_degC,
         'N_s': 1,
-        'T_degC_0': T_degC_stc,
-        'I_sc_A_0': 7.,
-        'I_rs_A_0': 6.e-7,
+        'T_0_degC': T_stc_degC,
+        'I_sc_0_A': 7.,
+        'I_rs_0_A': 6.e-7,
         'n_0': 1.25,
-        'R_s_Ohm_0': 0.,  # Zero series resistance gives exact solution.
-        'G_p_S_0': 0.005,
-        'E_g_eV_0': materials['x-Si']['E_g_eV_stc'],
+        'R_s_0_Ohm': 0.,  # Zero series resistance gives exact solution.
+        'G_p_0_S': 0.005,
+        'E_g_0_eV': materials['x-Si']['E_g_stc_eV'],
         'N_s_expected': numpy.intc(1),
-        'T_degC_expected': numpy.float64(T_degC_stc),
+        'T_degC_expected': numpy.float64(T_stc_degC),
         'I_ph_A_expected': numpy.float64(1.25 * 7.),
         'I_rs_A_expected': numpy.float64(6.e-7),
         'n_expected': numpy.float64(1.25),
@@ -99,13 +99,13 @@ def test_auxiliary_equations(auxiliary_equations_fixture):
     F = auxiliary_equations_fixture['F']
     T_degC = auxiliary_equations_fixture['T_degC']
     N_s = auxiliary_equations_fixture['N_s']
-    T_degC_0 = auxiliary_equations_fixture['T_degC_0']
-    I_sc_A_0 = auxiliary_equations_fixture['I_sc_A_0']
-    I_rs_A_0 = auxiliary_equations_fixture['I_rs_A_0']
+    T_0_degC = auxiliary_equations_fixture['T_0_degC']
+    I_sc_0_A = auxiliary_equations_fixture['I_sc_0_A']
+    I_rs_0_A = auxiliary_equations_fixture['I_rs_0_A']
     n_0 = auxiliary_equations_fixture['n_0']
-    R_s_Ohm_0 = auxiliary_equations_fixture['R_s_Ohm_0']
-    G_p_S_0 = auxiliary_equations_fixture['G_p_S_0']
-    E_g_eV_0 = auxiliary_equations_fixture['E_g_eV_0']
+    R_s_0_Ohm = auxiliary_equations_fixture['R_s_0_Ohm']
+    G_p_0_S = auxiliary_equations_fixture['G_p_0_S']
+    E_g_0_eV = auxiliary_equations_fixture['E_g_0_eV']
 
     N_s_expected = auxiliary_equations_fixture['N_s_expected']
     T_degC_expected = auxiliary_equations_fixture['T_degC_expected']
@@ -116,8 +116,8 @@ def test_auxiliary_equations(auxiliary_equations_fixture):
     G_p_S_expected = auxiliary_equations_fixture['G_p_S_expected']
 
     result = model.auxiliary_equations(
-        F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_A_0=I_rs_A_0, n_0=n_0,
-        R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
+        F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A, n_0=n_0,
+        R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
 
     assert isinstance(result['N_s'], type(N_s_expected))
     assert result['N_s'].dtype == N_s_expected.dtype

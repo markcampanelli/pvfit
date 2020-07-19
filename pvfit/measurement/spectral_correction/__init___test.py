@@ -1,5 +1,2 @@
-"""Package tests."""
-
-import pvfit.measurement.spectral_correction  # NOQA
-import pvfit.measurement.spectral_correction.api  # NOQA
-import pvfit.measurement.spectral_correction.data  # NOQA
+def test_import_package():
+    import pvfit.measurement.spectral_correction  # noqa

@@ -37,8 +37,8 @@ See the README's for individual subpackages to get started with specific functio
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [Python 3.6+](https://www.python.org/) with [numpy 1.8.2+](https://www.numpy.org/) and
-[scipy 1.2.0+](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
+`pvfit` minimally requires [python~=3.6](https://www.python.org/) with [scipy~=1.5.0](https://www.scipy.org/). It is
+tested on recent versions of Ubuntu, macOS, and Windows.
 
 ### Download, Install, and Verify Package (non-editable mode)
 
