@@ -1,3 +1,7 @@
+# pvfit-private builds
+inference/
+misc/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
