@@ -201,9 +201,10 @@ setup(
     # what's used to render the link text on PyPI.
     project_urls={  # Optional
         'Bug Reports': 'https://github.com/markcampanelli/pvfit/issues',
+        'Developer': 'https://intelligentmeasurementsystems.com',
         # 'Funding': 'https://donate.pypi.org',
         # 'Say Thanks!': 'http://saythanks.io/to/example',
-        'Source': 'https://github.com/markcampanelli/pvfit/',
+        'Source': 'https://github.com/markcampanelli/pvfit',
         'Web App': 'https://pvfit.app',
     },
 )
