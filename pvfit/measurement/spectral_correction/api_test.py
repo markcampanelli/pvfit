@@ -368,15 +368,8 @@ def test_M():
     assert record[3].message.args[0] == "Non-finite inner product detected."
     assert record[4].message.args[0] == "invalid value encountered in double_scalars"
     assert record[5].message.args[0] == "Non-finite M detected."
-    if os.name != 'nt':
-        # Not running on Windows.
-        assert record[6].message.args[0] == "Non-positive M detected."
-        assert len(record) == 7
-    else:
-        # An extra warning on Windows!
-        assert record[6].message.args[0] == "invalid value encountered in greater"
-        assert record[7].message.args[0] == "Non-positive M detected."
-        assert len(record) == 8
+    assert record[6].message.args[0] == "Non-positive M detected."
+    assert len(record) == 7
     assert isinstance(M, numpy.ndarray)
     numpy.testing.assert_equal(M.shape, shape)
     numpy.testing.assert_almost_equal(M, numpy.nan)
