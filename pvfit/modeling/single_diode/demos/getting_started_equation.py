@@ -8,7 +8,8 @@ import requests
 
 import pvfit.modeling.single_diode.equation as sde
 
-# By convention, variable names include the units of the value.
+# By convention, variable names include the units of the value.db2a05a
+
 
 print(f"pvfit version {get_distribution('pvfit').version}")
 
@@ -74,22 +75,26 @@ I_mp_A = result['I_mp_A']
 V_mp_V = result['V_mp_V']
 V_oc_V = result['V_oc_V']
 
-# Now we compute two additional points on the I-V curve that are normally
-# provided by the Sandia Array Performance Model (SAPM). See
-# https://pvpmc.sandia.gov/modeling-steps/2-dc-module-iv/point-value-models/sandia-pv-array-performance-model/
+# Note that the derived parameters include two additional points on the
+# I-V curve that are relevant to the Sandia Array Performance Model
+# (SAPM), namely (V_x, I_x) and (V_xx, I_xx), see
+# https://pvpmc.sandia.gov/modeling-steps/2-dc-module-iv/point-value-models/sandia-pv-array-performance-model/.
+# We now verify these values to further demonstrate the PVfit API.
 # Compute the voltages.
 V_x_V = V_oc_V / 2
 V_xx_V = (V_mp_V + V_oc_V) / 2
 
 # Demonstrate a vectorized computation of currents from voltages.
 V_V = numpy.array([V_x_V, V_xx_V])
+print(f"[V_x_V, V_xx_V] = {V_V}")
 # The API consistently returns a result dictionary, so that one must
-# specifically choose the currents.
+# specifically choose the currents from it.
 result = sde.I_at_V(V_V=V_V, **model_params_fit)
 # There are extra computed results included that are occassionally useful.
 print(f"result = {result}")
 # Get the currents (a numpy array).
 I_A = result['I_A']
+print(f"[I_x_A, I_xx_A] = {I_A}")
 
 # Unpack the computed currents.
 I_x_A, I_xx_A = I_A[0], I_A[1]
