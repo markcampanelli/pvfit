@@ -114,7 +114,7 @@ sphinx-apidoc -f -o . ../pvfit ../*_test.py
 ```
 then—
 ```terminal
-build html
+make html
 ```
 and the root of the generated documentation (uncommitted) is at `docs/_build/html/pvfit.html`. 
 

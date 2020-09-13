@@ -149,7 +149,8 @@ import pvfit.modeling.single_diode.equation as equation
             'G_p_S': 0.,
             'N_s': 1,
             'T_degC': T_stc_degC,
-            'I_sum_A_expected': numpy.array([7. - 6.e-7 * numpy.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_stc_K)) - 3.]),
+            'I_sum_A_expected': numpy.array(
+                [7. - 6.e-7 * numpy.expm1(q_C * 0.5 / (1 * 1.25 * k_B_J_per_K * T_stc_K)) - 3.]),
             'T_K_expected': numpy.float64(T_stc_K),
             'V_diode_V_expected': numpy.float64(0.5),
             'n_mod_V_expected': numpy.array([(1 * 1.25 * k_B_J_per_K * T_stc_K) / q_C])
