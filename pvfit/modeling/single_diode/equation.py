@@ -478,8 +478,7 @@ def P_mp(
     newton_options
         Options for Newton solver (see scipy.optimize.newton).
     minimize_scalar_bounded_options
-        Options for minimization solver (see
-        scipy.optimize.minimize_scalar).
+        Options for minimization solver (see scipy.optimize.minimize_scalar).
 
     Returns
     -------
@@ -503,8 +502,7 @@ def P_mp(
     Compute strategy:
 
     1) Compute solution bracketing interval as [0, Voc].
-    2) Compute maximum power in solution bracketing interval using
-    scipy.optimize.minimize_scalar.
+    2) Compute maximum power in solution bracketing interval using scipy.optimize.minimize_scalar.
     """
     # Compute Voc for assumed Vmp bracket [0, Voc].
     V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,

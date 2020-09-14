@@ -5,7 +5,9 @@ Subpackages
 -----------
 
 .. toctree::
+   :maxdepth: 4
 
+   pvfit.common
    pvfit.measurement
    pvfit.modeling
 
