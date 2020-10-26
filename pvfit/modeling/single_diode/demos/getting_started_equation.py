@@ -45,6 +45,14 @@ if response.status_code == 200:
         # Note that N_s and T_degC are included in the fit result for
         # completeness and ease of use in subsequent function calls.
         model_params_fit = response_json_dict['model_params_fit']
+        # Adjust some names for version change.
+        model_params_fit = {'N_s': model_params_fit['N_s'],
+                            'T_degC': model_params_fit['T_degC'],
+                            'I_ph_A': model_params_fit['I_ph_A'],
+                            'I_rs_1_A': model_params_fit['I_rs_A'],
+                            'n_1': model_params_fit['n'],
+                            'R_s_Ohm': model_params_fit['R_s_Ohm'],
+                            'G_p_S': model_params_fit['G_p_S']}
         print(f"Fit succeeded:\nmodel_params_fit = {model_params_fit}")
     else:
         print(f"Fit did not succeed:\nmodel_params_fit = \
@@ -56,7 +64,7 @@ else:
 if not success:
     model_params_fit = {
         'N_s': 72, 'T_degC': 25.0, 'I_ph_A': 8.903002024717399,
-        'I_rs_A': 1.98620148842876e-07, 'n': 1.2782631787313674,
+        'I_rs_1_A': 1.98620148842876e-07, 'n_1': 1.2782631787313674,
         'R_s_Ohm': 0.3013297637749544, 'G_p_S': 0.0005906833299600464}
     print(f"Falling back to previously computed fit parameters:\n\
 model_params_fit = {model_params_fit}")

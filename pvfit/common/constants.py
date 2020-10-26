@@ -25,38 +25,38 @@ h_J_s = scipy.constants.h
 
 # Temperature.
 # Absolute zero in degrees Celsius.
-T_abs_zero_degC = scipy.constants.convert_temperature(0, 'Kelvin', 'Celsius')
+T_degC_abs_zero = scipy.constants.convert_temperature(0, 'Kelvin', 'Celsius')
 # STC temperature in degrees Celsius.
-T_stc_degC = 25.
+T_degC_stc = 25.
 # STC temperature in Kelvin.
-T_stc_K = scipy.constants.convert_temperature(T_stc_degC, 'Celsius', 'Kelvin')
+T_K_stc = scipy.constants.convert_temperature(T_degC_stc, 'Celsius', 'Kelvin')
 
 # Total irradiance.
 # Hemispherical irradiance at STC (includes specified sun orientation, plane orientation, spectrum, etc.).
-G_hemi_stc_W_per_m2 = 1000.
+G_hemi_W_per_m2_stc = 1000.
 
 # Materials.
 materials = \
     {
      'CIGS': {  # Copper Indium Gallium Selenide (CIGS).
               # Band gap at STC, from De Soto et al. 2006.
-              'E_g_stc_eV': 1.15,
+              'E_g_eV_stc': 1.15,
              },
      'CIS':  {  # Copper Indium diSelenide (CIS).
               # Band gap at STC, from De Soto et al. 2006.
-              'E_g_stc_eV': 1.010,
+              'E_g_eV_stc': 1.010,
              },
      'CdTe': {  # Cadmium Telluride (CdTe).
               # Band gap at STC, from De Soto et al. 2006.
-              'E_g_stc_eV': 1.475,
+              'E_g_eV_stc': 1.475,
              },
      'GaAs': {  # Gallium Arsenide (GaAs).
               # Band gap at 300 K, Kittel, C., Intro. to Solid State Physics, 6th ed. 1986, p 185.
-              'E_g_stc_eV': 1.43,
+              'E_g_eV_stc': 1.43,
              },
      'x-Si': {  # Mono-/multi-crystalline Silicon (x-Si).
               # Band gap at STC, from De Soto et al. 2006.
-              'E_g_stc_eV': 1.121,
+              'E_g_eV_stc': 1.121,
              }
     }
 
@@ -70,3 +70,8 @@ newton_options_default = {'maxiter': inspect.signature(newton).parameters['maxit
 minimize_scalar_bounded_options_default = {
     'maxiter': inspect.signature(_minimize_scalar_bounded).parameters['maxiter'].default,
     'xatol': inspect.signature(_minimize_scalar_bounded).parameters['xatol'].default}
+
+# Assertions
+
+# Absolute tolerance for numpy.testing.assert_allclose when testing current sum is sufficnently near zero.
+I_sum_A_atol = 1e-12

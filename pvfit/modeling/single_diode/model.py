@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy
 from scipy.constants import convert_temperature
 
@@ -8,158 +10,378 @@ import pvfit.modeling.single_diode.equation as equation
 
 
 def current_sum_at_diode_node(
-        *, V_V, I_A, F, T_degC, N_s, T_0_degC, I_sc_0_A, I_rs_0_A, n_0, R_s_0_Ohm, G_p_0_S, E_g_0_eV):
+    *, V_V: Union[float, numpy.float64, numpy.ndarray], I_A: Union[float, numpy.float64, numpy.ndarray],
+    F: Union[float, numpy.float64, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray], T_degC_0: Union[float, numpy.float64, numpy.ndarray],
+    I_sc_A_0: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray],
+    n_1_0: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
+        G_p_S_0: Union[float, numpy.float64, numpy.ndarray], E_g_eV_0: Union[float, numpy.float64, numpy.ndarray]):
     """
-    Computes the sum of the currents at the high-voltage diode node in the implicit 6-parameter global single-diode
-    equivalent-circuit model (SDM-G).
+    Computes the sum of currents at the diode's anode node in the
+    6-parameter single-diode model (SDM) equivalent-circuit model.
 
-    Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Observables at operating conditions (device-level):
-            V_V terminal voltage
-            I_A terminal current
-            F effective irradiance ratio on diode junction
-            T_degC effective diode-junction temperature
-        Model parameters at reference conditions (device-level):
-            N_s integer number of cells in series in each parallel string
-            T_0_degC temperature of diode-junction
-            I_sc_0_A short-circuit current
-            I_rs_0_A diode reverse-saturation current
-            n_0 diode ideality factor
-            R_s_0_Ohm series resistance
-            G_p_0_S parallel conductance
-            E_g_0_eV material band gap
 
-    Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
-        dict containing:
-            I_sum_A sum of currents at high-voltage diode node
-            T_K temperature of diode junction (in Kelvin)
-            V_diode_V voltage at high-voltage diode node
-            n_mod_V modified diode ideality factor
+    Parameters
+    ----------
+    V_V
+        Terminal voltage [V].
+    I_A
+        Terminal current [A].
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        device temperature [°C].
+    N_s
+        Number of cells in series in each parallel string [·].
+    T_degC_0
+        Temperature at reference condtions [°C].
+    I_sc_A_0
+        Short-circuit current at reference condtions [A].
+    I_rs_1_A_0
+        Reverse-saturation current of diode at reference condtions [A].
+    n_1_0
+        Ideality factor of diode at reference condtions [·].
+    R_s_Ohm_0
+        Series resistance at reference condtions [Ω].
+    G_p_S_0
+        Parallel conductance at reference condtions [S].
+    E_g_eV_0
+        Material band gap at reference condtions [eV].
+
+    Returns
+    -------
+    result : dict
+        I_sum_A
+            Sum of currents at diode's anode node [A].
+        T_K
+            Temperature of device [K].
+        V_1_V
+            Voltage at diode's anode node [V].
+        n_1_mod_V
+            Modified ideality factor [V].
+
+    Notes
+    -----
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
-
-    params = auxiliary_equations(F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A,
-                                 n_0=n_0, R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
+    # Compute the auxiliary equations.
+    params = auxiliary_equations(
+        F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0, n_1_0=n_1_0,
+        R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
     return equation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, **params)
 
 
-def auxiliary_equations(*, F, T_degC, N_s, T_0_degC, I_sc_0_A, I_rs_0_A, n_0, R_s_0_Ohm, G_p_0_S, E_g_0_eV):
+def auxiliary_equations(
+    *, F: Union[float, numpy.float64, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray], T_degC_0: Union[float, numpy.float64, numpy.ndarray],
+    I_sc_A_0: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray],
+    n_1_0: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
+        G_p_S_0: Union[float, numpy.float64, numpy.ndarray], E_g_eV_0: Union[float, numpy.float64, numpy.ndarray]):
     """
-    Computes the auxiliary equations at F and T_degC for the 6-parameter SDM-G.
+    Computes the auxiliary equations at effective irradiance ratio and
+    device temperature.
 
-    Inputs (any broadcast-compatible combination of scalars and numpy arrays):
-        Same as current_sum_at_diode_node().
+    Parameters
+    ----------
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        Temperature of device [°C].
+    N_s
+        Number of cells in series in each parallel string [·].
+    T_degC_0
+        Temperature at reference condtions [°C].
+    I_sc_A_0
+        Short-circuit current at reference condtions [A].
+    I_rs_1_A_0
+        Reverse-saturation current of diode at reference condtions [A].
+    n_1_0
+        Ideality factor of diode at reference condtions [·].
+    R_s_Ohm_0
+        Series resistance at reference condtions [Ω].
+    G_p_S_0
+        Parallel conductance at reference condtions [S].
+    E_g_eV_0
+        Material band gap at reference condtions [eV].
 
-    Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
-        dict containing model parameters at operating conditions:
-            I_ph_A photocurrent
-            I_rs_A diode reverse-saturation current
-            n diode ideality factor
-            R_s_Ohm series resistance
-            G_p_S parallel conductance
-            N_s integer number of cells in series in each parallel string
-            T_degC effective diode-junction temperature
+    Returns
+    -------
+    result : dict
+        N_s
+            Number of cells in series in each parallel string [·].
+        T_degC
+            Temperature of device [°C].
+        I_ph_A
+            Photocurrent [A].
+        I_rs_1_A
+            Reverse-saturation current of diode [A].
+        n_1
+            Ideality factor of diode [·].
+        R_s_Ohm
+            Series resistance [Ω].
+        G_p_S
+            Parallel conductance [S].
+
+    Notes
+    -----
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
-
     # Temperatures must be in Kelvin.
     T_K = convert_temperature(T_degC, 'Celsius', 'Kelvin')
-    T_K_0 = convert_temperature(T_0_degC, 'Celsius', 'Kelvin')
+    T_K_0 = convert_temperature(T_degC_0, 'Celsius', 'Kelvin')
 
     # Compute variables at operating conditions.
 
     # Compute band gap (constant).
-    E_g_eV = E_g_0_eV
+    E_g_eV = E_g_eV_0
 
     # Compute diode ideality factor (constant).
-    n = n_0
+    n_1 = n_1_0
 
     # Compute reverse-saturation current at T_degC (this is independent of F, I_sc_0_A, R_s_0_Ohm, and G_p_0_S).
-    I_rs_A = I_rs_0_A * (T_K / T_K_0)**3 * numpy.exp(E_g_eV / (n * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
+    I_rs_1_A = I_rs_1_A_0 * (T_K / T_K_0)**3 * numpy.exp(E_g_eV / (n_1 * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
 
     # Compute series resistance (constant).
-    R_s_Ohm = R_s_0_Ohm
+    R_s_Ohm = R_s_Ohm_0
 
     # Compute parallel conductance (constant).
-    G_p_S = G_p_0_S
+    G_p_S = G_p_S_0
 
     # Compute parallel conductance (photo-conductive shunt).
-    # G_p_S = F * G_p_0_S
+    # G_p_S = F * G_p_S_0
 
     # Compute photo-generated current at F and T_degC (V=0 with I=Isc for this).
-    expr1 = I_sc_0_A * F
+    expr1 = I_sc_A_0 * F
     expr2 = expr1 * R_s_Ohm
-    I_ph_A = expr1 + I_rs_A * numpy.expm1(q_C * expr2 / (N_s * n * k_B_J_per_K * T_K)) + G_p_S * expr2
+    I_ph_A = expr1 + I_rs_1_A * numpy.expm1(q_C * expr2 / (N_s * n_1 * k_B_J_per_K * T_K)) + G_p_S * expr2
 
-    return ensure_numpy_scalars(dictionary={
-        'N_s': N_s, 'T_degC': T_degC, 'I_ph_A': I_ph_A, 'I_rs_A': I_rs_A, 'n': n, 'R_s_Ohm': R_s_Ohm, 'G_p_S': G_p_S})
+    return ensure_numpy_scalars(dictionary={'N_s': N_s, 'T_degC': T_degC, 'I_ph_A': I_ph_A, 'I_rs_1_A': I_rs_1_A,
+                                            'n_1': n_1, 'R_s_Ohm': R_s_Ohm, 'G_p_S': G_p_S})
 
 
-def I_at_V_F_T(*, V_V, F, T_degC, N_s, T_0_degC, I_sc_0_A, I_rs_0_A, n_0, R_s_0_Ohm, G_p_0_S, E_g_0_eV,
-               newton_options=newton_options_default):
+def I_at_V_F_T(
+    *, V_V: Union[float, numpy.float64, numpy.ndarray], F: Union[float, numpy.float64, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC_0: Union[float, numpy.float64, numpy.ndarray], I_sc_A_0: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray], n_1_0: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray], G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
+        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
     """
-    Compute terminal current at given terminal voltage, effective irradiance ratio, and effective diode-junction
-    temperature.
+    Compute terminal current at specified terminal voltage, effective
+    irradiance ratio, and device temperature.
 
-    Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Same as current_sum_at_diode_node(), but with removal of I_A and addition of:
-            newton_options (optional) options for Newton solver
+    Parameters
+    ----------
+    V_V
+        Terminal voltage [V].
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        Temperature of device [°C].
+    N_s
+        Number of cells in series in each parallel string [·].
+    T_degC_0
+        Temperature at reference condtions [°C].
+    I_sc_A_0
+        Short-circuit current at reference condtions [A].
+    I_rs_1_A_0
+        Reverse-saturation current of diode at reference condtions [A].
+    n_1_0
+        Ideality factor of diode at reference condtions [·].
+    R_s_Ohm_0
+        Series resistance at reference condtions [Ω].
+    G_p_S_0
+        Parallel conductance at reference condtions [S].
+    E_g_eV_0
+        Material band gap at reference condtions [eV].
+    newton_options
+        Options for Newton solver (see scipy.optimize.newton).
 
-    Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
-        dict containing the outputs of current_sum_at_diode_node() with the addition of:
-            I_A terminal current
+    Returns
+    -------
+    result : dict
+        I_A
+            Terminal current [A].
+        I_sum_A
+            Sum of currents at diode's anode node [A].
+        T_K
+            Effective diode-junction temperature [K].
+        V_1_V
+            Voltage at diode's anode node [V].
+        n_1_mod_V
+            Modified ideality factor [V].
+
+    Notes
+    -----
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
-
-    params = auxiliary_equations(F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A,
-                                 n_0=n_0, R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
+    params = auxiliary_equations(
+        F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0,
+        n_1_0=n_1_0, R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
     return equation.I_at_V(V_V=V_V, **params, newton_options=newton_options)
 
 
-def V_at_I_F_T(*, I_A, F, T_degC, N_s, T_0_degC, I_sc_0_A, I_rs_0_A, n_0, R_s_0_Ohm, G_p_0_S, E_g_0_eV,
-               newton_options=newton_options_default):
+def V_at_I_F_T(
+    *, I_A: Union[float, numpy.float64, numpy.ndarray], F: Union[float, numpy.float64, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC_0: Union[float, numpy.float64, numpy.ndarray], I_sc_A_0: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray], n_1_0: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray], G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
+        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
     """
-    Compute terminal voltage at given terminal current, effective irradiance ratio, and effective diode-junction
-    temperature.
+    Compute terminal voltage at specified terminal current, effective
+    irradiance ratio, and device temperature.
 
-    Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Same as current_sum_at_diode_node(), but with removal of V_V and addition of:
-            newton_options (optional) options for Newton solver
+    Parameters
+    ----------
+    I_A
+        Terminal current [A].
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        Temperature of device [°C].
+    N_s
+        Number of cells in series in each parallel string [·].
+    T_degC_0
+        Temperature at reference condtions [°C].
+    I_sc_A_0
+        Short-circuit current at reference condtions [A].
+    I_rs_1_A_0
+        Reverse-saturation current of diode at reference condtions [A].
+    n_1_0
+        Ideality factor of diode at reference condtions [·].
+    R_s_Ohm_0
+        Series resistance at reference condtions [Ω].
+    G_p_S_0
+        Parallel conductance at reference condtions [S].
+    E_g_eV_0
+        Material band gap at reference condtions [eV].
+    newton_options
+        Options for Newton solver (see scipy.optimize.newton).
 
-    Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
-        dict containing the outputs of current_sum_at_diode_node() with the addition of:
-            V_V terminal voltage
+    Returns
+    -------
+    result : dict
+        V_V
+            Terminal voltage [V].
+        I_sum_A
+            Sum of currents at diode's anode node [A].
+        T_K
+            Effective diode-junction temperature [K].
+        V_1_V
+            Voltage at diode's anode node [V].
+        n_1_mod_V
+            Modified ideality factor [V].
+
+    Notes
+    -----
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
-
-    params = auxiliary_equations(F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A,
-                                 n_0=n_0, R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
+    params = auxiliary_equations(
+        F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0, n_1_0=n_1_0,
+        R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
     return equation.V_at_I(I_A=I_A, **params, newton_options=newton_options)
 
 # TODO Need to complete the utility functions.
 
 
-def derived_params(*, F, T_degC, N_s, T_0_degC, I_sc_0_A, I_rs_0_A, n_0, R_s_0_Ohm, G_p_0_S, E_g_0_eV,
-                   minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
-                   newton_options=newton_options_default):
+def derived_params(
+    *, F: Union[float, numpy.float64, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray], T_degC_0: Union[float, numpy.float64, numpy.ndarray],
+    I_sc_A_0: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray],
+    n_1_0: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S_0: Union[float, numpy.float64, numpy.ndarray], E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: dict = newton_options_default,
+        minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default):
     """
-    Compute derived parameters as a function of irradiance and temperature.
+    Compute derived parameters at specified effective irradiance ratio
+    and device temperature.
 
-    Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Same as auxiliary_equations().
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        Temperature of device [°C].
+    N_s
+        Number of cells in series in each parallel string [·].
+    T_degC_0
+        Temperature at reference condtions [°C].
+    I_sc_A_0
+        Short-circuit current at reference condtions [A].
+    I_rs_1_A_0
+        Reverse-saturation current of diode at reference condtions [A].
+    n_1_0
+        Ideality factor of diode at reference condtions [·].
+    R_s_Ohm_0
+        Series resistance at reference condtions [Ω].
+    G_p_S_0
+        Parallel conductance at reference condtions [S].
+    E_g_eV_0
+        Material band gap at reference condtions [eV].
+    newton_options
+        Options for Newton solver (see scipy.optimize.newton).
+    minimize_scalar_bounded_options
+        Options for minimization solver (see scipy.optimize.minimize_scalar).
 
-    Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
-        dict containing the outputs of FF() with the addition of:
-            R_oc_Ohm resistance at open circuit
-            R_sc_Ohm resistance at short circuit
+    Returns
+    -------
+    result : dict
+        FF
+            Fill Factor [·].
+        I_ph_A
+            Photocurrent [A].
+        R_sc_Ohm
+            Terminal resistance at short circuit [Ω].
+        V_x_V
+            Terminal voltage at half of terminal open-circuit voltage [V].
+        I_x_A
+            Terminal current at V_x_V [A].
+        I_mp_A
+            Terminal current at maximum terminal power [A].
+        P_mp_W
+            Maximum terminal power [W].
+        V_mp_V
+            Terminal voltage at maximum terminal power [V].
+        V_xx_V
+            Terminal voltage at average of votage at maximum power and
+            terminal open-circuit voltage [V].
+        I_xx_A
+            Terminal current at V_xx_V [A].
+        R_oc_Ohm
+            Terminal resistance at open circuit [Ω].
+        V_oc_V
+            Terminal open-circuit voltage [V].
+
+    Notes
+    -----
+    All parameters are at the device level, where the device consists of
+    N_s PV cells in series in each of N_p strings in parallel. Inputs must
+    be broadcast compatible. Output values are numpy.float64 or
+    numpy.ndarray.
     """
 
-    params = auxiliary_equations(F=F, T_degC=T_degC, N_s=N_s, T_0_degC=T_0_degC, I_sc_0_A=I_sc_0_A, I_rs_0_A=I_rs_0_A,
-                                 n_0=n_0, R_s_0_Ohm=R_s_0_Ohm, G_p_0_S=G_p_0_S, E_g_0_eV=E_g_0_eV)
+    params = auxiliary_equations(
+        F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0,
+        n_1_0=n_1_0, R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
     result = equation.FF(
         **params, minimize_scalar_bounded_options=minimize_scalar_bounded_options, newton_options=newton_options)
 
-    # In SDM-G, I_ph_A is also a derived parameter.
+    # In SDM, I_ph_A is a derived parameter.
     result['I_ph_A'] = params['I_ph_A']
 
     # Compute the additional resistances.

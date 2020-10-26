@@ -4,18 +4,19 @@ import numpy
 from scipy.constants import convert_temperature
 from scipy.optimize import minimize_scalar, newton
 
-from pvfit.common.constants import k_B_J_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C
+from pvfit.common.constants import (
+    I_sum_A_atol, k_B_J_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C)
 from pvfit.common.utils import ensure_numpy_scalars
 
 
 def current_sum_at_diode_node(
     *, V_V: Union[float, numpy.float64, numpy.ndarray], I_A: Union[float, numpy.float64, numpy.ndarray],
     N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
         G_p_S: Union[float, numpy.float64, numpy.ndarray]) -> dict:
     """
-    Computes the sum of the currents at the high-voltage diode node in the
+    Computes the sum of the currents at the diode's anode in the
     5-parameter single-diode equation (SDE) equivalent-circuit model.
 
     Parameters
@@ -27,13 +28,13 @@ def current_sum_at_diode_node(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -46,41 +47,41 @@ def current_sum_at_diode_node(
             Sum of currents at high-voltage diode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
+        V_1_V
             Voltage at high-voltage diode node [V].
-        n_mod_V
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
     # Temperature in Kelvin.
     T_K = convert_temperature(T_degC, 'Celsius', 'Kelvin')
 
     # Voltage at diode node.
-    V_diode_V = V_V + I_A * R_s_Ohm
+    V_1_V = V_V + I_A * R_s_Ohm
 
-    # Modified ideality factor.
-    n_mod_V = (N_s * n * k_B_J_per_K * T_K) / q_C
+    # Modified idealityV_1_V factor.
+    n_1_mod_V = (N_s * n_1 * k_B_J_per_K * T_K) / q_C
 
     # Sum of currents at diode node. numpy.expm1() returns a numpy.float64 when arguments are all python/numpy scalars.
-    I_sum_A = I_ph_A - I_rs_A * numpy.expm1(V_diode_V / n_mod_V) - G_p_S * V_diode_V - I_A
+    I_sum_A = I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
-    return ensure_numpy_scalars(dictionary={'I_sum_A': I_sum_A, 'T_K': T_K, 'V_diode_V': V_diode_V, 'n_mod_V': n_mod_V})
+    return ensure_numpy_scalars(dictionary={'I_sum_A': I_sum_A, 'T_K': T_K, 'V_1_V': V_1_V, 'n_1_mod_V': n_1_mod_V})
 
 
 def I_at_V(
     *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_A: Union[float, numpy.float64, numpy.ndarray], n: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
         newton_options: dict = newton_options_default) -> dict:
     """
-    Compute terminal current from terminal voltage using Newton's method.
+    Compute terminal current at specified terminal voltage.
 
     Parameters
     ----------
@@ -89,13 +90,13 @@ def I_at_V(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -109,20 +110,20 @@ def I_at_V(
         I_A
             Terminal current [A].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
-            Voltage at high-voltage diode node [V].
-        n_mod_V
+        V_1_V
+            Voltage at diode's anode node [V].
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
 
     Compute strategy:
 
@@ -131,33 +132,33 @@ def I_at_V(
     2) Compute using scipy.optimize.newton.
     """
     # Optimization.
-    n_mod_V = (N_s * n * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
+    n_1_mod_V = (N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
 
     # Preserve shape of excluded R_s_Ohm in inital condition.
-    V_diode_V_ic = V_V + 0. * R_s_Ohm
+    V_1_V_ic = V_V + 0. * R_s_Ohm
 
     # Compute initially with zero R_s_Ohm.
-    I_A_ic = I_ph_A - I_rs_A * numpy.expm1(V_diode_V_ic / n_mod_V) - G_p_S * V_diode_V_ic
+    I_A_ic = I_ph_A - I_rs_1_A * numpy.expm1(V_1_V_ic / n_1_mod_V) - G_p_S * V_1_V_ic
 
     # Use closures in function definitions for Newton's method.
     def func(I_A):
-        V_diode_V = V_V + I_A * R_s_Ohm
-        return I_ph_A - I_rs_A * numpy.expm1(V_diode_V / n_mod_V) - G_p_S * V_diode_V - I_A
+        V_1_V = V_V + I_A * R_s_Ohm
+        return I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
     def fprime(I_A):
-        return -I_rs_A * R_s_Ohm / n_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V) - G_p_S * R_s_Ohm - 1.
+        return -I_rs_1_A * R_s_Ohm / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S * R_s_Ohm - 1.
 
     # FUTURE Consider using this in Halley's method.
     # def fprime2(I_A):
-    #     return -I_rs_A * (R_s_Ohm / n_mod_V)**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
+    #     return -I_rs_1_A * (R_s_Ohm / n_1_mod_V)**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
 
     # Solve for I_A using Newton's method.
     I_A = newton(func, I_A_ic, fprime=fprime, **newton_options)
 
     # Verify convergence, because newton() documentation says that this should be checked.
-    result = current_sum_at_diode_node(
-        V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_array_almost_equal(result['I_sum_A'], 0)
+    result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
+                                       n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
+    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol)
 
     # Add verified currents to result.
     result.update(ensure_numpy_scalars(dictionary={'I_A': I_A}))
@@ -168,7 +169,7 @@ def I_at_V(
 def I_at_V_d1(
     *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_A: Union[float, numpy.float64, numpy.ndarray], n: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
         newton_options: dict = newton_options_default) -> dict:
     """
@@ -182,13 +183,13 @@ def I_at_V_d1(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -205,27 +206,27 @@ def I_at_V_d1(
             Sum of currents at high-voltage diode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
+        V_1_V
             Voltage at high-voltage diode node [V].
-        n_mod_V
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
 
     This derivative is needed, e.g., for R_oc_Ohm and R_sc_Ohm
     calculations.
     """
     # Compute terminal current.
-    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)
+    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                    G_p_S=G_p_S, newton_options=newton_options)
 
     # Compute first derivative of current with respect to voltage at specified voltage.
-    expr1 = I_rs_A / result['n_mod_V'] * numpy.exp(result['V_diode_V'] / result['n_mod_V']) + G_p_S
+    expr1 = I_rs_1_A / result['n_1_mod_V'] * numpy.exp(result['V_1_V'] / result['n_1_mod_V']) + G_p_S
     I_d1_V_S = -expr1 / (1. + R_s_Ohm * expr1)
     result.update(ensure_numpy_scalars(dictionary={'I_d1_V_S': I_d1_V_S}))
 
@@ -235,11 +236,11 @@ def I_at_V_d1(
 def V_at_I(
     *, I_A: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_A: Union[float, numpy.float64, numpy.ndarray], n: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
         newton_options: dict = newton_options_default) -> dict:
     """
-    Compute terminal voltage from terminal current using Newton's method.
+    Compute terminal voltage at specified terminal current.
 
     Parameters
     ----------
@@ -248,13 +249,13 @@ def V_at_I(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -271,17 +272,17 @@ def V_at_I(
             Sum of currents at high-voltage diode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
+        V_1_V
             Voltage at high-voltage diode node [V].
-        n_mod_V
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
 
     Compute strategy:
 
@@ -290,30 +291,30 @@ def V_at_I(
     2) Compute using scipy.optimize.newton.
     """
     # Optimization.
-    n_mod_V = (N_s * n * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
+    n_1_mod_V = (N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
 
     # Compute initially with zero G_p_S, preserving shape of excluded G_p_S in inital condition.
-    V_V_ic = n_mod_V * (numpy.log(I_ph_A + I_rs_A - 0. * G_p_S - I_A) - numpy.log(I_rs_A)) - I_A * R_s_Ohm
+    V_V_ic = n_1_mod_V * (numpy.log(I_ph_A + I_rs_1_A - 0. * G_p_S - I_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm
 
     # Use closures in these function definitions for Newton's method.
     def func(V_V):
-        V_diode_V = V_V + I_A * R_s_Ohm
-        return I_ph_A - I_rs_A * numpy.expm1(V_diode_V / n_mod_V) - G_p_S * V_diode_V - I_A
+        V_1_V = V_V + I_A * R_s_Ohm
+        return I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
     def fprime(V_V):
-        return -I_rs_A / n_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V) - G_p_S
+        return -I_rs_1_A / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S
 
     # FUTURE Consider using this in Halley's method.
     # def fprime2(V_V):
-    #     return -I_rs_A / n_mod_V**2. * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
+    #     return -I_rs_1_A / n_1_mod_V**2. * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
 
     # Solve for V_V using Newton's method.
     V_V = newton(func, V_V_ic, fprime=fprime, **newton_options)
 
     # Verify convergence. newton() documentation says that this should be checked.
-    result = current_sum_at_diode_node(
-        V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_array_almost_equal(result['I_sum_A'], 0.)
+    result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
+                                       n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
+    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol)
 
     # Add verified voltages to result.
     result.update(ensure_numpy_scalars(dictionary={'V_V': V_V}))
@@ -324,7 +325,7 @@ def V_at_I(
 def V_at_I_d1(
     *, I_A: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_A: Union[float, numpy.float64, numpy.ndarray], n: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
         newton_options: dict = newton_options_default) -> dict:
     """
@@ -338,13 +339,13 @@ def V_at_I_d1(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -361,27 +362,27 @@ def V_at_I_d1(
             Sum of currents at high-voltage diode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
+        V_1_V
             Voltage at high-voltage diode node [V].
-        n_mod_V
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
 
-    This derivative is needed, e.g., for solving the differential equation
-    for capacitor charging.
+    This derivative is needed, e.g., for solving the differential
+    equation for capacitor charging.
     """
     # Compute terminal voltage.
-    result = V_at_I(I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)
+    result = V_at_I(I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                    G_p_S=G_p_S, newton_options=newton_options)
 
     # Compute first derivative of voltage with respect to current at specified current.
-    expr1 = I_rs_A / result['n_mod_V'] * numpy.exp(result['V_diode_V'] / result['n_mod_V']) + G_p_S
+    expr1 = I_rs_1_A / result['n_1_mod_V'] * numpy.exp(result['V_1_V'] / result['n_1_mod_V']) + G_p_S
     V_d1_I_Ohm = -1. / expr1 - R_s_Ohm
     result.update(ensure_numpy_scalars(dictionary={'V_d1_I_Ohm': V_d1_I_Ohm}))
 
@@ -391,11 +392,11 @@ def V_at_I_d1(
 def P_at_V(
     *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_A: Union[float, numpy.float64, numpy.ndarray], n: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
         newton_options: dict = newton_options_default) -> dict:
     """
-    Compute terminal power from terminal voltage.
+    Compute terminal power at specified terminal voltage.
 
     Parameters
     ----------
@@ -404,13 +405,13 @@ def P_at_V(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -429,21 +430,21 @@ def P_at_V(
             Sum of currents at high-voltage diode node [A].
         T_K
             Effective diode-junction temperature [K].
-        V_diode_V
+        V_1_V
             Voltage at high-voltage diode node [V].
-        n_mod_V
+        n_1_mod_V
             Modified ideality factor [V].
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
     # Compute power.
-    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)
+    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                    G_p_S=G_p_S, newton_options=newton_options)
     P_W = V_V * result['I_A']
     result.update(ensure_numpy_scalars(dictionary={'P_W': P_W}))
 
@@ -452,8 +453,8 @@ def P_at_V(
 
 def P_mp(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
     G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
         minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
     """
@@ -464,13 +465,13 @@ def P_mp(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -494,10 +495,10 @@ def P_mp(
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
 
     Compute strategy:
 
@@ -505,19 +506,21 @@ def P_mp(
     2) Compute maximum power in solution bracketing interval using scipy.optimize.minimize_scalar.
     """
     # Compute Voc for assumed Vmp bracket [0, Voc].
-    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)['V_V']
+    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,\
+                    G_p_S=G_p_S, newton_options=newton_options)['V_V']
 
     # This allows us to make a ufunc out of minimize_scalar(). Note closures over solver arguments/options.
-    def opposite_P_at_V(V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S):
-        return -P_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                       newton_options=newton_options)['P_W']
-    array_min_func = numpy.frompyfunc(lambda V_oc_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S: minimize_scalar(
-        opposite_P_at_V, bounds=(0., V_oc_V), args=(N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S), method='bounded',
-        options=minimize_scalar_bounded_options), 8, 1)
+    def opposite_P_at_V(V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S):
+        return -P_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                       G_p_S=G_p_S, newton_options=newton_options)['P_W']
+
+    array_min_func = numpy.frompyfunc(
+        lambda V_oc_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S: minimize_scalar(
+            opposite_P_at_V, bounds=(0., V_oc_V), args=(N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S),
+            method='bounded', options=minimize_scalar_bounded_options), 8, 1)
 
     # Solve for the array of OptimizeResult objects.
-    res_array = array_min_func(V_oc_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S)
+    res_array = array_min_func(V_oc_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S)
 
     # Verify convergence. Note that numpy.frompyfunc() always returns a PyObject array, which must be cast.
     if not numpy.all(numpy.array(numpy.frompyfunc(lambda res: res.success, 1, 1)(res_array), dtype=bool)):
@@ -535,8 +538,8 @@ def P_mp(
 
 def FF(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
     G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
         minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
     """
@@ -547,13 +550,13 @@ def FF(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -582,17 +585,17 @@ def FF(
 
     Notes
     -----
-     All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
-   """
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
+    """
     # Compute Pmp.
-    result = P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
+    result = P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                   minimize_scalar_bounded_options=minimize_scalar_bounded_options, newton_options=newton_options)
     # Compute Isc.
-    I_sc_A = I_at_V(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)['I_A']
+    I_sc_A = I_at_V(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                    G_p_S=G_p_S, newton_options=newton_options)['I_A']
     result.update({'I_sc_A': I_sc_A})
     # Compute FF.
     denominator = I_sc_A * result['V_oc_V']
@@ -606,8 +609,8 @@ def FF(
 
 def R_at_oc(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
         G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
     """
     Compute terminal resistance at open circuit in Ohms.
@@ -617,13 +620,13 @@ def R_at_oc(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -641,17 +644,17 @@ def R_at_oc(
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
     # Compute Voc.
-    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                    newton_options=newton_options)['V_V']
+    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                    G_p_S=G_p_S, newton_options=newton_options)['V_V']
 
     # Compute slope at Voc.
-    result = I_at_V_d1(V_V=V_oc_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm,
+    result = I_at_V_d1(V_V=V_oc_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
                        G_p_S=G_p_S, newton_options=newton_options)
 
     # Compute resistance at Voc.
@@ -662,8 +665,8 @@ def R_at_oc(
 
 def R_at_sc(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
         G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
     """
     Compute terminal resistance at short circuit in Ohms.
@@ -673,13 +676,13 @@ def R_at_sc(
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -697,14 +700,14 @@ def R_at_sc(
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
     # Compute derivative at Isc.
-    result = I_at_V_d1(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                       newton_options=newton_options)
+    result = I_at_V_d1(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
+                       G_p_S=G_p_S, newton_options=newton_options)
     I_sc_A = result['I_A']
 
     # Compute resistance at Isc.
@@ -715,8 +718,8 @@ def R_at_sc(
 
 def derived_params(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_A: Union[float, numpy.float64, numpy.ndarray],
-    n: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
     G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
         minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
     """
@@ -724,16 +727,20 @@ def derived_params(
 
     Parameters
     ----------
+    F
+        Effective irradiance ratio on device [·].
+    T_degC
+        Temperature of device [°C].
     N_s
         Number of cells in series in each parallel string [·].
     T_degC
-        Diode-junction temperature [°C].
+        Temperature of device [°C].
     I_ph_A
         Photocurrent [A].
-    I_rs_A
-        Diode reverse-saturation current [A].
-    n
-        Diode ideality factor [·].
+    I_rs_1_A
+        Reverse-saturation current of diode [A].
+    n_1
+        Ideality factor of diode [·].
     R_s_Ohm
         Series resistance [Ω].
     G_p_S
@@ -755,8 +762,7 @@ def derived_params(
         V_x_V
             Terminal voltage at half of terminal open-circuit voltage [V].
         I_x_A
-            Terminal current at V_x_V, according to Sandia Array
-            Performance Model [A].
+            Terminal current at V_x_V [A].
         I_mp_A
             Terminal current at maximum terminal power [A].
         P_mp_W
@@ -767,8 +773,7 @@ def derived_params(
             Terminal voltage at average of votage at maximum power and
             terminal open-circuit voltage [V].
         I_xx_A
-            Terminal current at V_xx_V, according to Sandia Array
-            Performance Model [A].
+            Terminal current at V_xx_V [A].
         R_oc_Ohm
             Terminal resistance at open circuit [Ω].
         V_oc_V
@@ -776,22 +781,22 @@ def derived_params(
 
     Notes
     -----
-    All parameters are at the device level, where the device consists of
-    N_s PV cells in series in each of N_p strings in parallel. Inputs must
-    be broadcast compatible. Output values are numpy.float64 or
-    numpy.ndarray.
+    All parameters are at the device level, where the device consists
+    of N_s PV cells in series in each of N_p strings in parallel.
+    Inputs must be broadcast compatible. Output values are
+    numpy.float64 or numpy.ndarray.
     """
-    result = FF(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
+    result = FF(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                 newton_options=newton_options, minimize_scalar_bounded_options=minimize_scalar_bounded_options)
-    R_sc_Ohm = R_at_sc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
+    R_sc_Ohm = R_at_sc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                        newton_options=newton_options)['R_sc_Ohm']
     V_x_V = result['V_oc_V'] / 2
-    I_x_A = I_at_V(V_V=V_x_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm,
+    I_x_A = I_at_V(V_V=V_x_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
                    G_p_S=G_p_S, newton_options=newton_options)['I_A']
     V_xx_V = (result['V_mp_V'] + result['V_oc_V']) / 2
-    I_xx_A = I_at_V(V_V=V_xx_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n,
+    I_xx_A = I_at_V(V_V=V_xx_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1,
                     R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)['I_A']
-    R_oc_Ohm = R_at_oc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_A=I_rs_A, n=n, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
+    R_oc_Ohm = R_at_oc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
                        newton_options=newton_options)['R_oc_Ohm']
     result.update({'R_oc_Ohm': R_oc_Ohm, 'V_x_V': V_x_V, 'I_x_A': I_x_A, 'V_xx_V': V_xx_V, 'I_xx_A': I_xx_A,
                    'R_sc_Ohm': R_sc_Ohm})
