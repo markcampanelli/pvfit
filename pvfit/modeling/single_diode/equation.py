@@ -506,7 +506,7 @@ def P_mp(
     2) Compute maximum power in solution bracketing interval using scipy.optimize.minimize_scalar.
     """
     # Compute Voc for assumed Vmp bracket [0, Voc].
-    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,\
+    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
                     G_p_S=G_p_S, newton_options=newton_options)['V_V']
 
     # This allows us to make a ufunc out of minimize_scalar(). Note closures over solver arguments/options.

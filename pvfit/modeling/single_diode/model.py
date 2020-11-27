@@ -20,7 +20,6 @@ def current_sum_at_diode_node(
     Computes the sum of currents at the diode's anode node in the
     6-parameter single-diode model (SDM) equivalent-circuit model.
 
-
     Parameters
     ----------
     V_V
@@ -378,15 +377,10 @@ def derived_params(
         F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0,
         n_1_0=n_1_0, R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
-    result = equation.FF(
+    result = equation.derived_params(
         **params, minimize_scalar_bounded_options=minimize_scalar_bounded_options, newton_options=newton_options)
 
-    # In SDM, I_ph_A is a derived parameter.
+    # In SDM, I_ph_A is a derived parameter, not I_sc_A.
     result['I_ph_A'] = params['I_ph_A']
-
-    # Compute the additional resistances.
-    R_oc_Ohm = equation.R_at_oc(**params, newton_options=newton_options)['R_oc_Ohm']
-    R_sc_Ohm = equation.R_at_sc(**params, newton_options=newton_options)['R_sc_Ohm']
-    result.update({'R_oc_Ohm': R_oc_Ohm, 'R_sc_Ohm': R_sc_Ohm})
 
     return result
