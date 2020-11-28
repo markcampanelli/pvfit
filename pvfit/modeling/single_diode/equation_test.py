@@ -177,8 +177,8 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     V_1_V_expected = current_sum_at_diode_node_fixture['V_1_V_expected']
     n_1_mod_V_expected = current_sum_at_diode_node_fixture['n_1_mod_V_expected']
 
-    result = equation.current_sum_at_diode_node(
-        V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
+    result = equation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A,
+                                                I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
 
     assert isinstance(result['I_sum_A'], type(I_sum_A_expected))
     assert result['I_sum_A'].dtype == I_sum_A_expected.dtype
@@ -252,8 +252,8 @@ def test_V_at_I_explicit():
     G_p_S = 0.
     N_s = 1
     T_degC = T_degC_stc
-    V_V_expected = \
-        N_s * n_1 * k_B_J_per_K * T_K_stc / q_C * (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm
+    V_V_expected = N_s * n_1 * k_B_J_per_K * T_K_stc / q_C * \
+        (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm
 
     V_V = equation.V_at_I(
         I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)['V_V']
@@ -298,8 +298,8 @@ def test_V_at_I_d1_explicit():
     G_p_S = 0.
     N_s = 1
     T_degC = T_degC_stc
-    V_V_expected = numpy.float64(
-        N_s * n_1 * k_B_J_per_K * T_K_stc / q_C * (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm)
+    V_V_expected = numpy.float64(N_s * n_1 * k_B_J_per_K * T_K_stc / q_C *
+                                 (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm)
 
     result = equation.V_at_I_d1(
         I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
@@ -395,25 +395,25 @@ def test_P_mp_no_convergence():
             'dtype_expected': numpy.dtype('float64'),
         }
     ])
-def derived_params_fixture(request):
+def iv_params_fixture(request):
     return request.param
 
 
-def test_derived_params(derived_params_fixture):
+def test_iv_params(iv_params_fixture):
 
     # Happy path for a function that touches many others.
-    result = equation.derived_params(N_s=derived_params_fixture['N_s'], T_degC=derived_params_fixture['T_degC'],
-                                     I_ph_A=derived_params_fixture['I_ph_A'], I_rs_1_A=derived_params_fixture['I_rs_1_A'],
-                                     n_1=derived_params_fixture['n_1'], R_s_Ohm=derived_params_fixture['R_s_Ohm'],
-                                     G_p_S=derived_params_fixture['G_p_S'])
+    result = equation.iv_params(N_s=iv_params_fixture['N_s'], T_degC=iv_params_fixture['T_degC'],
+                                I_ph_A=iv_params_fixture['I_ph_A'], I_rs_1_A=iv_params_fixture['I_rs_1_A'],
+                                n_1=iv_params_fixture['n_1'], R_s_Ohm=iv_params_fixture['R_s_Ohm'],
+                                G_p_S=iv_params_fixture['G_p_S'])
 
     for key, value in result.items():
-        assert isinstance(value, derived_params_fixture['type_expected'])
-        assert value.dtype == derived_params_fixture['dtype_expected']
+        assert isinstance(value, iv_params_fixture['type_expected'])
+        assert value.dtype == iv_params_fixture['dtype_expected']
         if key == 'FF':
             # Zero power cases.
-            assert numpy.all(numpy.isnan(value[derived_params_fixture['I_ph_A'] == 0.]))
+            assert numpy.all(numpy.isnan(value[iv_params_fixture['I_ph_A'] == 0.]))
             # Non-zero power cases.
-            assert numpy.all(numpy.isfinite(value[derived_params_fixture['I_ph_A'] != 0.]))
+            assert numpy.all(numpy.isfinite(value[iv_params_fixture['I_ph_A'] != 0.]))
         else:
             assert numpy.all(numpy.isfinite(value))

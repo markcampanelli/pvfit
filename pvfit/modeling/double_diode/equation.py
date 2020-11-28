@@ -543,11 +543,11 @@ def R_sc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, n
     return {'R_sc_Ohm': R_sc_Ohm, 'I_sc_A': I_sc_A}
 
 
-def derived_params(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-                   minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
-                   newton_options=newton_options_default):
+def iv_params(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
+              minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
+              newton_options=newton_options_default):
     """
-    Compute derived parameters.
+    Compute I-V curve parameters.
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
         Same as P_mp().

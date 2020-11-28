@@ -152,6 +152,6 @@ def test_V_at_I_F_T():
     pass
 
 
-@pytest.mark.skip("TODO: Write derived_params() tests.")
-def test_derived_params():
+@pytest.mark.skip("TODO: Write iv_params() tests.")
+def test_iv_params():
     pass

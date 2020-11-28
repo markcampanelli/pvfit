@@ -716,14 +716,14 @@ def R_at_sc(
     return ensure_numpy_scalars(dictionary={'R_sc_Ohm': R_sc_Ohm, 'I_sc_A': I_sc_A})
 
 
-def derived_params(
+def iv_params(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
     G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
         minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
     """
-    Compute derived parameters.
+    Compute I-V curve parameters.
 
     Parameters
     ----------

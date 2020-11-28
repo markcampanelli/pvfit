@@ -299,7 +299,7 @@ def V_at_I_F_T(
 # TODO Need to complete the utility functions.
 
 
-def derived_params(
+def iv_params(
     *, F: Union[float, numpy.float64, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     N_s: Union[int, numpy.intc, numpy.ndarray], T_degC_0: Union[float, numpy.float64, numpy.ndarray],
     I_sc_A_0: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray],
@@ -308,7 +308,7 @@ def derived_params(
     newton_options: dict = newton_options_default,
         minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default):
     """
-    Compute derived parameters at specified effective irradiance ratio
+    Compute I-V curve parameters at specified effective irradiance ratio
     and device temperature.
 
     F
@@ -341,8 +341,8 @@ def derived_params(
     result : dict
         FF
             Fill Factor [·].
-        I_ph_A
-            Photocurrent [A].
+        I_sc_A
+            Short-circuit current [A].
         R_sc_Ohm
             Terminal resistance at short circuit [Ω].
         V_x_V
@@ -377,10 +377,7 @@ def derived_params(
         F=F, T_degC=T_degC, N_s=N_s, T_degC_0=T_degC_0, I_sc_A_0=I_sc_A_0, I_rs_1_A_0=I_rs_1_A_0,
         n_1_0=n_1_0, R_s_Ohm_0=R_s_Ohm_0, G_p_S_0=G_p_S_0, E_g_eV_0=E_g_eV_0)
 
-    result = equation.derived_params(
+    result = equation.iv_params(
         **params, minimize_scalar_bounded_options=minimize_scalar_bounded_options, newton_options=newton_options)
-
-    # In SDM, I_ph_A is a derived parameter, not I_sc_A.
-    result['I_ph_A'] = params['I_ph_A']
 
     return result

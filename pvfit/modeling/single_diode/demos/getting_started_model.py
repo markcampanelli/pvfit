@@ -108,16 +108,16 @@ if not success:
     print(f"API call failed: Falling back to previously computed fit parameters:\n\
 model_params_fit = {model_params_fit}")
 
-# The response has further information such as derived parameters at the
+# The response has further information such as I-V curve parameters at the
 # reference condition (STC), which we recalculate here for demonstration
 # purposes. Note that the fit parameters dictionary can be succintly passed to
 # various modeling functions. Arguments to functions are always keyword-only,
 # in order to be explicit yet flexible with argument ordering.
-result = sdm.derived_params(F=1, T_degC=T_degC_stc, **model_params_fit)
-print(f"Derived parameters result:\n{result}")
+result = sdm.iv_params(F=1, T_degC=T_degC_stc, **model_params_fit)
+print("I-V curve parameters at STC:")
+pprint.pprint(result)
 
-# Save some derived values for later. Note that unlike the single-diode
-# equation, the photocurrent is now a derived parameter.
+# Save some I-V curve values for later.
 I_sc_A_0 = result['I_sc_A']
 I_mp_A_0 = result['I_mp_A']
 V_mp_V_0 = result['V_mp_V']
@@ -126,17 +126,17 @@ V_oc_V_0 = result['V_oc_V']
 # Compute an alternative operating condition.
 F_alt = 0.5
 T_degC_alt = 35.
-derived_params_alt = sdm.derived_params(F=F_alt, T_degC=T_degC_alt, **model_params_fit)
+iv_params_alt = sdm.iv_params(F=F_alt, T_degC=T_degC_alt, **model_params_fit)
 print(f"Alternative operating condition: F={F_alt}, T={T_degC_alt} °C")
-pprint.pprint(derived_params_alt)
+pprint.pprint(iv_params_alt)
 
 # F and/or T_degC can be vectorized, such as for a time-series of weather data.
 F_series = numpy.array([0.95, 0.97, 0.99, 1.01, 0.97, 0.98])
 T_degC_series = 35.  # This scalar value will be approapriately broadcast.
 # Note that the maximum power vector is picked out from the result dictionary.
-P_mp_W_series = sdm.derived_params(
+P_mp_W_series = sdm.iv_params(
     F=F_series, T_degC=T_degC_series, **model_params_fit)['P_mp_W']
-print(f"P_mp_W_series = {P_mp_W_series}")
+print(f"P_mp_W_series = {list(P_mp_W_series)}")
 
 # Now make a nice plot.
 fig, ax = plt.subplots(figsize=(8, 6))
@@ -150,12 +150,12 @@ for idx, (F, T_degC) in enumerate(zip(F_data_minimal, T_degC_data_minimal)):
             label=f"F={F:.2f} suns, T={T_degC:.0f} °C", color=color)
 # Plot the LIC.
 color = next(ax._get_lines.prop_cycler)['color']
-ax.plot([0., derived_params_alt['V_mp_V'], derived_params_alt['V_oc_V']],
-        [derived_params_alt['I_sc_A'], derived_params_alt['I_mp_A'], 0.], '*', color=color)
-V_V = numpy.linspace(0, derived_params_alt['V_oc_V'], 101)
+ax.plot([0., iv_params_alt['V_mp_V'], iv_params_alt['V_oc_V']],
+        [iv_params_alt['I_sc_A'], iv_params_alt['I_mp_A'], 0.], '*', color=color)
+V_V = numpy.linspace(0, iv_params_alt['V_oc_V'], 101)
 ax.plot(V_V, sdm.I_at_V_F_T(V_V=V_V, F=F_alt, T_degC=T_degC_alt, **model_params_fit)['I_A'], '--',
         label=f"F={F_alt:.2f} suns, T={T_degC_alt:.0f} °C", color=color)
-ax.set_title(f"6-Parameter SDM Fit to IEC 61853-1 Data", fontdict={'fontsize': 14})
+ax.set_title("6-Parameter SDM Fit to IEC 61853-1 Data", fontdict={'fontsize': 14})
 ax.set_xlabel("V (V)")
 ax.set_ylabel("I (A)")
 fig.legend(loc="center")

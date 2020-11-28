@@ -1,5 +1,6 @@
 # Python 3.6+
 from pkg_resources import get_distribution
+import pprint
 import sys
 
 from matplotlib import pyplot as plt
@@ -8,7 +9,7 @@ import requests
 
 import pvfit.modeling.single_diode.equation as sde
 
-# By convention, variable names include the units of the value.db2a05a
+# By convention, variable names include the units of the value.
 
 
 print(f"pvfit version {get_distribution('pvfit').version}")
@@ -69,21 +70,22 @@ if not success:
     print(f"Falling back to previously computed fit parameters:\n\
 model_params_fit = {model_params_fit}")
 
-# The response has further information such as derived parameters, which we
+# The response has further information such as I-V curve parameters, which we
 # recalculate here for demonstration purposes. Note that the fit parameters
 # dictionary can be succintly passed to various modeling functions. Arguments
 # to functions are always keyword-only, in order to be explicit yet flexible
 # with argument ordering.
-result = sde.derived_params(**model_params_fit)
-print(f"Derived parameters result:\n{result}")
+result = sde.iv_params(**model_params_fit)
+print("I-V curve parameters result:")
+pprint.pprint(result)
 
-# Save some derived values for later.
+# Save some I-V curve values for later.
 I_sc_A = result['I_sc_A']
 I_mp_A = result['I_mp_A']
 V_mp_V = result['V_mp_V']
 V_oc_V = result['V_oc_V']
 
-# Note that the derived parameters include two additional points on the
+# Note that the I-V curve parameters include two additional points on the
 # I-V curve that are relevant to the Sandia Array Performance Model
 # (SAPM), namely (V_x, I_x) and (V_xx, I_xx), see
 # https://pvpmc.sandia.gov/modeling-steps/2-dc-module-iv/point-value-models/sandia-pv-array-performance-model/.
