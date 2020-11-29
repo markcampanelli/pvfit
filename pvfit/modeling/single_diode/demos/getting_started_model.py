@@ -82,7 +82,7 @@ if response.status_code == 200:
         # Note that N_s and T_degC_0 are included in the fit result for
         # completeness and ease of use in subsequent function calls.
         model_params_fit = response_json_dict['model_params_fit']
-        # Adjust some names for version change.
+        # Adjust some keys for version change.
         model_params_fit = {'N_s': model_params_fit['N_s'],
                             'T_degC_0': model_params_fit['T_degC_0'],
                             'I_sc_A_0': model_params_fit['I_sc_A_0'],

@@ -7,7 +7,7 @@ from pvfit.common.constants import k_B_J_per_K, minimize_scalar_bounded_options_
 
 def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S):
     """
-    Computes the sum of the currents at the high-voltage diode node in the 7-parameter double-diode
+    Computes the sum of the currents at the diode's anode node in the 7-parameter double-diode
     equation (DDE) equivalent-circuit model at a single temperature and irradiance.
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):

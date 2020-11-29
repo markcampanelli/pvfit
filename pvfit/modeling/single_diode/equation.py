@@ -44,11 +44,11 @@ def current_sum_at_diode_node(
     -------
     result : dict
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
         V_1_V
-            Voltage at high-voltage diode node [V].
+            Voltage at diode's anode node [V].
         n_1_mod_V
             Modified ideality factor [V].
 
@@ -158,7 +158,8 @@ def I_at_V(
     # Verify convergence, because newton() documentation says that this should be checked.
     result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
                                        n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol)
+    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol,
+                                  err_msg=f"I_sum_A={result['I_sum_A']}", verbose=True)
 
     # Add verified currents to result.
     result.update(ensure_numpy_scalars(dictionary={'I_A': I_A}))
@@ -203,11 +204,11 @@ def I_at_V_d1(
         I_A
             Terminal current [A].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
         V_1_V
-            Voltage at high-voltage diode node [V].
+            Voltage at diode's anode node [V].
         n_1_mod_V
             Modified ideality factor [V].
 
@@ -269,11 +270,11 @@ def V_at_I(
         V_V
             Terminal voltage [V].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
         V_1_V
-            Voltage at high-voltage diode node [V].
+            Voltage at diode's anode node [V].
         n_1_mod_V
             Modified ideality factor [V].
 
@@ -314,7 +315,8 @@ def V_at_I(
     # Verify convergence. newton() documentation says that this should be checked.
     result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
                                        n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol)
+    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol,
+                                  err_msg=f"I_sum_A={result['I_sum_A']}", verbose=True)
 
     # Add verified voltages to result.
     result.update(ensure_numpy_scalars(dictionary={'V_V': V_V}))
@@ -359,11 +361,11 @@ def V_at_I_d1(
         V_V
             Terminal voltage [V].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
         V_1_V
-            Voltage at high-voltage diode node [V].
+            Voltage at diode's anode node [V].
         n_1_mod_V
             Modified ideality factor [V].
 
@@ -427,11 +429,11 @@ def P_at_V(
         I_A
             Terminal current [A].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Effective diode-junction temperature [K].
         V_1_V
-            Voltage at high-voltage diode node [V].
+            Voltage at diode's anode node [V].
         n_1_mod_V
             Modified ideality factor [V].
 

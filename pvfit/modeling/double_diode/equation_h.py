@@ -141,7 +141,7 @@ def I_at_V(
         I_A
             Terminal current [A].
         I_sum_A
-            Sum of currents at high-voltage diode node [A].
+            Sum of currents at diode's anode node [A].
         T_K
             Temperature of device [K].
         V_1_V

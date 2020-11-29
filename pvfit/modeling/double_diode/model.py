@@ -8,7 +8,7 @@ import pvfit.modeling.double_diode.equation as dde
 def current_sum_at_diode_node(*, V_V, I_A, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_0, I_rs_2_0_A, n_2_0, R_s_Ohm_0,
                               G_p_S_0, E_g_eV_0, N_s, T_degC_0=T_degC_stc):
     """
-    Computes the sum of the currents at the high-voltage diode node in the implicit 8-parameter global double-diode
+    Computes the sum of the currents at the diode's anode node in the implicit 8-parameter global double-diode
     equivalent-circuit model (DDM-G).
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
@@ -31,9 +31,9 @@ def current_sum_at_diode_node(*, V_V, I_A, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_
 
     Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
         dict containing:
-            I_sum_A sum of currents at high-voltage diode node
+            I_sum_A sum of currents at diode's anode node
             T_K temperature of diode junction (in Kelvin)
-            V_diode_V voltage at high-voltage diode node
+            V_diode_V voltage at diode's anode node
             n_mod_1_V first modified diode ideality factor
             n_mod_2_V second modified diode ideality factor
     """
