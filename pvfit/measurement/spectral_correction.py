@@ -218,8 +218,8 @@ def M(*, S_TD_OC: SpectralResponsivity, E_TD_OC: SpectralIrradiance, S_TD_RC: Sp
     The spectral mismatch is between a photovoltaic (PV) test device (TD)
     and a PV reference device (RD), each at a particular (non-explicit)
     temperature and illuminated by a (possibly different) spectral
-    irradiance at operating conditions (OC). The corresponding reference
-    conditions (RC) of each device need not be the same, but often are.
+    irradiance at operating condition (OC). The corresponding reference
+    condition (RC) of each device need not be the same, but often are.
     :math:`M` should be strictly positive, but could evalute to
     be zero, infinite, or NaN depending on possible zero values of the
     component integrals. See the :class:`SpectralIrradiance` and

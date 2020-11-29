@@ -10,7 +10,7 @@ E_G173_global_tilt_W_per_m2_nm = numpy.array([4.7309E-23,1.2307E-21,5.6895E-21,1
 E_G173_global_tilt = pvfit.measurement.spectral_correction.SpectralIrradiance(
     lambda_nm=lambda_G173_global_tilt_nm, E_W_per_m2_nm=E_G173_global_tilt_W_per_m2_nm)
 
-# Sample data at Standard Test Conditions (STC).
+# Sample data at Standard Test Condition (STC).
 # Special thanks to Behrang Hamadani from NIST for providing, https://www.nist.gov/people/behrang-hamadani.
 # See https://onlinelibrary.wiley.com/doi/full/10.1002/ese3.190
 lambda_nm_RD_NIST = numpy.array([279.968,300.004,320.028,339.965,359.964,380.025,399.996,420.027,439.967,459.966,480.021,499.984,520.002,539.999,559.976,580.007,600.014,619.999,640.033,659.968,680.026,699.983,719.983,739.964,759.989,779.985,800.023,820.029,840.002,860.015,879.993,900.008,919.987,940.001,959.977,979.986,1000.027,1020.025,1039.982,1059.968,1079.98,1100.018,1120.01,1140.026,1159.993,1179.98,1199.989])

@@ -21,7 +21,7 @@ c_m_per_s = scipy.constants.c
 # Plank's constant, 6.62607015e-34 J s
 h_J_s = scipy.constants.h
 
-# Reference values, including Standard Test Conditions (STC).
+# Reference values, including Standard Test Condition (STC).
 
 # Temperature.
 # Absolute zero in degrees Celsius.

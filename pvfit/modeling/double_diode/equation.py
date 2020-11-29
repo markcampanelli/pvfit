@@ -11,10 +11,10 @@ def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I
     equation (DDE) equivalent-circuit model at a single temperature and irradiance.
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Observables at operating conditions (device-level):
+        Observables at operating condition (device-level):
             V_V terminal voltage
             I_A terminal current
-        Model parameters at operating conditions (device-level):
+        Model parameters at operating condition (device-level):
             N_s integer number of cells in series in each parallel string
             T_degC effective diode-junction temperature
             I_ph_A photocurrent

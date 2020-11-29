@@ -12,12 +12,12 @@ def current_sum_at_diode_node(*, V_V, I_A, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_
     equivalent-circuit model (DDM-G).
 
     Inputs (any broadcast-compatible combination of python/numpy scalars and numpy arrays):
-        Observables at operating conditions (device-level):
+        Observables at operating condition(s) (device-level):
             V_V terminal voltage
             I_A terminal current
             F effective irradiance ratio on diode junction
-            T_degC effective diode-junction temperature
-        Parameters at reference conditions (device-level):
+            T_degC temperature
+        Parameters at reference condition (device-level):
             I_sc_A_0 short-circuit current
             I_rs_A_1_0 first diode reverse-saturation current
             n_1_0 first diode ideality factor
@@ -27,7 +27,7 @@ def current_sum_at_diode_node(*, V_V, I_A, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_
             G_p_S_0 parallel (shunt) conductance
             E_g_eV_0 material band gap
             N_s integer number of cells in series in each parallel string
-            T_degC_0 (optional) effective diode-junction temperature at reference conditions
+            T_degC_0 (optional) temperature at reference condition
 
     Outputs (device-level, at each combination of broadcast inputs, return type is numpy.float64 for all scalar inputs):
         dict containing:
@@ -63,7 +63,7 @@ def auxiliary_equations(*, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_0, I_rs_2_0_A, n
             R_s_Ohm series resistance
             G_p_S parallel conductance
             N_s integer number of cells in series in each parallel string
-            T_degC temperature of diode-junction at operating conditions
+            T_degC temperature
     """
 
     # Temperatures must be in Kelvin.
@@ -73,7 +73,7 @@ def auxiliary_equations(*, F, T_degC, I_sc_A_0, I_rs_1_A_0, n_1_0, I_rs_2_0_A, n
     # Optimization.
     V_therm_factor_V_0 = (N_s * k_B_J_per_K * T_K_0) / q_C
 
-    # Compute variables at operating conditions.
+    # Compute variables at operating condition.
 
     # Compute band gap (constant).
     E_g_eV = E_g_eV_0
