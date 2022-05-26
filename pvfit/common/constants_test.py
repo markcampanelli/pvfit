@@ -65,15 +65,5 @@ def test_materials():
     numpy.testing.assert_array_equal(constants.materials['x-Si']['E_g_eV_stc'], 1.121)
 
 
-def test_newton_options_default():
-    numpy.testing.assert_array_equal(constants.newton_options_default['maxiter'], 50)
-    numpy.testing.assert_array_equal(constants.newton_options_default['tol'], 1.48e-08)
-
-
-def test_minimize_scalar_bounded_options_default():
-    numpy.testing.assert_array_equal(constants.minimize_scalar_bounded_options_default['maxiter'], 500)
-    numpy.testing.assert_array_equal(constants.minimize_scalar_bounded_options_default['xatol'], 1e-05)
-
-
 def test_I_sum_A_atol():
     assert constants.I_sum_A_atol == 1e-12

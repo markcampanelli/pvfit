@@ -126,7 +126,7 @@ use `pandas`, e.g., integrating computations with
 [Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html) and
 [DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) objects. To avoid
 bloat, we also avoid dependency on plotting libraries such as [`matplotlib`](https://matplotlib.org/). Any new
-dependencies or version ranges should be appropriately recorded in [setup.py](setup.py).
+dependencies or version ranges should be appropriately recorded in [setup.cfg](setup.cfg).
 
 ### Coding Requirements and Style
 

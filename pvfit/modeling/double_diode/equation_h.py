@@ -4,14 +4,13 @@ WARNING: This code is experimental and not subject to semantic versioning.
 This is to be incorporated into equation.py. Set R_h_Ohm = 0 to "fall back" to standard DDE.
 """
 
-from typing import Union
+from typing import Optional, Union
 
 import numpy
 from scipy.constants import convert_temperature
-from scipy.optimize import minimize_scalar, newton
+from scipy.optimize import newton
 
-from pvfit.common.constants import (
-    I_sum_A_atol, k_B_J_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C)
+from pvfit.common.constants import I_sum_A_atol, k_B_J_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
 import pvfit.modeling.single_diode.equation
 
@@ -104,7 +103,7 @@ def I_at_V(
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     I_rs_h_A: Union[float, numpy.float64, numpy.ndarray], n_h: Union[float, numpy.float64, numpy.ndarray],
     R_h_Ohm: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
+        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal current from terminal voltage using Newton's method.
 

@@ -2,7 +2,7 @@ import numpy
 from scipy.constants import convert_temperature
 from scipy.optimize import minimize_scalar, newton
 
-from pvfit.common.constants import k_B_J_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C
+from pvfit.common.constants import k_B_J_per_K, q_C
 
 
 def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S):
@@ -69,8 +69,7 @@ def current_sum_at_diode_node(*, V_V, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I
     return {'I_sum_A': I_sum_A, 'T_K': T_K, 'V_diode_V': V_diode_V, 'n_mod_1_V': n_mod_1_V, 'n_mod_2_V': n_mod_2_V}
 
 
-def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-           newton_options=newton_options_default):
+def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute terminal current from terminal voltage using Newton's method.
 
@@ -117,6 +116,8 @@ def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     #         I_rs_2_A * (R_s_Ohm / n_mod_2_V)**2 * numpy.exp(V_diode_V / n_mod_2_V)
 
     # Solve for I_A using Newton's method.
+    if newton_options is None:
+        newton_options = {}
     I_A = newton(func, I_A_ic, fprime=fprime, **newton_options)
 
     # Verify convergence. newton() documentation says that this should be checked.
@@ -135,8 +136,7 @@ def I_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     return result
 
 
-def I_at_V_d1(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-              newton_options=newton_options_default):
+def I_at_V_d1(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute 1st derivative of terminal current with respect to terminal voltage at specified terminal voltage.
 
@@ -170,8 +170,7 @@ def I_at_V_d1(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm
     return result
 
 
-def V_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-         newton_options=newton_options_default):
+def V_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute open-circuit voltage (terminal voltage where terminal current is zero).
 
@@ -257,6 +256,8 @@ def V_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
                             n_mod_2_V=n_mod_2_V, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
 
     # All Voc estimates should be >= Voc and have finite evaluation in func, so now it's safe to use Newton's method.
+    if newton_options is None:
+        newton_options = {}
     V_oc_V = newton(func, V_oc_V_est, fprime=fprime, args=(
         I_ph_A, I_rs_1_A, n_mod_1_V, I_rs_2_A, n_mod_2_V, R_s_Ohm, G_p_S), **newton_options)
 
@@ -271,8 +272,7 @@ def V_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
         return {'V_oc_V': numpy.asscalar(V_oc_V)}
 
 
-def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-           newton_options=newton_options_default):
+def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute terminal voltage from terminal current using Newton's method.
 
@@ -297,13 +297,13 @@ def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
 
     # Compute Isc and resistance (equiv. slope) at Isc, which are generally arrays.
     result = R_sc(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, I_rs_2_A=I_rs_2_A, n_2=n_2,
-                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options_default)
+                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)
     I_sc_A = result['I_sc_A']
     R_sc_Ohm = result['R_sc_Ohm']
 
     # Compute Voc and resistance (equiv. slope) at Voc, which are generally arrays.
     result = R_oc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, I_rs_2_A=I_rs_2_A, n_2=n_2,
-                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options_default)
+                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)
     V_oc_V = result['V_oc_V']
     R_oc_Ohm = result['R_oc_Ohm']
 
@@ -334,6 +334,8 @@ def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     #         I_rs_2_A / n_mod_2_V**2. * numpy.exp(v_diode_V / n_mod_2_V)
 
     # Solve for V_V using Newton's method.
+    if newton_options is None:
+        newton_options = {}
     V_V = newton(func, V_V_ic, fprime=fprime, **newton_options)
 
     # Verify convergence. newton() documentation says that this should be checked.
@@ -352,8 +354,7 @@ def V_at_I(*, I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     return result
 
 
-def P_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-           newton_options=newton_options_default):
+def P_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute terminal power from terminal voltage.
 
@@ -366,7 +367,7 @@ def P_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     """
 
     result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, I_rs_2_A=I_rs_2_A,
-                    n_2=n_2, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options_default)
+                    n_2=n_2, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)
     P_W = V_V * result['I_A']
 
     # Make sure to return numpy.ndarray if any input was that type (undoes casting of rank-0 numpy.ndarray to
@@ -379,9 +380,8 @@ def P_at_V(*, V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G
     return result
 
 
-def P_mp(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-         minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
-         newton_options=newton_options_default):
+def P_mp(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, minimize_scalar_bounded_options=None,
+         newton_options=None):
     """
     Compute maximum terminal power.
 
@@ -445,9 +445,8 @@ def P_mp(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
     return {'P_mp_W': P_mp_W, 'I_mp_A': I_mp_A, 'V_mp_V': V_mp_V, 'V_oc_V': V_oc_V}
 
 
-def FF(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-       minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
-       newton_options=newton_options_default, ):
+def FF(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, minimize_scalar_bounded_options=None,
+       newton_options=None):
     """
     Compute fill factor (unitless fraction).
 
@@ -465,7 +464,7 @@ def FF(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
                     n_2=n_2, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)['I_A']
     # Compute Pmp.
     result = P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, I_rs_2_A=I_rs_2_A, n_2=n_2,
-                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
+                  R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, minimize_scalar_bounded_options=minimize_scalar_bounded_options,
                   newton_options=newton_options)
     # Compute FF.
     denominator = I_sc_A * result['V_oc_V']
@@ -482,7 +481,7 @@ def FF(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
     return result
 
 
-def R_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=newton_options_default):
+def R_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute resistance at open circuit in Ohms.
 
@@ -514,7 +513,7 @@ def R_oc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, n
     return {'R_oc_Ohm': R_oc_Ohm, 'V_oc_V': V_oc_V}
 
 
-def R_sc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=newton_options_default):
+def R_sc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, newton_options=None):
     """
     Compute resistance at short circuit in Ohms.
 
@@ -544,8 +543,7 @@ def R_sc(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S, n
 
 
 def iv_params(*, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, I_rs_2_A, n_2, R_s_Ohm, G_p_S,
-              minimize_scalar_bounded_options=minimize_scalar_bounded_options_default,
-              newton_options=newton_options_default):
+              minimize_scalar_bounded_options=None, newton_options=None):
     """
     Compute I-V curve parameters.
 

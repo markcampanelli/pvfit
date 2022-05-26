@@ -12,6 +12,14 @@ pvfit.modeling.double\_diode.equation module
    :undoc-members:
    :show-inheritance:
 
+pvfit.modeling.double\_diode.equation\_h module
+-----------------------------------------------
+
+.. automodule:: pvfit.modeling.double_diode.equation_h
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pvfit.modeling.double\_diode.model module
 -----------------------------------------
 

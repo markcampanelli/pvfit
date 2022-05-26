@@ -4,7 +4,7 @@ import numpy
 import pytest
 from scipy.constants import convert_temperature
 
-from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, minimize_scalar_bounded_options_default, q_C
+from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C
 import pvfit.modeling.single_diode.equation as equation
 
 
@@ -338,8 +338,7 @@ def test_P_mp_no_convergence():
     G_p_S = 0.001
     N_s = 1
     T_degC = T_degC_stc
-    minimize_scalar_bounded_options = copy.copy(minimize_scalar_bounded_options_default)
-    minimize_scalar_bounded_options['maxiter'] = 1  # Does not converge with only one iteration.
+    minimize_scalar_bounded_options = {'maxiter': 1, 'xatol': 1e-05}  # Does not converge with only one iteration.
 
     with pytest.raises(ValueError) as excinfo:
         equation.P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,

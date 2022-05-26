@@ -1,6 +1,5 @@
-# Python 3.6+
+# Python 3.8+
 import os
-from pkg_resources import get_distribution
 import pprint
 import sys
 
@@ -13,8 +12,6 @@ from pvfit.common.constants import T_degC_stc
 import pvfit.modeling.single_diode.model as sdm
 
 # By convention, variable names include the units of the value.
-
-print(f"pvfit version {get_distribution('pvfit').version}")
 
 # Load IEC 61853-1 data for a 72-cell HIT module measured over variable
 # irradiance and temperature. See https://www.nrel.gov/docs/fy14osti/61610.pdf and
@@ -36,7 +33,7 @@ T_degC_data_minimal = numpy.copy(V_V_data)
 # Pick out Isc at STC, which is needed to determine F for each I-V curve.
 I_sc_A_0_meas_row_idx = numpy.logical_and(
     data_table.values[:, 2] == 25, data_table.values[:, 3] == 1000)
-I_sc_A_0_meas = numpy.float(data_table.values[I_sc_A_0_meas_row_idx, 4])
+I_sc_A_0_meas = float(data_table.values[I_sc_A_0_meas_row_idx, 4])
 
 # Ordering of the I-V-F-T points does not matter, as long as it's consistent
 # between vectors.

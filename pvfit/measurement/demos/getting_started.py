@@ -1,11 +1,8 @@
-# Python 3.6+
-from pkg_resources import get_distribution
-
+# Python 3.8+
 import pvfit.measurement.spectral_correction
 import pvfit.measurement.spectral_correction_data
 
-
-print(f"pvfit version {get_distribution('pvfit').version}")
+# By convention, variable names include the units of the value.
 
 """
 pvfit.measurement.spectral_correction has several data classes that wrap

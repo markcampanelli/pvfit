@@ -1,5 +1,4 @@
-# Python 3.6+
-from pkg_resources import get_distribution
+# Python 3.8+
 import pprint
 import sys
 
@@ -10,9 +9,6 @@ import requests
 import pvfit.modeling.single_diode.equation as sde
 
 # By convention, variable names include the units of the value.
-
-
-print(f"pvfit version {get_distribution('pvfit').version}")
 
 # Load I-V data for a 72-cell x-Si module measured at constant irradiance and
 # temperature. Ordering of the I-V points does not matter, as long as it's

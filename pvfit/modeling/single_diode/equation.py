@@ -1,11 +1,10 @@
-from typing import Union
+from typing import Optional, Union
 
 import numpy
 from scipy.constants import convert_temperature
 from scipy.optimize import minimize_scalar, newton
 
-from pvfit.common.constants import (
-    I_sum_A_atol, k_B_J_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C)
+from pvfit.common.constants import I_sum_A_atol, k_B_J_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
 
 
@@ -79,7 +78,7 @@ def I_at_V(
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: dict = newton_options_default) -> dict:
+        newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal current at specified terminal voltage.
 
@@ -153,6 +152,8 @@ def I_at_V(
     #     return -I_rs_1_A * (R_s_Ohm / n_1_mod_V)**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
 
     # Solve for I_A using Newton's method.
+    if newton_options is None:
+        newton_options = {}
     I_A = newton(func, I_A_ic, fprime=fprime, **newton_options)
 
     # Verify convergence, because newton() documentation says that this should be checked.
@@ -172,7 +173,7 @@ def I_at_V_d1(
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: dict = newton_options_default) -> dict:
+        newton_options: Optional[dict] = None) -> dict:
     """
     Compute 1st derivative of terminal current with respect to terminal
     voltage at specified terminal voltage.
@@ -239,7 +240,7 @@ def V_at_I(
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: dict = newton_options_default) -> dict:
+        newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal voltage at specified terminal current.
 
@@ -310,6 +311,8 @@ def V_at_I(
     #     return -I_rs_1_A / n_1_mod_V**2. * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
 
     # Solve for V_V using Newton's method.
+    if newton_options is None:
+        newton_options = {}
     V_V = newton(func, V_V_ic, fprime=fprime, **newton_options)
 
     # Verify convergence. newton() documentation says that this should be checked.
@@ -329,7 +332,7 @@ def V_at_I_d1(
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: dict = newton_options_default) -> dict:
+        newton_options: Optional[dict] = None) -> dict:
     """
     Compute 1st derivative of terminal voltage with respect to terminal
     current at specified terminal current.
@@ -396,7 +399,7 @@ def P_at_V(
     T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: dict = newton_options_default) -> dict:
+        newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal power at specified terminal voltage.
 
@@ -457,8 +460,8 @@ def P_mp(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
-        minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
+    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
+        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
     """
     Compute maximum terminal power.
 
@@ -542,8 +545,8 @@ def FF(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
-        minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
+    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
+        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
     """
     Compute fill factor (unitless fraction).
 
@@ -613,7 +616,7 @@ def R_at_oc(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
+        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal resistance at open circuit in Ohms.
 
@@ -669,7 +672,7 @@ def R_at_sc(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
+        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal resistance at short circuit in Ohms.
 
@@ -722,8 +725,8 @@ def iv_params(
     *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
     I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
     n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default,
-        minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default) -> dict:
+    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
+        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
     """
     Compute I-V curve parameters.
 

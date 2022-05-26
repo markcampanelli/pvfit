@@ -1,10 +1,9 @@
-from typing import Union
+from typing import Optional, Union
 
 import numpy
 from scipy.constants import convert_temperature
 
-from pvfit.common.constants import (
-    k_B_J_per_K, k_B_eV_per_K, minimize_scalar_bounded_options_default, newton_options_default, q_C)
+from pvfit.common.constants import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
 import pvfit.modeling.single_diode.equation as equation
 
@@ -171,7 +170,7 @@ def I_at_V_F_T(
     T_degC_0: Union[float, numpy.float64, numpy.ndarray], I_sc_A_0: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray], n_1_0: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray], G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
-        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
+        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal current at specified terminal voltage, effective
     irradiance ratio, and device temperature.
@@ -237,7 +236,7 @@ def V_at_I_F_T(
     T_degC_0: Union[float, numpy.float64, numpy.ndarray], I_sc_A_0: Union[float, numpy.float64, numpy.ndarray],
     I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray], n_1_0: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray], G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
-        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: dict = newton_options_default) -> dict:
+        E_g_eV_0: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
     """
     Compute terminal voltage at specified terminal current, effective
     irradiance ratio, and device temperature.
@@ -305,8 +304,7 @@ def iv_params(
     I_sc_A_0: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A_0: Union[float, numpy.float64, numpy.ndarray],
     n_1_0: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray], E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
-    newton_options: dict = newton_options_default,
-        minimize_scalar_bounded_options: dict = minimize_scalar_bounded_options_default):
+        newton_options: Optional[dict] = None, minimize_scalar_bounded_options: Optional[dict] = None):
     """
     Compute I-V curve parameters at specified effective irradiance ratio
     and device temperature.

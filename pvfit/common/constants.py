@@ -1,8 +1,4 @@
-import inspect
-
 import scipy.constants
-from scipy.optimize import newton
-from scipy.optimize.optimize import _minimize_scalar_bounded
 
 # Some useful physical constants (CODATA 2018: https://physics.nist.gov/cuu/Constants/).
 
@@ -59,17 +55,6 @@ materials = \
               'E_g_eV_stc': 1.121,
              }
     }
-
-# Solvers
-
-# Default options taken from current version of scipy.optimize.newton.
-newton_options_default = {'maxiter': inspect.signature(newton).parameters['maxiter'].default,
-                          'tol': inspect.signature(newton).parameters['tol'].default}
-
-# Default options taken from current version of scipy.optimize.minimize_scalar, for 'bounded' mode.
-minimize_scalar_bounded_options_default = {
-    'maxiter': inspect.signature(_minimize_scalar_bounded).parameters['maxiter'].default,
-    'xatol': inspect.signature(_minimize_scalar_bounded).parameters['xatol'].default}
 
 # Assertions
 

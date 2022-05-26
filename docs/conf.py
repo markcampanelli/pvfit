@@ -11,19 +11,19 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-from pkg_resources import get_distribution
 import sys
-sys.path.insert(0, os.path.abspath('..'))
 
+from pvfit import __version__
+
+sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
 # Versioning
 project = 'pvfit'
-copyright = '2019, Mark Campanelli'
+copyright = '2022, Intelligent Measurement Systems LLC'
 author = 'Mark Campanelli'
-version = get_distribution(project).version
-
+version = __version__
 
 # -- General configuration ---------------------------------------------------
 
