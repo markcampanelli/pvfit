@@ -8,9 +8,8 @@
 **IMPORTANT:** This code is pre-release, and so the code organiztion and Application Programming Interface (API) should
 be expected to change without warning.
 
-[![Build Status](https://dev.azure.com/markcampanelli/markcampanelli/_apis/build/status/markcampanelli.pvfit?branchName=master)](https://dev.azure.com/markcampanelli/markcampanelli/_build/latest?definitionId=1&branchName=master)
+![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yaml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
-[![Coverage](https://img.shields.io/azure-devops/coverage/markcampanelli/markcampanelli/2.svg)](https://dev.azure.com/markcampanelli/markcampanelli/definitionId=2&branchName=master)
 
 
 ## So What Can PVfit Do for Me?
@@ -37,8 +36,8 @@ See the README's for individual subpackages to get started with specific functio
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [python~=3.6](https://www.python.org/) with [scipy~=1.5.0](https://www.scipy.org/). It is
-tested on recent versions of Ubuntu, macOS, and Windows.
+`pvfit` minimally requires [python>=3.8,<3.11](https://www.python.org/) with [numpy](https://numpy.org/) and
+[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
 
 ### Download, Install, and Verify Package (non-editable mode)
 
@@ -74,7 +73,8 @@ pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo
 
 The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
 [Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com), in Bozeman, MT, USA. Your
-[suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues) and
+[suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues),
+[questions/discussions](https://github.com/markcampanelli/pvfit/discussions), and
 [contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.
 
 ## Developer Notes
@@ -85,7 +85,7 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` in editable (development) mode, including the `pytest` and `sphinx` packages, with `pip`—
 ```terminal
-pip install -e .[demo,dev,test]
+pip install -e .[demo,dev,docs,test]
 ```
 This also installs the libraries needed to develop the code demonstrations.
 
@@ -100,11 +100,11 @@ which should print something similar to—
 
 ### Run Tests with Coverage Locally
 
-From the repo's root directory—
+From the repo's `pvfit` subdirectory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
-and the root of the generated coverage report (uncommitted) is at `htmlcov/index.html`. 
+and the root of the generated coverage report (uncommitted) is at `pvfit/htmlcov/index.html`. 
 
 ### Build Documentation Locally
 
@@ -121,7 +121,8 @@ and the root of the generated documentation (uncommitted) is at `docs/_build/htm
 ### Dependencies
 
 Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are the only runtime dependencies. In
-order to ensure a straightforward, consistent, and well-tested API, the decision has been made to avoid any dependecy on [`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward integration with consumers that
+order to ensure a straightforward, consistent, and well-tested API, the decision has been made to avoid any dependecy on
+[`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward integration with consumers that
 use `pandas`, e.g., integrating computations with
 [Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html) and
 [DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) objects. To avoid
