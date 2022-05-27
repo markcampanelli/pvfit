@@ -43,8 +43,9 @@ See the README's for individual subpackages to get started with specific functio
 
 This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
 deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
-using `pip`—
+using a sufficiently recent version of `pip`—
 ```terminal
+pip install --upgrade pip
 pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 NOTES:
