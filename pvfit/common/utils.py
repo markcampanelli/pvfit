@@ -24,7 +24,7 @@ def ensure_numpy_scalars(*, dictionary: dict) -> dict:
     return dictionary
 
 
-def get_version(*, log: bool = True) -> str:
+def get_version(*, info_log: bool = False) -> str:
     """Return pvfit version with optional info log, raising with exception log if not found."""
 
     try:
@@ -33,7 +33,7 @@ def get_version(*, log: bool = True) -> str:
     except PackageNotFoundError:
         logger.exception("pvfit version not found. Is the pvfit package properly installed?")
 
-    if log:
+    if info_log:
         logger.info(f"pvfit version {version_}")
 
     return version_

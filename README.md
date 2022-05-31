@@ -58,7 +58,7 @@ grab the default versions from [PyPI](https://pypi.org/).
 
 Verify your installation—
 ```terminal
-python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
+python -c "from pvfit import __version__; print(__version__)"
 ```
 which should print something similar to—
 ```terminal
@@ -92,24 +92,26 @@ This also installs the libraries needed to develop the code demonstrations.
 
 Verify your installation—
 ```terminal
-python -c "from pkg_resources import get_distribution; import pvfit; print(get_distribution('pvfit').version)"
+python -c "from pvfit import __version__; print(__version__)"
 ```
 which should print something similar to—
 ```terminal
 0.1.dev9+gadf7f38.d20190812
 ```
 
+Next, make sure that the tests are passing.
+
 ### Run Tests with Coverage Locally
 
-From the repo's `pvfit` subdirectory—
+From the [pvfit](pvfit) subdirectory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
-and the root of the generated coverage report (uncommitted) is at `pvfit/htmlcov/index.html`. 
+The root of the generated coverage report is at `pvfit/htmlcov/index.html` (uncommitted). 
 
 ### Build Documentation Locally
 
-From the [docs](docs) directory—
+From the [docs](docs) subdirectory—
 ```terminal
 sphinx-apidoc -f -o . ../pvfit ../*_test.py
 ```
@@ -117,7 +119,7 @@ then—
 ```terminal
 make html
 ```
-and the root of the generated documentation (uncommitted) is at `docs/_build/html/pvfit.html`. 
+The root of the generated documentation is at `docs/_build/html/pvfit.html` (uncommitted). 
 
 ### Dependencies
 

@@ -1,4 +1,5 @@
 import copy
+import logging
 
 import numpy
 import pytest
@@ -32,3 +33,16 @@ def test_ensure_numpy_scalars(ensure_numpy_scalars_fixture):
             assert value.dtype == dictionary[key].dtype
             assert value.shape == dictionary[key].shape
             numpy.testing.assert_array_equal(value, dictionary[key])
+
+
+def test_get_version(caplog) -> str:
+    caplog.set_level(logging.INFO)
+    version1 = pvfit.common.utils.get_version()
+    assert version1
+    assert len(caplog.records) == 0
+
+    version2 = pvfit.common.utils.get_version(info_log=True)
+    assert version1 == version2
+    assert len(caplog.records) == 1
+    assert caplog.records[0].levelname == "INFO"
+    assert f"pvfit version {version2}" in caplog.text
