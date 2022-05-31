@@ -37,7 +37,8 @@ See the README's for individual subpackages to get started with specific functio
 ## Up and Running in 5 Minutes
 
 `pvfit` minimally requires [python>=3.8,<3.11](https://www.python.org/) with [numpy](https://numpy.org/) and
-[scipy](https://www.scipy.org/). It is tested on recent versions of Ubuntu, macOS, and Windows.
+[scipy](https://www.scipy.org/). It is tested with CPython on recent versions of Ubuntu, macOS, and Windows. We suggest
+using a suitable Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 
 ### Download, Install, and Verify Package (non-editable mode)
 
@@ -45,8 +46,8 @@ This package will not be available on [PyPI](https://pypi.org/) until the applic
 deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
 using a sufficiently recent version of `pip`—
 ```terminal
-pip install --upgrade pip
-pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+python -m pip install --upgrade pip
+python -m pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 NOTES:
 - You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
@@ -65,10 +66,13 @@ which should print something similar to—
 0.1.dev9+gadf7f38.d20190812
 ```
 
-Stay up to date with code changes using—
+Likewise, stay up to date with the latest code changes using—
 ```terminal
-pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+python -m pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
+
+You should now be able to explore PVfit's functionality with the "getting started" modules in the various `demos`
+subpackages.
 
 ## About the Maintainer
 
@@ -86,7 +90,7 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` in editable (development) mode, including the `pytest` and `sphinx` packages, with `pip`—
 ```terminal
-pip install -e .[demo,dev,docs,test]
+python -m pip install -e .[demo,dev,docs,test]
 ```
 This also installs the libraries needed to develop the code demonstrations.
 
