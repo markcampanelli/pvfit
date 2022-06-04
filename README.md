@@ -108,7 +108,7 @@ Next, make sure that the tests are passing.
 
 ### Run Tests with Coverage Locally
 
-From the [pvfit](pvfit) subdirectory—
+From the root directory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
