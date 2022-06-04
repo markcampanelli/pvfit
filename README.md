@@ -108,9 +108,9 @@ Next, make sure that the tests are passing.
 
 ### Run Tests with Coverage Locally
 
-From the root directory—
+From the [pvfit](pvfit) subdirectory directory—
 ```terminal
-pytest --doctest-modules --cov=pvfit --cov-report=html
+pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
 ```
 The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not committed). 
 

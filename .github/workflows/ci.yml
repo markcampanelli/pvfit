@@ -30,7 +30,8 @@ jobs:
           flake8 .
       - name: Test with pytest
         run: |
-          pytest --doctest-modules --cov=pvfit --cov-report=html --cov-report=xml --junitxml=junit/test-results.xml
+          cd pytest
+          pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
