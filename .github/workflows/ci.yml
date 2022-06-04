@@ -30,7 +30,7 @@ jobs:
           flake8 .
       - name: Test with pytest
         run: |
-          cd pytest
+          cd pvfit
           pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
