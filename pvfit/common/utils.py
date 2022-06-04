@@ -1,4 +1,5 @@
 """Common utilities for PVfit."""
+
 from importlib.metadata import version, PackageNotFoundError
 import logging
 
@@ -13,25 +14,45 @@ def ensure_numpy_scalars(*, dictionary: dict) -> dict:
 
     TODO: Complete docstring.
 
-    CAUTION: This updates the input dictionary in place and returns a reference for convienence.
+    CAUTION: This updates the input dictionary in place and returns a
     """
 
-    # In order to allow consistent downstream processing, make sure no Python scalars are returned.
-    # Note that many external operations cast rank-0 numpy.ndarray to numpy.float64.
-    dictionary.update({key: numpy.float64(value) for key, value in dictionary.items() if isinstance(value, float)})
-    dictionary.update({key: numpy.intc(value) for key, value in dictionary.items() if isinstance(value, int)})
+    # In order to allow consistent downstream processing, make sure no
+    # Python scalars are returned.
+    # Note that many external operations cast rank-0 numpy.ndarray to
+    # numpy.float64.
+    dictionary.update(
+        {
+            key: numpy.float64(value)
+            for key, value in dictionary.items()
+            if isinstance(value, float)
+        }
+    )
+    dictionary.update(
+        {
+            key: numpy.intc(value)
+            for key, value in dictionary.items()
+            if isinstance(value, int)
+        }
+    )
 
     return dictionary
 
 
 def get_version(*, info_log: bool = False) -> str:
-    """Return pvfit version with optional info log, raising with exception log if not found."""
+    """
+    Return pvfit version with optional info log, raising with exception
+    log if not found.
+    """
 
     try:
-        # This relies on setuptools_scm magic, and raises when pvfit package is not installed.
-        version_ = version('pvfit')
+        # This relies on setuptools_scm magic, and raises when pvfit
+        # package is not installed.
+        version_ = version("pvfit")
     except PackageNotFoundError:
-        logger.exception("pvfit version not found. Is the pvfit package properly installed?")
+        logger.exception(
+            "pvfit version not found. Is the pvfit package properly installed?"
+        )
 
     if info_log:
         logger.info(f"pvfit version {version_}")

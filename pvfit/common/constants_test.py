@@ -5,6 +5,7 @@ import pvfit.common.constants as constants
 
 # Test constants for value changes. Constants are python scalars.
 
+
 def test_q_C():
     assert isinstance(constants.q_C, float)
     assert constants.q_C == 1.602176634e-19
@@ -22,7 +23,7 @@ def test_k_B_eV_per_K():
 
 def test_T_degC_stc():
     assert isinstance(constants.T_degC_stc, float)
-    assert constants.T_degC_stc == 25.
+    assert constants.T_degC_stc == 25.0
 
 
 def test_T_degC_abs_zero():
@@ -45,24 +46,24 @@ def test_h_J_s():
 
 def test_G_hemi_W_per_m2_stc():
     assert isinstance(constants.G_hemi_W_per_m2_stc, float)
-    numpy.testing.assert_array_equal(constants.G_hemi_W_per_m2_stc, 1000.)
+    numpy.testing.assert_array_equal(constants.G_hemi_W_per_m2_stc, 1000.0)
 
 
 def test_materials():
-    assert isinstance(constants.materials['CIGS']['E_g_eV_stc'], float)
-    numpy.testing.assert_array_equal(constants.materials['CIGS']['E_g_eV_stc'], 1.15)
+    assert isinstance(constants.materials["CIGS"]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(constants.materials["CIGS"]["E_g_eV_stc"], 1.15)
 
-    assert isinstance(constants.materials['CIS']['E_g_eV_stc'], float)
-    numpy.testing.assert_array_equal(constants.materials['CIS']['E_g_eV_stc'], 1.010)
+    assert isinstance(constants.materials["CIS"]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(constants.materials["CIS"]["E_g_eV_stc"], 1.010)
 
-    assert isinstance(constants.materials['CdTe']['E_g_eV_stc'], float)
-    numpy.testing.assert_array_equal(constants.materials['CdTe']['E_g_eV_stc'], 1.475)
+    assert isinstance(constants.materials["CdTe"]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(constants.materials["CdTe"]["E_g_eV_stc"], 1.475)
 
-    assert isinstance(constants.materials['GaAs']['E_g_eV_stc'], float)
-    numpy.testing.assert_array_equal(constants.materials['GaAs']['E_g_eV_stc'], 1.43)
+    assert isinstance(constants.materials["GaAs"]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(constants.materials["GaAs"]["E_g_eV_stc"], 1.43)
 
-    assert isinstance(constants.materials['x-Si']['E_g_eV_stc'], float)
-    numpy.testing.assert_array_equal(constants.materials['x-Si']['E_g_eV_stc'], 1.121)
+    assert isinstance(constants.materials["x-Si"]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(constants.materials["x-Si"]["E_g_eV_stc"], 1.121)
 
 
 def test_I_sum_A_atol():

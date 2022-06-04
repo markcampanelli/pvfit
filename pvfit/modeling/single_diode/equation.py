@@ -9,11 +9,17 @@ from pvfit.common.utils import ensure_numpy_scalars
 
 
 def current_sum_at_diode_node(
-    *, V_V: Union[float, numpy.float64, numpy.ndarray], I_A: Union[float, numpy.float64, numpy.ndarray],
-    N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray]) -> dict:
+    *,
+    V_V: Union[float, numpy.float64, numpy.ndarray],
+    I_A: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+) -> dict:
     """
     Computes the sum of the currents at the diode's anode in the
     5-parameter single-diode equation (SDE) equivalent-circuit model.
@@ -59,7 +65,7 @@ def current_sum_at_diode_node(
     numpy.float64 or numpy.ndarray.
     """
     # Temperature in Kelvin.
-    T_K = convert_temperature(T_degC, 'Celsius', 'Kelvin')
+    T_K = convert_temperature(T_degC, "Celsius", "Kelvin")
 
     # Voltage at diode node.
     V_1_V = V_V + I_A * R_s_Ohm
@@ -67,18 +73,32 @@ def current_sum_at_diode_node(
     # Modified idealityV_1_V factor.
     n_1_mod_V = (N_s * n_1 * k_B_J_per_K * T_K) / q_C
 
-    # Sum of currents at diode node. numpy.expm1() returns a numpy.float64 when arguments are all python/numpy scalars.
+    # Sum of currents at diode node. numpy.expm1() returns a numpy.float64
+    # when arguments are all python/numpy scalars.
     I_sum_A = I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
-    return ensure_numpy_scalars(dictionary={'I_sum_A': I_sum_A, 'T_K': T_K, 'V_1_V': V_1_V, 'n_1_mod_V': n_1_mod_V})
+    return ensure_numpy_scalars(
+        dictionary={
+            "I_sum_A": I_sum_A,
+            "T_K": T_K,
+            "V_1_V": V_1_V,
+            "n_1_mod_V": n_1_mod_V,
+        }
+    )
 
 
 def I_at_V(
-    *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
-    T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
-    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: Optional[dict] = None) -> dict:
+    *,
+    V_V: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute terminal current at specified terminal voltage.
 
@@ -131,10 +151,12 @@ def I_at_V(
     2) Compute using scipy.optimize.newton.
     """
     # Optimization.
-    n_1_mod_V = (N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
+    n_1_mod_V = (
+        N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, "Celsius", "Kelvin")
+    ) / q_C
 
     # Preserve shape of excluded R_s_Ohm in inital condition.
-    V_1_V_ic = V_V + 0. * R_s_Ohm
+    V_1_V_ic = V_V + 0.0 * R_s_Ohm
 
     # Compute initially with zero R_s_Ohm.
     I_A_ic = I_ph_A - I_rs_1_A * numpy.expm1(V_1_V_ic / n_1_mod_V) - G_p_S * V_1_V_ic
@@ -145,35 +167,67 @@ def I_at_V(
         return I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
     def fprime(I_A):
-        return -I_rs_1_A * R_s_Ohm / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S * R_s_Ohm - 1.
+        return (
+            -I_rs_1_A
+            * R_s_Ohm
+            / n_1_mod_V
+            * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+            - G_p_S * R_s_Ohm
+            - 1.0
+        )
 
     # FUTURE Consider using this in Halley's method.
-    # def fprime2(I_A):
-    #     return -I_rs_1_A * (R_s_Ohm / n_1_mod_V)**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+    def fprime2(I_A):
+        return (
+            -I_rs_1_A
+            * (R_s_Ohm / n_1_mod_V) ** 2
+            * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+        )
 
     # Solve for I_A using Newton's method.
     if newton_options is None:
         newton_options = {}
     I_A = newton(func, I_A_ic, fprime=fprime, **newton_options)
 
-    # Verify convergence, because newton() documentation says that this should be checked.
-    result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
-                                       n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol,
-                                  err_msg=f"I_sum_A={result['I_sum_A']}", verbose=True)
+    # Verify convergence, because newton() documentation says that this
+    # should be checked.
+    result = current_sum_at_diode_node(
+        V_V=V_V,
+        I_A=I_A,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+    )
+    numpy.testing.assert_allclose(
+        result["I_sum_A"],
+        0.0,
+        atol=I_sum_A_atol,
+        err_msg=f"I_sum_A={result['I_sum_A']}",
+        verbose=True,
+    )
 
     # Add verified currents to result.
-    result.update(ensure_numpy_scalars(dictionary={'I_A': I_A}))
+    result.update(ensure_numpy_scalars(dictionary={"I_A": I_A}))
 
     return result
 
 
 def I_at_V_d1(
-    *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
-    T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
-    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: Optional[dict] = None) -> dict:
+    *,
+    V_V: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute 1st derivative of terminal current with respect to terminal
     voltage at specified terminal voltage.
@@ -224,23 +278,44 @@ def I_at_V_d1(
     calculations.
     """
     # Compute terminal current.
-    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)
+    result = I_at_V(
+        V_V=V_V,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )
 
-    # Compute first derivative of current with respect to voltage at specified voltage.
-    expr1 = I_rs_1_A / result['n_1_mod_V'] * numpy.exp(result['V_1_V'] / result['n_1_mod_V']) + G_p_S
-    I_d1_V_S = -expr1 / (1. + R_s_Ohm * expr1)
-    result.update(ensure_numpy_scalars(dictionary={'I_d1_V_S': I_d1_V_S}))
+    # Compute first derivative of current with respect to voltage at
+    # specified voltage.
+    expr1 = (
+        I_rs_1_A
+        / result["n_1_mod_V"]
+        * numpy.exp(result["V_1_V"] / result["n_1_mod_V"])
+        + G_p_S
+    )
+    I_d1_V_S = -expr1 / (1.0 + R_s_Ohm * expr1)
+    result.update(ensure_numpy_scalars(dictionary={"I_d1_V_S": I_d1_V_S}))
 
     return result
 
 
 def V_at_I(
-    *, I_A: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
-    T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
-    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: Optional[dict] = None) -> dict:
+    *,
+    I_A: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute terminal voltage at specified terminal current.
 
@@ -293,10 +368,17 @@ def V_at_I(
     2) Compute using scipy.optimize.newton.
     """
     # Optimization.
-    n_1_mod_V = (N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, 'Celsius', 'Kelvin')) / q_C
+    n_1_mod_V = (
+        N_s * n_1 * k_B_J_per_K * convert_temperature(T_degC, "Celsius", "Kelvin")
+    ) / q_C
 
-    # Compute initially with zero G_p_S, preserving shape of excluded G_p_S in inital condition.
-    V_V_ic = n_1_mod_V * (numpy.log(I_ph_A + I_rs_1_A - 0. * G_p_S - I_A) - numpy.log(I_rs_1_A)) - I_A * R_s_Ohm
+    # Compute initially with zero G_p_S, preserving shape of excluded
+    # G_p_S in inital condition.
+    V_V_ic = (
+        n_1_mod_V
+        * (numpy.log(I_ph_A + I_rs_1_A - 0.0 * G_p_S - I_A) - numpy.log(I_rs_1_A))
+        - I_A * R_s_Ohm
+    )
 
     # Use closures in these function definitions for Newton's method.
     def func(V_V):
@@ -304,35 +386,60 @@ def V_at_I(
         return I_ph_A - I_rs_1_A * numpy.expm1(V_1_V / n_1_mod_V) - G_p_S * V_1_V - I_A
 
     def fprime(V_V):
-        return -I_rs_1_A / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S
+        return (
+            -I_rs_1_A / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S
+        )
 
     # FUTURE Consider using this in Halley's method.
-    # def fprime2(V_V):
-    #     return -I_rs_1_A / n_1_mod_V**2. * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+    def fprime2(V_V):
+        return (
+            -I_rs_1_A / n_1_mod_V**2.0 * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+        )
 
     # Solve for V_V using Newton's method.
     if newton_options is None:
         newton_options = {}
     V_V = newton(func, V_V_ic, fprime=fprime, **newton_options)
 
-    # Verify convergence. newton() documentation says that this should be checked.
-    result = current_sum_at_diode_node(V_V=V_V, I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A,
-                                       n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S)
-    numpy.testing.assert_allclose(result['I_sum_A'], 0., atol=I_sum_A_atol,
-                                  err_msg=f"I_sum_A={result['I_sum_A']}", verbose=True)
+    # Verify convergence. newton() documentation says that this should be
+    # checked.
+    result = current_sum_at_diode_node(
+        V_V=V_V,
+        I_A=I_A,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+    )
+    numpy.testing.assert_allclose(
+        result["I_sum_A"],
+        0.0,
+        atol=I_sum_A_atol,
+        err_msg=f"I_sum_A={result['I_sum_A']}",
+        verbose=True,
+    )
 
     # Add verified voltages to result.
-    result.update(ensure_numpy_scalars(dictionary={'V_V': V_V}))
+    result.update(ensure_numpy_scalars(dictionary={"V_V": V_V}))
 
     return result
 
 
 def V_at_I_d1(
-    *, I_A: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
-    T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
-    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: Optional[dict] = None) -> dict:
+    *,
+    I_A: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute 1st derivative of terminal voltage with respect to terminal
     current at specified terminal current.
@@ -383,23 +490,44 @@ def V_at_I_d1(
     equation for capacitor charging.
     """
     # Compute terminal voltage.
-    result = V_at_I(I_A=I_A, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)
+    result = V_at_I(
+        I_A=I_A,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )
 
-    # Compute first derivative of voltage with respect to current at specified current.
-    expr1 = I_rs_1_A / result['n_1_mod_V'] * numpy.exp(result['V_1_V'] / result['n_1_mod_V']) + G_p_S
-    V_d1_I_Ohm = -1. / expr1 - R_s_Ohm
-    result.update(ensure_numpy_scalars(dictionary={'V_d1_I_Ohm': V_d1_I_Ohm}))
+    # Compute first derivative of voltage with respect to current at
+    # specified current.
+    expr1 = (
+        I_rs_1_A
+        / result["n_1_mod_V"]
+        * numpy.exp(result["V_1_V"] / result["n_1_mod_V"])
+        + G_p_S
+    )
+    V_d1_I_Ohm = -1.0 / expr1 - R_s_Ohm
+    result.update(ensure_numpy_scalars(dictionary={"V_d1_I_Ohm": V_d1_I_Ohm}))
 
     return result
 
 
 def P_at_V(
-    *, V_V: Union[float, numpy.float64, numpy.ndarray], N_s: Union[int, numpy.intc, numpy.ndarray],
-    T_degC: Union[float, numpy.float64, numpy.ndarray], I_ph_A: Union[float, numpy.float64, numpy.ndarray],
-    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray], n_1: Union[float, numpy.float64, numpy.ndarray],
-    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray], G_p_S: Union[float, numpy.float64, numpy.ndarray],
-        newton_options: Optional[dict] = None) -> dict:
+    *,
+    V_V: Union[float, numpy.float64, numpy.ndarray],
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute terminal power at specified terminal voltage.
 
@@ -448,20 +576,35 @@ def P_at_V(
     numpy.float64 or numpy.ndarray.
     """
     # Compute power.
-    result = I_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)
-    P_W = V_V * result['I_A']
-    result.update(ensure_numpy_scalars(dictionary={'P_W': P_W}))
+    result = I_at_V(
+        V_V=V_V,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )
+    P_W = V_V * result["I_A"]
+    result.update(ensure_numpy_scalars(dictionary={"P_W": P_W}))
 
     return result
 
 
 def P_mp(
-    *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
-        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
+    *,
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+    minimize_scalar_bounded_options: Optional[dict] = None,
+) -> dict:
     """
     Compute maximum terminal power.
 
@@ -484,7 +627,7 @@ def P_mp(
     newton_options
         Options for Newton solver (see scipy.optimize.newton).
     minimize_scalar_bounded_options
-        Options for minimization solver (see scipy.optimize.minimize_scalar).
+        Options for minimizer solver (see scipy.optimize.minimize_scalar).
 
     Returns
     -------
@@ -508,45 +651,94 @@ def P_mp(
     Compute strategy:
 
     1) Compute solution bracketing interval as [0, Voc].
-    2) Compute maximum power in solution bracketing interval using scipy.optimize.minimize_scalar.
+    2) Compute maximum power in solution bracketing interval using
+    scipy.optimize.minimize_scalar.
     """
     # Compute Voc for assumed Vmp bracket [0, Voc].
-    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)['V_V']
+    V_oc_V = V_at_I(
+        I_A=0,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["V_V"]
 
-    # This allows us to make a ufunc out of minimize_scalar(). Note closures over solver arguments/options.
+    # This allows us to make a ufunc out of minimize_scalar(). Note
+    # closures over solver arguments/options.
     def opposite_P_at_V(V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S):
-        return -P_at_V(V_V=V_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                       G_p_S=G_p_S, newton_options=newton_options)['P_W']
+        return -P_at_V(
+            V_V=V_V,
+            N_s=N_s,
+            T_degC=T_degC,
+            I_ph_A=I_ph_A,
+            I_rs_1_A=I_rs_1_A,
+            n_1=n_1,
+            R_s_Ohm=R_s_Ohm,
+            G_p_S=G_p_S,
+            newton_options=newton_options,
+        )["P_W"]
 
     array_min_func = numpy.frompyfunc(
         lambda V_oc_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S: minimize_scalar(
-            opposite_P_at_V, bounds=(0., V_oc_V), args=(N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S),
-            method='bounded', options=minimize_scalar_bounded_options), 8, 1)
+            opposite_P_at_V,
+            bounds=(0.0, V_oc_V),
+            args=(N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S),
+            method="bounded",
+            options=minimize_scalar_bounded_options,
+        ),
+        8,
+        1,
+    )
 
     # Solve for the array of OptimizeResult objects.
-    res_array = array_min_func(V_oc_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S)
+    res_array = array_min_func(
+        V_oc_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S
+    )
 
-    # Verify convergence. Note that numpy.frompyfunc() always returns a PyObject array, which must be cast.
-    if not numpy.all(numpy.array(numpy.frompyfunc(lambda res: res.success, 1, 1)(res_array), dtype=bool)):
+    # Verify convergence. Note that numpy.frompyfunc() always returns a
+    # PyObject array, which must be cast.
+    if not numpy.all(
+        numpy.array(
+            numpy.frompyfunc(lambda res: res.success, 1, 1)(res_array), dtype=bool
+        )
+    ):
         raise ValueError(
-            f"mimimize_scalar() with method='bounded' did not converge for options={minimize_scalar_bounded_options}.")
+            f"mimimize_scalar() with method='bounded' did not converge for options={minimize_scalar_bounded_options}."
+        )
 
-    # Collect results. Casting with numpy.float64() creates numpy.ndarray if needed.
+    # Collect results. Casting with numpy.float64() creates numpy.ndarray
+    # if needed.
     V_mp_V = numpy.float64(numpy.frompyfunc(lambda res: res.x, 1, 1)(res_array))
     P_mp_W = numpy.float64(numpy.frompyfunc(lambda res: -res.fun, 1, 1)(res_array))
-    with numpy.errstate(divide='ignore', invalid='ignore'):
-        I_mp_A = numpy.float64(numpy.where(V_mp_V != 0., P_mp_W / V_mp_V, 0.))
+    with numpy.errstate(divide="ignore", invalid="ignore"):
+        I_mp_A = numpy.float64(numpy.where(V_mp_V != 0.0, P_mp_W / V_mp_V, 0.0))
 
-    return ensure_numpy_scalars(dictionary={'P_mp_W': P_mp_W, 'I_mp_A': I_mp_A, 'V_mp_V': V_mp_V, 'V_oc_V': V_oc_V})
+    return ensure_numpy_scalars(
+        dictionary={
+            "P_mp_W": P_mp_W,
+            "I_mp_A": I_mp_A,
+            "V_mp_V": V_mp_V,
+            "V_oc_V": V_oc_V,
+        }
+    )
 
 
 def FF(
-    *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
-        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
+    *,
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+    minimize_scalar_bounded_options: Optional[dict] = None,
+) -> dict:
     """
     Compute fill factor (unitless fraction).
 
@@ -596,27 +788,54 @@ def FF(
     numpy.float64 or numpy.ndarray.
     """
     # Compute Pmp.
-    result = P_mp(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                  minimize_scalar_bounded_options=minimize_scalar_bounded_options, newton_options=newton_options)
+    result = P_mp(
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        minimize_scalar_bounded_options=minimize_scalar_bounded_options,
+        newton_options=newton_options,
+    )
     # Compute Isc.
-    I_sc_A = I_at_V(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)['I_A']
-    result.update({'I_sc_A': I_sc_A})
+    I_sc_A = I_at_V(
+        V_V=0,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["I_A"]
+    result.update({"I_sc_A": I_sc_A})
     # Compute FF.
-    denominator = I_sc_A * result['V_oc_V']
-    with numpy.errstate(divide='ignore', invalid='ignore'):
-        # numpy.where() does not respect types, always giving numpy.ndarray, so cast with numpy.float64()
-        FF = numpy.float64(numpy.where(denominator != 0, result['P_mp_W'] / denominator, numpy.nan))
-    result.update(ensure_numpy_scalars(dictionary={'FF': FF}))
+    denominator = I_sc_A * result["V_oc_V"]
+    with numpy.errstate(divide="ignore", invalid="ignore"):
+        # numpy.where() does not respect types, always giving
+        # numpy.ndarray, so cast with numpy.float64().
+        FF = numpy.float64(
+            numpy.where(denominator != 0, result["P_mp_W"] / denominator, numpy.nan)
+        )
+    result.update(ensure_numpy_scalars(dictionary={"FF": FF}))
 
     return result
 
 
 def R_at_oc(
-    *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
+    *,
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute terminal resistance at open circuit in Ohms.
 
@@ -655,24 +874,48 @@ def R_at_oc(
     numpy.float64 or numpy.ndarray.
     """
     # Compute Voc.
-    V_oc_V = V_at_I(I_A=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                    G_p_S=G_p_S, newton_options=newton_options)['V_V']
+    V_oc_V = V_at_I(
+        I_A=0,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["V_V"]
 
     # Compute slope at Voc.
-    result = I_at_V_d1(V_V=V_oc_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                       G_p_S=G_p_S, newton_options=newton_options)
+    result = I_at_V_d1(
+        V_V=V_oc_V,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )
 
     # Compute resistance at Voc.
-    R_oc_Ohm = -1 / result['I_d1_V_S']
+    R_oc_Ohm = -1 / result["I_d1_V_S"]
 
-    return ensure_numpy_scalars(dictionary={'R_oc_Ohm': R_oc_Ohm, 'V_oc_V': V_oc_V})
+    return ensure_numpy_scalars(dictionary={"R_oc_Ohm": R_oc_Ohm, "V_oc_V": V_oc_V})
 
 
 def R_at_sc(
-    *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-        G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None) -> dict:
+    *,
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+) -> dict:
     """
     Compute terminal resistance at short circuit in Ohms.
 
@@ -711,22 +954,37 @@ def R_at_sc(
     numpy.float64 or numpy.ndarray.
     """
     # Compute derivative at Isc.
-    result = I_at_V_d1(V_V=0, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                       G_p_S=G_p_S, newton_options=newton_options)
-    I_sc_A = result['I_A']
+    result = I_at_V_d1(
+        V_V=0,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )
+    I_sc_A = result["I_A"]
 
     # Compute resistance at Isc.
-    R_sc_Ohm = -1 / result['I_d1_V_S']
+    R_sc_Ohm = -1 / result["I_d1_V_S"]
 
-    return ensure_numpy_scalars(dictionary={'R_sc_Ohm': R_sc_Ohm, 'I_sc_A': I_sc_A})
+    return ensure_numpy_scalars(dictionary={"R_sc_Ohm": R_sc_Ohm, "I_sc_A": I_sc_A})
 
 
 def iv_params(
-    *, N_s: Union[int, numpy.intc, numpy.ndarray], T_degC: Union[float, numpy.float64, numpy.ndarray],
-    I_ph_A: Union[float, numpy.float64, numpy.ndarray], I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
-    n_1: Union[float, numpy.float64, numpy.ndarray], R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray], newton_options: Optional[dict] = None,
-        minimize_scalar_bounded_options: Optional[dict] = None) -> dict:
+    *,
+    N_s: Union[int, numpy.intc, numpy.ndarray],
+    T_degC: Union[float, numpy.float64, numpy.ndarray],
+    I_ph_A: Union[float, numpy.float64, numpy.ndarray],
+    I_rs_1_A: Union[float, numpy.float64, numpy.ndarray],
+    n_1: Union[float, numpy.float64, numpy.ndarray],
+    R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
+    newton_options: Optional[dict] = None,
+    minimize_scalar_bounded_options: Optional[dict] = None,
+) -> dict:
     """
     Compute I-V curve parameters.
 
@@ -753,7 +1011,7 @@ def iv_params(
     newton_options
         Options for Newton solver (see scipy.optimize.newton).
     minimize_scalar_bounded_options
-        Options for minimization solver (see scipy.optimize.minimize_scalar).
+        Options for minimizer solver (see scipy.optimize.minimize_scalar).
 
     Returns
     -------
@@ -791,19 +1049,70 @@ def iv_params(
     Inputs must be broadcast compatible. Output values are
     numpy.float64 or numpy.ndarray.
     """
-    result = FF(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                newton_options=newton_options, minimize_scalar_bounded_options=minimize_scalar_bounded_options)
-    R_sc_Ohm = R_at_sc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                       newton_options=newton_options)['R_sc_Ohm']
-    V_x_V = result['V_oc_V'] / 2
-    I_x_A = I_at_V(V_V=V_x_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm,
-                   G_p_S=G_p_S, newton_options=newton_options)['I_A']
-    V_xx_V = (result['V_mp_V'] + result['V_oc_V']) / 2
-    I_xx_A = I_at_V(V_V=V_xx_V, N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1,
-                    R_s_Ohm=R_s_Ohm, G_p_S=G_p_S, newton_options=newton_options)['I_A']
-    R_oc_Ohm = R_at_oc(N_s=N_s, T_degC=T_degC, I_ph_A=I_ph_A, I_rs_1_A=I_rs_1_A, n_1=n_1, R_s_Ohm=R_s_Ohm, G_p_S=G_p_S,
-                       newton_options=newton_options)['R_oc_Ohm']
-    result.update({'R_oc_Ohm': R_oc_Ohm, 'V_x_V': V_x_V, 'I_x_A': I_x_A, 'V_xx_V': V_xx_V, 'I_xx_A': I_xx_A,
-                   'R_sc_Ohm': R_sc_Ohm})
+    result = FF(
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+        minimize_scalar_bounded_options=minimize_scalar_bounded_options,
+    )
+    R_sc_Ohm = R_at_sc(
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["R_sc_Ohm"]
+    V_x_V = result["V_oc_V"] / 2
+    I_x_A = I_at_V(
+        V_V=V_x_V,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["I_A"]
+    V_xx_V = (result["V_mp_V"] + result["V_oc_V"]) / 2
+    I_xx_A = I_at_V(
+        V_V=V_xx_V,
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["I_A"]
+    R_oc_Ohm = R_at_oc(
+        N_s=N_s,
+        T_degC=T_degC,
+        I_ph_A=I_ph_A,
+        I_rs_1_A=I_rs_1_A,
+        n_1=n_1,
+        R_s_Ohm=R_s_Ohm,
+        G_p_S=G_p_S,
+        newton_options=newton_options,
+    )["R_oc_Ohm"]
+    result.update(
+        {
+            "R_oc_Ohm": R_oc_Ohm,
+            "V_x_V": V_x_V,
+            "I_x_A": I_x_A,
+            "V_xx_V": V_xx_V,
+            "I_xx_A": I_xx_A,
+            "R_sc_Ohm": R_sc_Ohm,
+        }
+    )
 
     return result

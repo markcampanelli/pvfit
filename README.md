@@ -10,6 +10,7 @@ be expected to change without warning.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yaml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 ## So What Can PVfit Do for Me?
@@ -111,7 +112,7 @@ From the [pvfit](pvfit) subdirectory—
 ```terminal
 pytest --doctest-modules --cov=pvfit --cov-report=html
 ```
-The root of the generated coverage report is at `pvfit/htmlcov/index.html` (uncommitted). 
+The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not committed). 
 
 ### Build Documentation Locally
 
@@ -123,7 +124,7 @@ then—
 ```terminal
 make html
 ```
-The root of the generated documentation is at `docs/_build/html/pvfit.html` (uncommitted). 
+The root of the generated documentation is at `docs/_build/html/pvfit.html` (not committed). 
 
 ### Dependencies
 
@@ -138,11 +139,11 @@ dependencies or version ranges should be appropriately recorded in [setup.cfg](s
 
 ### Coding Requirements and Style
 
-- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout.
-- [`flake8`](http://flake8.pycqa.org/en/latest/) formatting with a 120-character line limit for source code files.
-- A 75-character line limit for all docstrings, following the
-[numpydoc docstring standard](https://numpydoc.readthedocs.io/en/latest/format.html).
-- An 80-character line limit for demonstration code in `demos` directories.
-- There is no character line limit for data in Python code, such as in
-[data.py](pvfit/measurement/spectral_correction/data.py).
-- Unit testing is a must, with naming scheme `module_test.py` to test `module.py` in the same directory.
+- Unit testing is a must, with a "collocation" scheme, i.e., `module_test.py` to test `module.py` in the same directory.
+- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout (WIP).
+- [`flake8`](http://flake8.pycqa.org/en/latest/) is used for linting, with `black`'s default 88-character line limit
+(configured in [setup.cfg](setup.cfg)).
+- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat code. Before committing code, use--
+```terminal
+black .
+```

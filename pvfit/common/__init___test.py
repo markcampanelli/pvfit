@@ -1,2 +1,2 @@
 def test_import_package():
-    import pvfit.common  # noqa
+    import pvfit.common  # NOQA

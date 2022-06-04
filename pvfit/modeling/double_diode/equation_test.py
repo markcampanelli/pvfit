@@ -1,1 +1,1 @@
-import pvfit.modeling.double_diode.equation  # noqa
+import pvfit.modeling.double_diode.equation  # NOQA

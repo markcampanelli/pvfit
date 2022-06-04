@@ -24,7 +24,8 @@ S_A_per_W = pvfit.measurement.spectral_correction_data.S_A_per_W_TD_NIST
 ...one then creates a SpectralResponsivity object—
 """
 S = pvfit.measurement.spectral_correction.SpectralResponsivity(
-    lambda_nm=lambda_nm, S_A_per_W=S_A_per_W)
+    lambda_nm=lambda_nm, S_A_per_W=S_A_per_W
+)
 """
 This gets spectral responsivity [A/W] at each wavelength [nm] from the
 underlying numpy.ndarray and shows the domain and range—
@@ -83,6 +84,13 @@ Compute spectral mismatch correction factor M. See the function docstring
 for details.
 """
 M = pvfit.measurement.spectral_correction.M(
-    S_TD_OC=S_TD_OC, E_TD_OC=E_TD_OC, S_TD_RC=S_TD_RC, E_TD_RC=E_TD_RC,
-    S_RD_OC=S_RD_OC, E_RD_OC=E_RD_OC, S_RD_RC=S_RD_RC, E_RD_RC=E_RD_RC)
-print('M = {}'.format(M))
+    S_TD_OC=S_TD_OC,
+    E_TD_OC=E_TD_OC,
+    S_TD_RC=S_TD_RC,
+    E_TD_RC=E_TD_RC,
+    S_RD_OC=S_RD_OC,
+    E_RD_OC=E_RD_OC,
+    S_RD_RC=S_RD_RC,
+    E_RD_RC=E_RD_RC,
+)
+print("M = {}".format(M))
