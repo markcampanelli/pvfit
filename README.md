@@ -75,14 +75,6 @@ python -m pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=
 You should now be able to explore PVfit's functionality with the "getting started" modules in the various `demos`
 subpackages.
 
-## About the Maintainer
-
-The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
-[Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com), in Bozeman, MT, USA. Your
-[suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues),
-[questions/discussions](https://github.com/markcampanelli/pvfit/discussions), and
-[contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.
-
 ## Developer Notes
 
 ### Download, Install, and Verify Package with Developer and Testing Dependencies (editable mode)
@@ -140,10 +132,24 @@ dependencies or version ranges should be appropriately recorded in [setup.cfg](s
 ### Coding Requirements and Style
 
 - Unit testing is a must, with a "collocation" scheme, i.e., `module_test.py` to test `module.py` in the same directory.
+100% code coverage is the goal.
 - [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout (WIP).
 - [`flake8`](http://flake8.pycqa.org/en/latest/) is used for linting, with `black`'s default 88-character line limit
-(configured in [setup.cfg](setup.cfg)).
-- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat code. Before committing code, use--
+(configured in [setup.cfg](setup.cfg)). Check before committing code using--
+```terminal
+flake8 .
+```
+Annotate troublesome lines (sparingly) with the suffix `# NOQA`.
+- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat code. Autoformat before committing
+code, using--
 ```terminal
 black .
 ```
+
+## About the Maintainer
+
+The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
+[Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com), in Bozeman, MT, USA. Your
+[suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues),
+[questions/discussions](https://github.com/markcampanelli/pvfit/discussions), and
+[contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.
