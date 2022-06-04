@@ -33,13 +33,14 @@ jobs:
           cd pvfit
           pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov-${{ matrix.python-version }} --junitxml=../junit/test-results-${{ matrix.python-version }}.xml
       - name: Archive test results
+        uses: actions/upload-artifact@v3
         with:
-          name: pytest-results-${{ matrix.python-version }}
+          name: test-results-${{ matrix.python-version }}
           path: junit/test-results-${{ matrix.python-version }}.xml
         if: ${{ always() }}
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:
-          name: code-coverage-report
+          name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
         if: ${{ always() }}
