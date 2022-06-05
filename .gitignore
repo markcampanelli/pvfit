@@ -1,5 +1,7 @@
-# pvfit-private builds
+# Proprietary code that we should never commit (links or directories).
+inference
 inference/
+misc
 misc/
 
 # Byte-compiled / optimized / DLL files
