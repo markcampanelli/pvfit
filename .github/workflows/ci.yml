@@ -48,10 +48,9 @@ jobs:
 # TODO check manifest and build source dist and wheel (inc. nuitka?) artifacts
       - name: Build generic source and wheel disributions
         run: |
-          cd pvfit
           python -m build
       - name: Archive disributions
         uses: actions/upload-artifact@v3
         with:
           name: dist-${{ matrix.python-version }}
-          path: pvfit/dist
+          path: dist
