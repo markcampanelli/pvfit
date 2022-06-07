@@ -22,7 +22,7 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip
           python -m pip --version
           pip uninstall -y setuptools
-          python -m pip install --progress-bar off .[demo,dev,docs,test]
+          python -m pip install --progress-bar off .[build,demo,dev,docs,test]
           python -m pip list
       - name: Check formatting with black
         run: |
@@ -46,3 +46,4 @@ jobs:
           name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
         if: ${{ always() }}
+# TODO check manifest and build source dist and wheel (inc. nuitka?) artifacts

@@ -81,11 +81,11 @@ subpackages.
 
 Clone this repo using your preferred git method, and go to the repo's root directory.
 
-Install `pvfit` in editable (development) mode, including the `pytest` and `sphinx` packages, with `pip`—
+Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
-python -m pip install -e .[demo,dev,docs,test]
+python -m pip install -e .[build,demo,dev,docs,test]
 ```
-This also installs the libraries needed to develop the code demonstrations.
+This also installs the libraries needed to develop the code demonstrations and build source and wheel distributions.
 
 Verify your installation—
 ```terminal
@@ -117,6 +117,14 @@ then—
 make html
 ```
 The root of the generated documentation is at `docs/_build/html/pvfit.html` (not committed). 
+
+
+### Building Distributions with Nuitka
+
+FIXME
+- Source vs. wheel disctributions
+- Usage of `setup.py`
+
 
 ### Dependencies
 
