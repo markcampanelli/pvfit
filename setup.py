@@ -8,4 +8,4 @@ dynamically using pyproject.toml.
 from setuptools import setup
 
 # setuptools_scm is otherwise specified in pyproject.toml, which is not used in this build path.
-setup(setup_requires=['setuptools_scm'], use_scm_version=True)
+setup(setup_requires=["setuptools_scm"], use_scm_version=True)
