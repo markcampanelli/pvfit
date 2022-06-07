@@ -46,8 +46,7 @@ def get_version(*, info_log: bool = False) -> str:
     """
 
     try:
-        # This relies on setuptools_scm magic, and raises when pvfit
-        # package is not installed.
+        # This relies on setuptools_scm magic, and raises when pvfit package is not installed.
         version_ = version("pvfit")
     except PackageNotFoundError:
         logger.exception(
