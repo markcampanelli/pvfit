@@ -1,11 +1,11 @@
 """
 Sandia Array Performance Model (SAPM)
 
-https://pvpmc.sandia.gov/modeling-steps/2-dc-module-iv/point-value-models/sandia-pv-array-performance-model/
-
+https://energy.sandia.gov/wp-content/gallery/uploads/SAND-2004_PV-Performance-Array-Model.pdf
 
 WARNING: This code is experimental and not subject to semantic versioning.
 """
+
 from typing import Union
 
 import numpy

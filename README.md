@@ -12,15 +12,16 @@ be expected to change without warning.
 
 ## So What Can PVfit Do for Me?
 
-PVfit is currently restricted to direct-current (DC) PV performance measurement and modeling. Following the standardized
-technical approach of most accredited PV calibration laboratories for measuring I-V curves using PV reference devices,
-PVfit makes considerable use of the effective irradiance ratio (F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the
-*effective* irradiance on a PV device, in contrast to the common use of MET-station data
-([poster](https://pvpmc.sandia.gov/download/7302/)). See [this paper](https://doi.org/10.1002/ese3.190) for a more
-detailed introduction and/or email [Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
-[PVfit Slack channel](https://pvfit.slack.com), where you can chat realtime about your quesitons. This open-source code
-supports and complements a closed-source model calibration service (e.g., single-diode model parameter fitting from I-V
-curve data) available at [https://pvfit.app](https://pvfit.app) and via a REST API.
+PVfit is currently focused on direct-current (DC) PV module performance measurement and modeling. Following the
+standardized technical approach of most accredited PV calibration laboratories for measuring I-V curves using PV
+reference devices, PVfit makes considerable use of the effective irradiance ratio
+(F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the *effective* irradiance on a PV device, in contrast to the
+common use of MET-station data ([poster](https://pvpmc.sandia.gov/download/7302/)). See
+[this paper](https://doi.org/10.1002/ese3.190) for a more detailed introduction. Email
+[Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the [PVfit Slack channel](https://pvfit.slack.com),
+where you can chat realtime about your quesitons/applications. This open-source code supports and complements a
+closed-source model calibration service (e.g., single-diode model parameter fitting from I-V curve data) available at
+[https://pvfit.app](https://pvfit.app) and via a REST API.
 
 See the README's for individual subpackages to get started with specific functionalities—
 
@@ -31,6 +32,8 @@ See the README's for individual subpackages to get started with specific functio
   - [Single Diode](pvfit/modeling/single_diode)
       - [Equation](pvfit/modeling/single_diode/equation.py)
       - [Model](pvfit/modeling/single_diode/model.py)
+
+Certain other subpackages are marked as experimental.
 
 ## Up and Running in 5 Minutes
 

@@ -1,3 +1,11 @@
+"""
+Sandia Inverter Performance Model (SIPM)
+
+https://energy.sandia.gov/wp-content/gallery/uploads/Performance-Model-for-Grid-Connected-Photovoltaic-Inverters.pdf
+
+WARNING: This code is experimental and not subject to semantic versioning.
+"""
+
 import numpy
 
 
