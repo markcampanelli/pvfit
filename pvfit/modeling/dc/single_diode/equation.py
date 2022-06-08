@@ -650,9 +650,9 @@ def P_mp(
 
     Compute strategy:
 
-    1) Compute solution bracketing interval as [0, Voc].
-    2) Compute maximum power in solution bracketing interval using
-    scipy.optimize.minimize_scalar.
+      1) Compute solution bracketing interval as [0, Voc].
+      2) Compute maximum power in solution bracketing interval using scipy.optimize.minimize_scalar.
+
     """
     # Compute Voc for assumed Vmp bracket [0, Voc].
     V_oc_V = V_at_I(

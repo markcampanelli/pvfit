@@ -5,7 +5,7 @@ from scipy.constants import convert_temperature
 
 from pvfit.common.constants import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
-import pvfit.modeling.single_diode.equation as equation
+import pvfit.modeling.dc.single_diode.equation as equation
 
 
 def current_sum_at_diode_node(

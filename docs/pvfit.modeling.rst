@@ -7,8 +7,8 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pvfit.modeling.double_diode
-   pvfit.modeling.single_diode
+   pvfit.modeling.ac
+   pvfit.modeling.dc
 
 Module contents
 ---------------

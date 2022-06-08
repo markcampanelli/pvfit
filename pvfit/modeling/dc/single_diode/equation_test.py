@@ -3,7 +3,7 @@ import pytest
 from scipy.constants import convert_temperature
 
 from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C
-import pvfit.modeling.single_diode.equation as equation
+import pvfit.modeling.dc.single_diode.equation as equation
 
 
 @pytest.fixture(
