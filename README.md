@@ -118,13 +118,15 @@ The root of the generated documentation is at `docs/_build/html/pvfit.html` (not
 
 ### Distribute, inc. with Nuitka
 
-PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to generate distributions--
+PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to generate distributions using
+[setuptools](https://setuptools.pypa.io/en/latest/) as the build backend (specified in `pyproject.toml`). From the repo
+root, execute--
 ```terminal
 python -m build
 ```
 Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not committed).
 
-`pip` can also be used to build pure-python wheels--
+`pip` can also be used to build pure-Python wheels--
 ```terminal
 python -m pip wheel --no-deps .
 ```
@@ -134,10 +136,9 @@ faster-executing, compiled C code--
 ```terminal
 python setup.py bdist_nuitka
 ```
-A platfrom-specific `*.whl` file is placed in the `dist` directory (not committed). The resulting Python extension
-module has the same interface. Due to current limitations with specifying multiple build backends in `pyproject.toml`,
-`nuitka` builds use the legacy `setup.py` method of building. Users may wish to remove tests and demos before generating
-such wheel files.
+A platfrom-specific `*.whl` file is created (not committed). The associated Python extension module has the same
+interface. Due to current limitations with specifying multiple build backends in `pyproject.toml`, `nuitka` builds use
+the legacy `setup.py` method of building. Users may wish to remove tests and demos before generating such wheel files.
 
 Finally, the distribution manifests (cf. `MANIFEST.in`) are checked using--
 ```terminal
