@@ -1,6 +1,3 @@
-**NOTE:** The `pvfit-m` repo now redirects here, with its contents in
-[this subpackage](pvfit/measurement/spectral_correction).
-
 # pvfit
 
 **PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling**
@@ -83,6 +80,7 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
+python -m pip install --upgrade pip setuptools wheel
 python -m pip install -e .[build,demo,dev,docs,test]
 ```
 This also installs the libraries needed to develop the code demonstrations and build source and wheel distributions.
@@ -98,7 +96,7 @@ which should print something similar to—
 
 Next, make sure that the tests are passing.
 
-### Run Tests with Coverage Locally
+### Test with Coverage
 
 From the [pvfit](pvfit) subdirectory—
 ```terminal
@@ -106,7 +104,7 @@ pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
 ```
 The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not committed). 
 
-### Build Documentation Locally
+### Build Documentation
 
 From the [docs](docs) subdirectory—
 ```terminal
@@ -118,13 +116,33 @@ make html
 ```
 The root of the generated documentation is at `docs/_build/html/pvfit.html` (not committed). 
 
+### Distribute, inc. with Nuitka
 
-### Building Distributions with Nuitka
+PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to generate distributions--
+```terminal
+python -m build
+```
+Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not committed).
 
-FIXME
-- Source vs. wheel disctributions
-- Usage of `setup.py`
+`pip` can also be used to build pure-python wheels--
+```terminal
+python -m pip wheel --no-deps .
+```
 
+Alternatively, [nuitka](https://nuitka.net/index.html) can be used to transpile the Python source code into
+faster-executing, compiled C code--
+```terminal
+python setup.py bdist_nuitka
+```
+A platfrom-specific `*.whl` file is placed in the `dist` directory (not committed). The resulting Python extension
+module has the same interface. Due to current limitations with specifying multiple build backends in `pyproject.toml`,
+`nuitka` builds use the legacy `setup.py` method of building. Users may wish to remove tests and demos before generating
+such wheel files.
+
+Finally, the distribution manifests (cf. `MANIFEST.in`) are checked using--
+```terminal
+check-manifest
+```
 
 ### Dependencies
 

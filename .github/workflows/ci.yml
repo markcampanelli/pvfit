@@ -45,9 +45,9 @@ jobs:
           name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
         if: ${{ always() }}
-# TODO check manifest
       - name: Build generic source and wheel disributions
         run: |
+          check-manifest
           python -m build
       - name: Archive disributions
         uses: actions/upload-artifact@v3
