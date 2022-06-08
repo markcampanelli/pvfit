@@ -5,7 +5,7 @@
 **IMPORTANT:** This code is pre-release, and so the code organiztion and Application Programming Interface (API) should
 be expected to change without warning.
 
-![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yaml/badge.svg)
+![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
