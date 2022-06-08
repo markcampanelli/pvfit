@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --progress-bar off --upgrade pip
+          python -m pip install --progress-bar off --upgrade pip setuptools wheel
           python -m pip --version
           python -m pip install --progress-bar off .[build,demo,dev,docs,test]
           python -m pip list
@@ -45,7 +45,7 @@ jobs:
           name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
         if: ${{ always() }}
-# TODO check manifest and build source dist and wheel (inc. nuitka?) artifacts
+# TODO check manifest
       - name: Build generic source and wheel disributions
         run: |
           python -m build
