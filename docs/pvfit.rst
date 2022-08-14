@@ -8,9 +8,7 @@ Subpackages
    :maxdepth: 4
 
    pvfit.common
-   pvfit.inference
    pvfit.measurement
-   pvfit.misc
    pvfit.modeling
 
 Module contents

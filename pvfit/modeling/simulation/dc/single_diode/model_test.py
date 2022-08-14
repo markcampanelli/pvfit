@@ -2,7 +2,7 @@ import numpy
 import pytest
 
 from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C, materials
-import pvfit.modeling.dc.single_diode.model as model
+import pvfit.modeling.simulation.dc.single_diode.model as model
 
 
 @pytest.fixture(

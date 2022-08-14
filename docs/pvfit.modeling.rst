@@ -7,8 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   pvfit.modeling.ac
-   pvfit.modeling.dc
+   pvfit.modeling.simulation
 
 Module contents
 ---------------

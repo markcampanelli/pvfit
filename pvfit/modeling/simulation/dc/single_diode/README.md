@@ -1,4 +1,4 @@
-# pvfit.modeling.dc.single_diode
+# pvfit.modeling.simulation.dc.single_diode
 
 **Current-voltage (I-V) relationships for the single-diode model (SDM) of photovoltaic (PV) devices**
 
@@ -11,7 +11,7 @@ First, make sure that you have followed the package setup instructions
 
 #### Load Measurement Data, Calibrate, and Compute an I-V Curve
 
-The [pvfit.modeling.dc.single_diode.equation](equation.py) module comes with a demonstration. Get started by reading
+The [pvfit.modeling.simulation.dc.single_diode.equation](equation.py) module comes with a demonstration. Get started by reading
 through and executing the script [getting_started_equation.py](demos/getting_started_equation.py) from within the
 [demos](demos) directory—
 ```terminal
@@ -26,7 +26,7 @@ which should print out some interesting information and ultimately this pretty g
 
 #### Load Measurement Data, Calibrate, and Compute an I-V Curve
 
-The [pvfit.modeling.dc.single_diode.model](model.py) module comes with a demonstration. Get started by reading
+The [pvfit.modeling.simulation.dc.single_diode.model](model.py) module comes with a demonstration. Get started by reading
 through and executing the script [getting_started_model.py](demos/getting_started_model.py) from within the
 [demos](demos) directory—
 ```terminal

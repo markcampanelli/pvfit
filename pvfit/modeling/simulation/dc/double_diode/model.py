@@ -2,7 +2,7 @@ import numpy
 from scipy.constants import convert_temperature
 
 from pvfit.common.constants import T_degC_stc, k_B_J_per_K, k_B_eV_per_K, q_C
-import pvfit.modeling.dc.double_diode.equation as dde
+import pvfit.modeling.simulation.dc.double_diode.equation as dde
 
 
 def current_sum_at_diode_node(
