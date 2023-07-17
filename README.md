@@ -2,8 +2,8 @@
 
 **PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling**
 
-**IMPORTANT:** This code is pre-release, and so the code organiztion and Application Programming Interface (API) should
-be expected to change without warning.
+**IMPORTANT:** This code is pre-release, and so the code organiztion and Application
+Programming Interface (API) should be expected to change without warning.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
@@ -12,51 +12,59 @@ be expected to change without warning.
 
 ## So What Can PVfit Do for Me?
 
-PVfit is currently focused on direct-current (DC) PV module performance measurement and modeling. Following the
-standardized technical approach of most accredited PV calibration laboratories for measuring I-V curves using PV
-reference devices, PVfit makes considerable use of the effective irradiance ratio
-(F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the *effective* irradiance on a PV device, in contrast to the
-common use of MET-station data ([poster](https://pvpmc.sandia.gov/download/7302/)). See
+PVfit is currently focused on direct-current (DC) PV module performance measurement and
+modeling. Following the standardized technical approach of most accredited PV
+calibration laboratories for measuring I-V curves using PV reference devices, PVfit
+makes considerable use of the effective irradiance ratio
+(F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the *effective* irradiance on a PV
+device, in contrast to the common use of MET-station data
+([poster](https://pvpmc.sandia.gov/download/7302/)). See
 [this paper](https://doi.org/10.1002/ese3.190) for a more detailed introduction. Email
-[Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the [PVfit Slack channel](https://pvfit.slack.com),
-where you can chat realtime about your quesitons/applications. This open-source code supports and complements a
-closed-source model calibration service (e.g., single-diode model parameter fitting from I-V curve data) available at
-[https://pvfit.app](https://pvfit.app) and via a REST API.
+[Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
+[PVfit Slack channel](https://pvfit.slack.com), where you can chat realtime about your
+quesitons/applications. This open-source code supports and complements a closed-source
+model calibration service (e.g., single-diode model parameter fitting from I-V curve
+data) available at [https://pvfit.app](https://pvfit.app) and via a REST API.
 
-See the README's for individual subpackages to get started with specific functionalities—
+See the README's for individual subpackages to get started with specific
+functionalities—
 
 - [Measurement](pvfit/measurement)
-  - [Spectral Mismatch Correction Factor M](pvfit/measurement/spectral_correction)
+  - [Spectral Mismatch Correction Factor M](pvfit/measurement/spectral_correction.py)
   - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
 - [Modeling](pvfit/modeling)
-  - [Single Diode](pvfit/modeling/single_diode)
-      - [Equation](pvfit/modeling/single_diode/equation.py)
-      - [Model](pvfit/modeling/single_diode/model.py)
+  - [Single Diode](pvfit/modeling/simulation/dc/single_diode)
+      - [Equation](pvfit/modeling/simulation/dc/single_diode/equation.py)
+      - [Model](pvfit/modeling/simulation/dc/single_diode/model.py)
 
 Certain other subpackages are marked as experimental.
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [python>=3.8,<3.11](https://www.python.org/) with [numpy](https://numpy.org/) and
-[scipy](https://www.scipy.org/). It is tested with CPython on recent versions of Ubuntu, macOS, and Windows. We suggest
-using a suitable Python virtual environment that provides [pip](https://pypi.org/project/pip/).
+`pvfit` minimally requires [python>=3.8,<3.12](https://www.python.org/) with
+[numpy](https://numpy.org/) and [scipy](https://www.scipy.org/). It is tested with
+CPython on recent versions of Ubuntu, macOS, and Windows. We suggest using a suitable
+Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 
 ### Download, Install, and Verify Package (non-editable mode)
 
-This package will not be available on [PyPI](https://pypi.org/) until the application programming interface (API) is
-deemed stable and sufficiently tested and documented. Meanwhile, install the latest code directly from the GitHub repo
-using a sufficiently recent version of `pip`—
+This package will not be available on [PyPI](https://pypi.org/) until the application
+programming interface (API) is deemed stable and sufficiently tested and documented.
+Meanwhile, install the latest code directly from the GitHub repo using a sufficiently
+recent version of `pip`—
 ```terminal
 python -m pip install --upgrade pip
 python -m pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 NOTES:
-- You may want to install your own optimized versions of [`numpy`](https://www.numpy.org/) and
-[`scipy`](https://www.scipy.org/) (e.g., using [conda](https://docs.conda.io/en/latest/)), otherwise this setup will
-grab the default versions from [PyPI](https://pypi.org/).
-- The `demo` option adds the [matplotlib](https://matplotlib.org/), [pandas](https://pandas.pydata.org/), and
-[requests](https://2.python-requests.org/en/master/) packages in order to run all the provided demonstrations in the
-`demos` directories.
+- You may want to install your own optimized versions of
+[`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) (e.g., using
+[conda](https://docs.conda.io/en/latest/)), otherwise this setup will grab the default
+versions from [PyPI](https://pypi.org/).
+- The `demo` option adds the [matplotlib](https://matplotlib.org/),
+[pandas](https://pandas.pydata.org/), and
+[requests](https://2.python-requests.org/en/master/) packages in order to run all the
+provided demonstrations in the `demos` directories.
 
 Verify your installation—
 ```terminal
@@ -72,8 +80,8 @@ Likewise, stay up to date with the latest code changes using—
 python -m pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 
-You should now be able to explore PVfit's functionality with the "getting started" modules in the various `demos`
-subpackages.
+You should now be able to explore PVfit's functionality with the "getting started"
+modules in the various `demos` subpackages.
 
 ## Developer Notes
 
@@ -83,10 +91,11 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
-python -m pip install --upgrade pip setuptools wheel
-python -m pip install -e .[build,demo,dev,docs,test]
+python -m pip install --upgrade pip
+python -m pip install -e .[demo,dev,docs]
 ```
-This also installs the libraries needed to develop the code demonstrations and build source and wheel distributions.
+This also installs the libraries needed to develop the code demonstrations and build
+source and wheel distributions.
 
 Verify your installation—
 ```terminal
@@ -103,9 +112,10 @@ Next, make sure that the tests are passing.
 
 From the [pvfit](pvfit) subdirectory—
 ```terminal
-pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
+python -m pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
 ```
-The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not committed). 
+The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not
+committed). 
 
 ### Build Documentation
 
@@ -117,69 +127,76 @@ then—
 ```terminal
 make html
 ```
-The root of the generated documentation is at `docs/_build/html/pvfit.html` (not committed). 
+The root of the generated documentation is at `docs/_build/html/pvfit.html` (not
+committed). 
 
 ### Distribute, inc. with Nuitka
 
-PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to generate distributions using
-[setuptools](https://setuptools.pypa.io/en/latest/) as the build backend (specified in `pyproject.toml`). From the repo
-root, execute--
+PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to
+generate distributions using [setuptools](https://setuptools.pypa.io/en/latest/) as the
+build backend (specified in `pyproject.toml`). From the repo root, execute--
 ```terminal
 python -m build
 ```
-Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not committed).
+Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not
+committed).
 
-`pip` can also be used to build pure-Python wheels--
+Alternatively, [nuitka](https://nuitka.net/index.html) can be used to transpile the
+Python source code into faster-executing, compiled C code with the same Python
+interface. With an appropriate setup for Nuitka (compilers, etc.), swap the
+`[build-system]` table in the `pyproject.toml`, then--
 ```terminal
-python -m pip wheel --no-deps .
+python -m build
 ```
-
-Alternatively, [nuitka](https://nuitka.net/index.html) can be used to transpile the Python source code into
-faster-executing, compiled C code--
-```terminal
-python setup.py bdist_nuitka
-```
-A platfrom-specific `*.whl` file is created (not committed). The associated Python extension module has the same
-interface. Due to current limitations with specifying multiple build backends in `pyproject.toml`, `nuitka` builds use
-the legacy `setup.py` method of building. Users may wish to remove tests and demos before generating such wheel files.
+A platfrom-specific `*.whl` file is placed in the `dist` directory (not committed). The
+included Python extension module has the same interface. Users may wish to remove
+tests and demos before generating such wheel files.
 
 Finally, the distribution manifests (cf. `MANIFEST.in`) are checked using--
 ```terminal
-check-manifest
+python -m check_manifest
 ```
 
 ### Dependencies
 
-Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are the only runtime dependencies. In
-order to ensure a straightforward, consistent, and well-tested API, the decision has been made to avoid any dependecy on
-[`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward integration with consumers that
-use `pandas`, e.g., integrating computations with
-[Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html) and
-[DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html) objects. To avoid
-bloat, we also avoid dependency on plotting libraries such as [`matplotlib`](https://matplotlib.org/). Any new
-dependencies or version ranges should be appropriately recorded in [setup.cfg](setup.cfg).
+Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are
+the only runtime dependencies. In order to ensure a straightforward, consistent, and
+well-tested API, the decision has been made to avoid any dependecy on
+[`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward
+integration with consumers that use `pandas`, e.g., integrating computations with
+[Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html)
+and
+[DataFrame](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html)
+objects. To avoid bloat, we also avoid dependency on plotting libraries such as
+[`matplotlib`](https://matplotlib.org/). Any new dependencies or version ranges should
+be appropriately recorded in [pyproject.toml](pyproject.toml).
 
 ### Coding Requirements and Style
 
-- Unit testing is a must, with a "collocation" scheme, i.e., `module_test.py` to test `module.py` in the same directory.
-100% code coverage is the goal.
-- [Type hints](https://docs.python.org/3/library/typing.html) should be used throughout (WIP).
-- [`flake8`](http://flake8.pycqa.org/en/latest/) is used for linting, with `black`'s default 88-character line limit
-(configured in [setup.cfg](setup.cfg)). Check before committing code using--
+- Unit testing is a must, with a "collocation" scheme, i.e., `module_test.py` to test
+`module.py` in the same directory. 100% code coverage is the goal.
+- [Type hints](https://docs.python.org/3/library/typing.html) should be used
+throughout (WIP).
+- [`pylint`](https://pylint.readthedocs.io/en/latest/?badge=latest) is used for linting,
+with `black`'s default 88-character line limit (configured in 
+[pyproject.toml](pyproject.toml)). Check before committing code using--
 ```terminal
-flake8 .
+python -m pylint .
 ```
-Annotate troublesome lines (sparingly) with the suffix `# NOQA`.
-- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat code. Autoformat before committing
+Skip troublesome lines (sparingly) with the suffix `# pylint: disable=<code>`.
+- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat
+code. Autoformat before committing
 code, using--
 ```terminal
-black .
+python -m black .
 ```
 
-## About the Maintainer
+## About the Author and Maintainer
 
-The maintainer of this code is [Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
-[Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com), in Bozeman, MT, USA. Your
+The author and maintainer of this code is
+[Mark Campanelli](https://www.linkedin.com/in/markcampanelli/), the proprietor of
+[Intelligent Measurement Systems LLC (IMS)](https://intelligentmeasurementsystems.com),
+in Bozeman, MT, USA. Your
 [suggestions/bug reports](https://github.com/markcampanelli/pvfit/issues),
 [questions/discussions](https://github.com/markcampanelli/pvfit/discussions), and
 [contributions](https://github.com/markcampanelli/pvfit/pulls) are welcome.

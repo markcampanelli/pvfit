@@ -21,7 +21,7 @@ def current_sum_at_diode_node(
     n_1_0: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
-    E_g_eV_0: Union[float, numpy.float64, numpy.ndarray]
+    E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
 ):
     """
     Computes the sum of currents at the diode's anode node in the
@@ -101,7 +101,7 @@ def auxiliary_equations(
     n_1_0: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
-    E_g_eV_0: Union[float, numpy.float64, numpy.ndarray]
+    E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
 ):
     """
     Computes the auxiliary equations at effective irradiance ratio and
@@ -184,8 +184,7 @@ def auxiliary_equations(
     # Compute parallel conductance (photo-conductive shunt).
     # G_p_S = F * G_p_S_0
 
-    # Compute photo-generated current at F and T_degC (V=0 with I=Isc for
-    # this).
+    # Compute photo-generated current at F and T_degC (V=0 with I=Isc for this).
     expr1 = I_sc_A_0 * F
     expr2 = expr1 * R_s_Ohm
     I_ph_A = (
@@ -220,7 +219,7 @@ def I_at_V_F_T(
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
     E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
-    newton_options: Optional[dict] = None
+    newton_options: Optional[dict] = None,
 ) -> dict:
     """
     Compute terminal current at specified terminal voltage, effective
@@ -303,7 +302,7 @@ def V_at_I_F_T(
     R_s_Ohm_0: Union[float, numpy.float64, numpy.ndarray],
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
     E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
-    newton_options: Optional[dict] = None
+    newton_options: Optional[dict] = None,
 ) -> dict:
     """
     Compute terminal voltage at specified terminal current, effective
@@ -389,7 +388,7 @@ def iv_params(
     G_p_S_0: Union[float, numpy.float64, numpy.ndarray],
     E_g_eV_0: Union[float, numpy.float64, numpy.ndarray],
     newton_options: Optional[dict] = None,
-    minimize_scalar_bounded_options: Optional[dict] = None
+    minimize_scalar_bounded_options: Optional[dict] = None,
 ):
     """
     Compute I-V curve parameters at specified effective irradiance ratio
@@ -473,7 +472,7 @@ def iv_params(
     result = equation.iv_params(
         **params,
         minimize_scalar_bounded_options=minimize_scalar_bounded_options,
-        newton_options=newton_options
+        newton_options=newton_options,
     )
 
     return result

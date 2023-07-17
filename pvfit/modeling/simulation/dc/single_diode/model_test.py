@@ -44,7 +44,6 @@ def current_sum_at_diode_node_fixture(request):
 
 
 def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
-
     V_V = current_sum_at_diode_node_fixture["V_V"]
     I_A = current_sum_at_diode_node_fixture["I_A"]
     F = current_sum_at_diode_node_fixture["F"]

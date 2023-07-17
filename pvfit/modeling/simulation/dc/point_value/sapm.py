@@ -25,7 +25,7 @@ def F_at_E_T(
     f_1_params,
     f_2_params,
     f_d,
-    alpha_I_sc_per_degC
+    alpha_I_sc_per_degC,
 ):
     """TODO"""
     # : Union[float, numpy.float64, numpy.ndarray]
@@ -44,7 +44,7 @@ def f_1(
     a_1: Union[float, numpy.float64, numpy.ndarray],
     a_2: Union[float, numpy.float64, numpy.ndarray],
     a_3: Union[float, numpy.float64, numpy.ndarray],
-    a_4: Union[float, numpy.float64, numpy.ndarray]
+    a_4: Union[float, numpy.float64, numpy.ndarray],
 ):
     """TODO"""
     return ensure_numpy_scalars(
@@ -60,7 +60,7 @@ def f_2(
     b_2: Union[float, numpy.float64, numpy.ndarray],
     b_3: Union[float, numpy.float64, numpy.ndarray],
     b_4: Union[float, numpy.float64, numpy.ndarray],
-    b_5: Union[float, numpy.float64, numpy.ndarray]
+    b_5: Union[float, numpy.float64, numpy.ndarray],
 ):
     """TODO"""
     return ensure_numpy_scalars(

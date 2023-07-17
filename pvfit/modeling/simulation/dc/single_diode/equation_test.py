@@ -321,7 +321,6 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
 
 
 def test_I_at_V_explicit():
-
     # Can handle zero series resistance.
     V_V = 0.35
     I_ph_A = 0.125
@@ -353,7 +352,6 @@ def test_I_at_V_explicit():
 
 
 def test_I_at_V_implicit():
-
     # Implicit computation checks out when chaining with inverse function.
     V_V = numpy.array(0.35)
     I_ph_A = 0.125
@@ -393,7 +391,6 @@ def test_I_at_V_implicit():
 
 
 def test_V_at_I_explicit():
-
     # Explicit solution when G_p_S==0.
     I_A = 0.1
     I_ph_A = 0.125
@@ -429,7 +426,6 @@ def test_V_at_I_explicit():
 
 
 def test_V_at_I_implicit():
-
     # Implicit computation checks out when chaining with inverse function.
     I_A = numpy.array(0.1)
     I_ph_A = 0.125
@@ -470,7 +466,6 @@ def test_V_at_I_implicit():
 
 
 def test_V_at_I_d1_explicit():
-
     # Explicit solution when G_p_S==0.
     I_A = numpy.array(0.1)
     I_ph_A = 0.125
@@ -506,7 +501,6 @@ def test_V_at_I_d1_explicit():
 
 
 def test_P_at_V_explicit():
-
     # Can handle zero series resistance.
     V_V = numpy.array(0.35)
     I_ph_A = 0.125
@@ -541,7 +535,6 @@ def test_P_at_V_explicit():
 
 
 def test_P_mp_no_convergence():
-
     I_ph_A = 0.125
     I_rs_1_A = 9.24e-7
     n_1 = 1.5
@@ -624,7 +617,6 @@ def iv_params_fixture(request):
 
 
 def test_iv_params(iv_params_fixture):
-
     # Happy path for a function that touches many others.
     result = equation.iv_params(
         N_s=iv_params_fixture["N_s"],

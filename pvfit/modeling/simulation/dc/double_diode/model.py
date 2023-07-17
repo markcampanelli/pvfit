@@ -20,7 +20,7 @@ def current_sum_at_diode_node(
     G_p_S_0,
     E_g_eV_0,
     N_s,
-    T_degC_0=T_degC_stc
+    T_degC_0=T_degC_stc,
 ):
     """
     Computes the sum of the currents at the diode's anode node in the implicit 8-parameter global double-diode
@@ -84,7 +84,7 @@ def auxiliary_equations(
     G_p_S_0,
     E_g_eV_0,
     N_s,
-    T_degC_0=T_degC_stc
+    T_degC_0=T_degC_stc,
 ):
     """
     Computes the auxiliary equations at F and T_degC for the 8-parameter DDM-G.

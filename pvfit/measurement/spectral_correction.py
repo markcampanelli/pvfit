@@ -231,7 +231,7 @@ def M(
     S_RD_OC: SpectralResponsivity,
     E_RD_OC: SpectralIrradiance,
     S_RD_RC: SpectralResponsivity,
-    E_RD_RC: SpectralIrradiance
+    E_RD_RC: SpectralIrradiance,
 ) -> numpy.ndarray:
     r"""
     Compute spectral mismatch correction factor (:math:`M`).

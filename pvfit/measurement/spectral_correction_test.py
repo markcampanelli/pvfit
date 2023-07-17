@@ -502,7 +502,7 @@ def test_M():
     assert record[1].message.args[0] == "Non-finite inner product detected."
     assert record[2].message.args[0] == "overflow encountered in multiply"
     assert record[3].message.args[0] == "Non-finite inner product detected."
-    assert record[4].message.args[0] == "invalid value encountered in double_scalars"
+    assert record[4].message.args[0] == "invalid value encountered in scalar divide"
     assert record[5].message.args[0] == "Non-finite M detected."
     assert record[6].message.args[0] == "Non-positive M detected."
     assert len(record) == 7

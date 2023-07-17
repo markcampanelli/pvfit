@@ -28,7 +28,7 @@ def current_sum_at_diode_node(
     n_h: Union[float, numpy.float64, numpy.ndarray],
     R_h_Ohm: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
-    G_p_S: Union[float, numpy.float64, numpy.ndarray]
+    G_p_S: Union[float, numpy.float64, numpy.ndarray],
 ) -> dict:
     """
     Computes the sum of the currents at the high-voltage node of the main
@@ -86,16 +86,18 @@ def current_sum_at_diode_node(
     numpy.ndarray.
     """
 
-    result = pvfit.modeling.simulation.dc.single_diode.equation.current_sum_at_diode_node(
-        V_V=V_V,
-        I_A=I_A,
-        N_s=N_s,
-        T_degC=T_degC,
-        I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
-        R_s_Ohm=R_s_Ohm,
-        G_p_S=G_p_S,
+    result = (
+        pvfit.modeling.simulation.dc.single_diode.equation.current_sum_at_diode_node(
+            V_V=V_V,
+            I_A=I_A,
+            N_s=N_s,
+            T_degC=T_degC,
+            I_ph_A=I_ph_A,
+            I_rs_1_A=I_rs_1_A,
+            n_1=n_1,
+            R_s_Ohm=R_s_Ohm,
+            G_p_S=G_p_S,
+        )
     )
 
     # Modified ideality factor of diode in series with resistor.
@@ -133,7 +135,7 @@ def I_at_V(
     R_h_Ohm: Union[float, numpy.float64, numpy.ndarray],
     R_s_Ohm: Union[float, numpy.float64, numpy.ndarray],
     G_p_S: Union[float, numpy.float64, numpy.ndarray],
-    newton_options: Optional[dict] = None
+    newton_options: Optional[dict] = None,
 ) -> dict:
     """
     Compute terminal current from terminal voltage using Newton's method.
