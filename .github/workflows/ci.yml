@@ -23,6 +23,9 @@ jobs:
           python -m pip --version
           python -m pip install --progress-bar off .[demo,dev,docs]
           python -m pip list
+      - name: Check manifest with check_manifest
+        run: |
+          python -m check_manifest  
       - name: Check formatting with black
         run: |
           python -m black . --check
@@ -45,9 +48,8 @@ jobs:
           name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
         if: ${{ always() }}
-      - name: Build generic source and wheel disributions
+      - name: Build pure-Python source and wheel disributions
         run: |
-          python -m check_manifest
           python -m build
       - name: Archive disributions
         uses: actions/upload-artifact@v3
