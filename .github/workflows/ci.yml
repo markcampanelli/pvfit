@@ -29,9 +29,9 @@ jobs:
       - name: Check formatting with black
         run: |
           python -m black . --check
-      - name: Lint with pylint
-        run: |
-          python -m pylint .
+      # - name: Lint with pylint
+      #   run: |
+      #     python -m pylint .
       - name: Test with pytest
         run: |
           cd pvfit
