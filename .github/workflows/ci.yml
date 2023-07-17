@@ -47,7 +47,7 @@ jobs:
         if: ${{ always() }}
       - name: Build generic source and wheel disributions
         run: |
-          python -m check-manifest
+          python -m check_manifest
           python -m build
       - name: Archive disributions
         uses: actions/upload-artifact@v3
