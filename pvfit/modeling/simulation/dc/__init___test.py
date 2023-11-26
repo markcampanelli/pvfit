@@ -1,2 +1,2 @@
 def test_import_package():
-    import pvfit.modeling.simulation.dc  # NOQA
+    import pvfit.modeling.simulation.dc

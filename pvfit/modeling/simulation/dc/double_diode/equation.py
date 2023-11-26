@@ -474,7 +474,7 @@ def V_oc(
     if is_ndarray:
         return {"V_oc_V": V_oc_V}
     else:
-        return {"V_oc_V": numpy.asscalar(V_oc_V)}
+        return {"V_oc_V": V_oc_V.item()}
 
 
 def V_at_I(

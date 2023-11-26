@@ -52,7 +52,19 @@ materials = {
         # Physics, 6th ed. 1986, p 185.
         "E_g_eV_stc": 1.43,
     },
-    "x-Si": {  # Mono-/multi-crystalline Silicon (x-Si).
+    "mono-Si": {  # Mono-crystalline Silicon (mono-Si).
+        # Band gap at STC, from De Soto et al. 2006.
+        "E_g_eV_stc": 1.121,
+    },
+    "multi-Si": {  # Multi-crystalline Silicon (multi-Si).
+        # Band gap at STC, from De Soto et al. 2006.
+        "E_g_eV_stc": 1.121,
+    },
+    "poly-Si": {  # Poly-crystalline Silicon (poly-Si).
+        # Band gap at STC, from De Soto et al. 2006.
+        "E_g_eV_stc": 1.121,
+    },
+    "x-Si": {  # Crystalline Silicon (x-Si).
         # Band gap at STC, from De Soto et al. 2006.
         "E_g_eV_stc": 1.121,
     },

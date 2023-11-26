@@ -172,7 +172,7 @@ def auxiliary_equations(
     I_rs_1_A = (
         I_rs_1_A_0
         * (T_K / T_K_0) ** 3
-        * numpy.exp(E_g_eV / (n_1 * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
+        * numpy.exp(E_g_eV / (n_1_0 * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
     )
 
     # Compute series resistance (constant).
@@ -185,12 +185,12 @@ def auxiliary_equations(
     # G_p_S = F * G_p_S_0
 
     # Compute photo-generated current at F and T_degC (V=0 with I=Isc for this).
-    expr1 = I_sc_A_0 * F
-    expr2 = expr1 * R_s_Ohm
+    I_sc_A = I_sc_A_0 * F
+    V_diode_sc_V = I_sc_A * R_s_Ohm
     I_ph_A = (
-        expr1
-        + I_rs_1_A * numpy.expm1(q_C * expr2 / (N_s * n_1 * k_B_J_per_K * T_K))
-        + G_p_S * expr2
+        I_sc_A
+        + I_rs_1_A * numpy.expm1(q_C * V_diode_sc_V / (N_s * n_1 * k_B_J_per_K * T_K))
+        + G_p_S * V_diode_sc_V
     )
 
     return ensure_numpy_scalars(
