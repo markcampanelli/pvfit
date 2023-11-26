@@ -1,3 +1,5 @@
+"""PVfit tests."""
+
 import pvfit
 
 

@@ -19,7 +19,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
         run: |
-          python -m pip install --progress-bar off --upgrade pip
+          python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip --version
           python -m pip install --progress-bar off .[demo,dev,docs]
           python -m pip list

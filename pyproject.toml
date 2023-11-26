@@ -48,7 +48,7 @@ dev = [
     "pytest-cov >=4, <5",
 ]
 demo =[
-    "matplotlib >=3, <4",
+    "matplotlib >=3, <3.8",
     "pandas >=1, <2",
     "requests >=2, <3",
 ]
@@ -75,4 +75,3 @@ include = ["pvfit"]
 max-line-length = 88  # Compatible with default black config.
 recursive = true
 ignore = ["build"]
-fail-under = 2.75  # Improve this to 10 over time.
