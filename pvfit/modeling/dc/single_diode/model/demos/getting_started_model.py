@@ -9,7 +9,7 @@ import pandas
 import requests
 
 from pvfit.common.constants import T_degC_stc
-import pvfit.modeling.dc.single_diode.simulation.model as sdm
+import pvfit.modeling.dc.single_diode.model.simulation as sdm
 
 # By convention, variable names include the units of the value.
 

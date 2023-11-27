@@ -12,7 +12,7 @@ from scipy.optimize import newton
 
 from pvfit.common.constants import I_sum_A_atol, k_B_J_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
-import pvfit.modeling.dc.single_diode.simulation.equation
+import pvfit.modeling.dc.single_diode.equation.simulation
 
 
 def current_sum_at_diode_node(
@@ -87,7 +87,7 @@ def current_sum_at_diode_node(
     """
 
     result = (
-        pvfit.modeling.dc.single_diode.simulation.equation.current_sum_at_diode_node(
+        pvfit.modeling.dc.single_diode.equation.simulation.current_sum_at_diode_node(
             V_V=V_V,
             I_A=I_A,
             N_s=N_s,

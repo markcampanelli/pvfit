@@ -2,4 +2,4 @@
 
 
 def test_package_import():
-    import pvfit.modeling.dc.point_value.simulation.sapm
+    import pvfit.modeling.dc.sapm.simulation

@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import numpy
 import requests
 
-import pvfit.modeling.dc.single_diode.simulation.equation as sde
+import pvfit.modeling.dc.single_diode.equation.simulation as sde
 
 # By convention, variable names include the units of the value.
 

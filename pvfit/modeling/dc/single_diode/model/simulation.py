@@ -7,7 +7,7 @@ from scipy.constants import convert_temperature
 
 from pvfit.common.constants import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.common.utils import ensure_numpy_scalars
-import pvfit.modeling.dc.single_diode.simulation.equation as equation
+import pvfit.modeling.dc.single_diode.equation.simulation as simulation
 
 
 def current_sum_at_diode_node(
@@ -89,7 +89,7 @@ def current_sum_at_diode_node(
         E_g_eV_0=E_g_eV_0,
     )
 
-    return equation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, **params)
+    return simulation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, **params)
 
 
 def auxiliary_equations(
@@ -288,7 +288,7 @@ def I_at_V_F_T(
         E_g_eV_0=E_g_eV_0,
     )
 
-    return equation.I_at_V(V_V=V_V, **params, newton_options=newton_options)
+    return simulation.I_at_V(V_V=V_V, **params, newton_options=newton_options)
 
 
 def V_at_I_F_T(
@@ -371,7 +371,7 @@ def V_at_I_F_T(
         E_g_eV_0=E_g_eV_0,
     )
 
-    return equation.V_at_I(I_A=I_A, **params, newton_options=newton_options)
+    return simulation.V_at_I(I_A=I_A, **params, newton_options=newton_options)
 
 
 # TODO Need to complete the utility functions.
@@ -471,7 +471,7 @@ def iv_params(
         E_g_eV_0=E_g_eV_0,
     )
 
-    result = equation.iv_params(
+    result = simulation.iv_params(
         **params,
         minimize_scalar_bounded_options=minimize_scalar_bounded_options,
         newton_options=newton_options,

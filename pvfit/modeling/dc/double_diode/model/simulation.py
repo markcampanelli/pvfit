@@ -6,7 +6,7 @@ import numpy
 from scipy.constants import convert_temperature
 
 from pvfit.common.constants import T_degC_stc, k_B_J_per_K, k_B_eV_per_K, q_C
-import pvfit.modeling.dc.double_diode.simulation.equation as equation
+import pvfit.modeling.dc.double_diode.equation.simulation as simulation
 
 
 def current_sum_at_diode_node(
@@ -72,7 +72,7 @@ def current_sum_at_diode_node(
         T_degC_0=T_degC_0,
     )
 
-    return equation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, **params)
+    return simulation.current_sum_at_diode_node(V_V=V_V, I_A=I_A, **params)
 
 
 def auxiliary_equations(
@@ -278,7 +278,7 @@ def iv_params(
         E_g_eV_0=E_g_eV_0,
     )
 
-    result = equation.iv_params(
+    result = simulation.iv_params(
         **params,
         minimize_scalar_bounded_options=minimize_scalar_bounded_options,
         newton_options=newton_options,

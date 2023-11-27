@@ -5,7 +5,7 @@ import pytest
 from scipy.constants import convert_temperature
 
 from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C
-import pvfit.modeling.dc.single_diode.simulation.equation as equation
+import pvfit.modeling.dc.single_diode.equation.simulation as simulation
 
 
 @pytest.fixture(
@@ -293,7 +293,7 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     V_1_V_expected = current_sum_at_diode_node_fixture["V_1_V_expected"]
     n_1_mod_V_expected = current_sum_at_diode_node_fixture["n_1_mod_V_expected"]
 
-    result = equation.current_sum_at_diode_node(
+    result = simulation.current_sum_at_diode_node(
         V_V=V_V,
         I_A=I_A,
         N_s=N_s,
@@ -338,7 +338,7 @@ def test_I_at_V_explicit():
         - G_p_S * V_V
     )
 
-    I_A = equation.I_at_V(
+    I_A = simulation.I_at_V(
         V_V=V_V,
         N_s=N_s,
         T_degC=T_degC,
@@ -366,7 +366,7 @@ def test_I_at_V_implicit():
     I_A_type_expected = numpy.float64
     V_V_expected = V_V
 
-    I_A = equation.I_at_V(
+    I_A = simulation.I_at_V(
         V_V=V_V,
         N_s=N_s,
         T_degC=T_degC,
@@ -379,7 +379,7 @@ def test_I_at_V_implicit():
     assert isinstance(I_A, I_A_type_expected)
     assert I_A.dtype == V_V.dtype
 
-    V_V_inv_comp = equation.V_at_I(
+    V_V_inv_comp = simulation.V_at_I(
         I_A=I_A,
         N_s=N_s,
         T_degC=T_degC,
@@ -412,7 +412,7 @@ def test_V_at_I_explicit():
         - I_A * R_s_Ohm
     )
 
-    V_V = equation.V_at_I(
+    V_V = simulation.V_at_I(
         I_A=I_A,
         N_s=N_s,
         T_degC=T_degC,
@@ -440,7 +440,7 @@ def test_V_at_I_implicit():
     V_V_type_expected = numpy.float64
     I_A_expected = I_A
 
-    V_V = equation.V_at_I(
+    V_V = simulation.V_at_I(
         I_A=I_A,
         N_s=N_s,
         T_degC=T_degC,
@@ -453,7 +453,7 @@ def test_V_at_I_implicit():
     assert isinstance(V_V, V_V_type_expected)
     assert V_V.dtype == I_A.dtype
 
-    I_A_inv_comp = equation.I_at_V(
+    I_A_inv_comp = simulation.I_at_V(
         V_V=V_V,
         N_s=N_s,
         T_degC=T_degC,
@@ -487,7 +487,7 @@ def test_V_at_I_d1_explicit():
         - I_A * R_s_Ohm
     )
 
-    result = equation.V_at_I_d1(
+    result = simulation.V_at_I_d1(
         I_A=I_A,
         N_s=N_s,
         T_degC=T_degC,
@@ -521,7 +521,7 @@ def test_P_at_V_explicit():
         )
     )
 
-    P_W = equation.P_at_V(
+    P_W = simulation.P_at_V(
         V_V=V_V,
         N_s=N_s,
         T_degC=T_degC,
@@ -550,7 +550,7 @@ def test_P_mp_no_convergence():
     }  # Does not converge with only one iteration.
 
     with pytest.raises(ValueError) as excinfo:
-        equation.P_mp(
+        simulation.P_mp(
             N_s=N_s,
             T_degC=T_degC,
             I_ph_A=I_ph_A,
@@ -620,7 +620,7 @@ def iv_params_fixture(request):
 
 def test_iv_params(iv_params_fixture):
     # Happy path for a function that touches many others.
-    result = equation.iv_params(
+    result = simulation.iv_params(
         N_s=iv_params_fixture["N_s"],
         T_degC=iv_params_fixture["T_degC"],
         I_ph_A=iv_params_fixture["I_ph_A"],

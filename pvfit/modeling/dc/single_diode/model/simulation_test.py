@@ -4,7 +4,7 @@ import numpy
 import pytest
 
 from pvfit.common.constants import T_K_stc, T_degC_stc, k_B_J_per_K, q_C, materials
-import pvfit.modeling.dc.single_diode.simulation.model as model
+import pvfit.modeling.dc.single_diode.model.simulation as simulation
 
 
 @pytest.fixture(
@@ -63,7 +63,7 @@ def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
     V_1_V_expected = current_sum_at_diode_node_fixture["V_1_V_expected"]
     n_1_mod_V_expected = current_sum_at_diode_node_fixture["n_1_mod_V_expected"]
 
-    result = model.current_sum_at_diode_node(
+    result = simulation.current_sum_at_diode_node(
         V_V=V_V,
         I_A=I_A,
         F=F,
@@ -143,7 +143,7 @@ def test_auxiliary_equations(auxiliary_equations_fixture):
     R_s_Ohm_expected = auxiliary_equations_fixture["R_s_Ohm_expected"]
     G_p_S_expected = auxiliary_equations_fixture["G_p_S_expected"]
 
-    result = model.auxiliary_equations(
+    result = simulation.auxiliary_equations(
         F=F,
         T_degC=T_degC,
         N_s=N_s,
