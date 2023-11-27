@@ -1,5 +1,5 @@
 """
-Sandia Inverter Performance Model (SIPM)
+Sandia Inverter Performance Model (SIPM) simulation.
 
 https://energy.sandia.gov/wp-content/gallery/uploads/Performance-Model-for-Grid-Connected-Photovoltaic-Inverters.pdf
 
