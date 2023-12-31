@@ -21,7 +21,7 @@ jobs:
         run: |
           python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip --version
-          python -m pip install --progress-bar off .[demo,dev,docs]
+          python -m pip install --progress-bar off .[demo,dev,docs,test]
           python -m pip list
       - name: Check manifest with check_manifest
         run: |
@@ -34,8 +34,8 @@ jobs:
       #     python -m pylint .
       - name: Test with pytest
         run: |
-          cd pvfit
-          pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov-${{ matrix.python-version }} --junitxml=../junit/test-results-${{ matrix.python-version }}.xml
+          pytest --doctest-modules --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-test-results.xml -vv
+          mv artifacts/test mv artifacts/test-${{ matrix.python-version }}
       - name: Archive test results
         uses: actions/upload-artifact@v3
         with:
@@ -47,6 +47,12 @@ jobs:
         with:
           name: code-coverage-report-${{ matrix.python-version }}
           path: htmlcov-${{ matrix.python-version }}
+        if: ${{ always() }}
+      - name: Archive test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts-${{ matrix.python-version }}
+          path: artifacts/test-${{ matrix.python-version }}
         if: ${{ always() }}
       - name: Build pure-Python source and wheel disributions
         run: |

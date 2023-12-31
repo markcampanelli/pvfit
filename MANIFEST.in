@@ -3,7 +3,6 @@ recursive-include docs *.bat
 recursive-include docs *.py
 recursive-include docs *.rst
 recursive-include docs Makefile
-recursive-include pvfit *.csv
 recursive-include pvfit *.md
-recursive-include pvfit *.png
 recursive-include pvfit *.py
+recursive-include tests *.py

@@ -5,6 +5,11 @@
 **IMPORTANT:** This code is pre-release, and so the code organiztion and Application
 Programming Interface (API) should be expected to change without warning.
 
+**NOTICE:** We are in the process of open-sourcing the single-diode equation (SDE) and 
+single-diode model (SDM) fitting algorithms (!), and thus moving the related code here.
+The SDE move is reasonably complete, but the SDM move is still under way, and all the
+SDM is temporarily unavailable on the `master` branch.
+
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -22,26 +27,39 @@ device, in contrast to the common use of MET-station data
 [this paper](https://doi.org/10.1002/ese3.190) for a more detailed introduction. Email
 [Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
 [PVfit Slack channel](https://pvfit.slack.com), where you can chat realtime about your
-quesitons/applications. This open-source code supports and complements a closed-source
-model calibration service (e.g., single-diode model parameter fitting from I-V curve
-data) available at [https://pvfit.app](https://pvfit.app) and via a REST API.
+quesitons/applications. This open-source code complements a model calibration service
+(e.g., single-diode model parameter fitting from I-V curve data) available at
+[https://pvfit.app](https://pvfit.app) and via a REST API.
 
-See the README's for individual subpackages to get started with specific
-functionalities—
+See the `demos/getting_started.py` in individual subpackages to get started with
+specific functionalities—
 
 - [Measurement](pvfit/measurement)
-  - [Spectral Mismatch Correction Factor M](pvfit/measurement/spectral_correction.py)
-  - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
+  - [Spectral Mismatch Correction](pvfit/measurement/spectral_correction)
+    - [Quantum Efficiency/Spectral Response and Spectrum Types](pvfit/measurement/spectral_correction/types.py)
+    - [Spectral Mismatch Correction Computations](pvfit/measurement/spectral_correction/computation.py)
+    - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
+  - [Current-Voltage (I-V) Data/Curves](pvfit/measurement/iv)
+    - [I-V Data/Curve Types](pvfit/measurement/iv/types.py)
+    - [I-V Data/Curve Computations](pvfit/measurement/iv/computation.py)
 - [Modeling](pvfit/modeling)
-  - [Single Diode](pvfit/modeling/simulation/dc/single_diode)
-      - [Equation](pvfit/modeling/simulation/dc/single_diode/equation.py)
-      - [Model](pvfit/modeling/simulation/dc/single_diode/model.py)
+  - [Direct Current (DC)](pvfit/modeling/simulation/dc)
+    - [Single Diode](pvfit/modeling/simulation/dc/single_diode)
+      - [Equation (single operating condition)](pvfit/modeling/simulation/dc/single_diode/equation)
+        - [Parameter Fitting](pvfit/modeling/simulation/dc/single_diode/equation/inference.py)
+        - [Simulation](pvfit/modeling/simulation/dc/single_diode/equation/simulation.py)
+      - [Model (variable operating conditions)](pvfit/modeling/simulation/dc/single_diode/model) (WARNING: Currently missing due to refactor.)
+        - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/simulation/dc/single_diode/model/inference_matrxi.py)
+        - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/simulation/dc/single_diode/model/inference_spec_sheet.py)
+        - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/simulation/dc/single_diode/model/inference_iv_curves.py)
+        - [Simulation](pvfit/modeling/simulation/dc/single_diode/model/simulation.py)
 
-Certain other subpackages are marked as experimental.
+The above subpackages are reasonably well tested. Certain other subpackages are
+considered more experimental.
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [python>=3.8,<3.12](https://www.python.org/) with
+`pvfit` minimally requires [python>=3.8,<3.13](https://www.python.org/) with
 [numpy](https://numpy.org/) and [scipy](https://www.scipy.org/). It is tested with
 CPython on recent versions of Ubuntu, macOS, and Windows. We suggest using a suitable
 Python virtual environment that provides [pip](https://pypi.org/project/pip/).
@@ -51,9 +69,9 @@ Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 This package will not be available on [PyPI](https://pypi.org/) until the application
 programming interface (API) is deemed stable and sufficiently tested and documented.
 Meanwhile, install the latest code directly from the GitHub repo using a sufficiently
-recent version of `pip`—
+recent version of `pip` and `setuptools`—
 ```terminal
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip setuptools
 python -m pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 NOTES:
@@ -61,10 +79,8 @@ NOTES:
 [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) (e.g., using
 [conda](https://docs.conda.io/en/latest/)), otherwise this setup will grab the default
 versions from [PyPI](https://pypi.org/).
-- The `demo` option adds the [matplotlib](https://matplotlib.org/),
-[pandas](https://pandas.pydata.org/), and
-[requests](https://2.python-requests.org/en/master/) packages in order to run all the
-provided demonstrations in the `demos` directories.
+- The `demo` option adds the [matplotlib](https://matplotlib.org/) package in order to
+run all the provided demonstrations in the `demos` directories.
 
 Verify your installation—
 ```terminal
@@ -80,8 +96,8 @@ Likewise, stay up to date with the latest code changes using—
 python -m pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
 ```
 
-You should now be able to explore PVfit's functionality with the "getting started"
-modules in the various `demos` subpackages.
+You should now be able to explore PVfit's functionality with the `getting_started.py`
+modules in the various `demos` directories of the various subpackages.
 
 ## Developer Notes
 
@@ -91,11 +107,11 @@ Clone this repo using your preferred git method, and go to the repo's root direc
 
 Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
-python -m pip install --upgrade pip
-python -m pip install -e .[demo,dev,docs]
+python -m pip install --upgrade pip setuptools
+python -m pip install -e .[demo,dev,docs,test]
 ```
-This also installs the libraries needed to develop the code demonstrations and build
-source and wheel distributions.
+This also installs the libraries needed to test, develop the code demonstrations, and
+build documentation and source and wheel distributions.
 
 Verify your installation—
 ```terminal
@@ -110,11 +126,11 @@ Next, make sure that the tests are passing.
 
 ### Test with Coverage
 
-From the [pvfit](pvfit) subdirectory—
+From the root directory—
 ```terminal
-python -m pytest --doctest-modules --cov=pvfit --cov-report=html:../htmlcov
+python -m pytest --doctest-modules --cov=pvfit --cov-report=html:htmlcov tests
 ```
-The root of the generated coverage report is at `pvfit/htmlcov/index.html` (not
+The root of the generated coverage report is at `artifacts/test/htmlcov/index.html` (not
 committed). 
 
 ### Build Documentation

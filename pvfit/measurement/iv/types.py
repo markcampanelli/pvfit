@@ -1,0 +1,103 @@
+"""
+PVfit: Types for current-voltage (I-V) measurement.
+
+Copyright 2023 Intelligent Measurement Systems LLC
+"""
+
+from typing import TypedDict
+
+import numpy
+
+from pvfit.types import FloatArray, FloatBroadcastable, FloatVector
+
+
+class IVData:
+    """Current-voltage (I-V) data at possibly many irradiance and temperature."""
+
+    def __init__(self, *, V_V: FloatBroadcastable, I_A: FloatBroadcastable) -> None:
+        """Initialize I-V data, allowing broadcast-compatible data."""
+        self._V_V, self._I_A = numpy.broadcast_arrays(V_V, I_A)
+
+    @property
+    def V_V(self) -> FloatArray:
+        """Get voltages."""
+        return self._V_V
+
+    @property
+    def I_A(self) -> FloatArray:
+        """Get currents."""
+        return self._I_A
+
+    @property
+    def P_W(self) -> FloatArray:
+        """Get powers."""
+        return numpy.array(self._I_A * self._V_V)
+
+
+class IVCurve(IVData):
+    """
+    Current-voltage (I-V) curve in positive power quadrant at one irradiance and
+    temperature.
+    """
+
+    def __init__(self, *, V_V: FloatVector, I_A: FloatVector) -> None:
+        """Initialize I-V curve with validation."""
+        super().__init__(V_V=V_V, I_A=I_A)
+
+        if self.V_V.ndim != 1:
+            raise ValueError("V_V is not one dimensional")
+
+        if self.I_A.ndim != 1:
+            raise ValueError("I_A is not one dimensional")
+
+        if self.V_V.size == 0:
+            raise ValueError("V_V is empty")
+
+        if self.I_A.size == 0:
+            raise ValueError("I_A is empty")
+
+        if self.V_V.size != self.I_A.size:
+            raise ValueError("V_V and I_A have different lengths")
+
+        if numpy.unique(self.V_V).size < 3:
+            raise ValueError("fewer than three unique voltages in I-V curve")
+
+        if numpy.unique(self.I_A).size < 3:
+            raise ValueError("fewer than three unique currents in I-V curve")
+
+        if numpy.all(self.P_W <= 0):
+            raise ValueError("I-V curve has no points in positive-power quadrant")
+
+
+class IVCurveParameters(TypedDict):
+    """I-V curve parameters (at one operating condition)."""
+
+    I_sc_A: float
+    R_sc_Ohm: float
+    V_x_V: float
+    I_x_A: float
+    V_mp_V: float
+    P_mp_W: float
+    I_mp_A: float
+    V_xx_V: float
+    I_xx_A: float
+    R_oc_Ohm: float
+    V_oc_V: float
+    FF: float
+
+
+class IVCurveParametersArray(TypedDict):
+    """I-V curve parameters (at one/more operating conditions)."""
+
+    I_sc_A: FloatArray
+    R_sc_Ohm: FloatArray
+    V_x_V: FloatArray
+    I_x_A: FloatArray
+    V_mp_V: FloatArray
+    P_mp_W: FloatArray
+    I_mp_A: FloatArray
+    V_xx_V: FloatArray
+    I_xx_A: FloatArray
+    R_oc_Ohm: FloatArray
+    V_oc_V: FloatArray
+    FF: FloatArray

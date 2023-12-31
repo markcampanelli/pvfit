@@ -1,5 +1,9 @@
-"""PVfit."""
+"""
+PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling.
 
-from pvfit.common.utils import get_version
+Copyright 2023 Intelligent Measurement Systems LLC
+"""
 
-__version__ = get_version()
+import importlib.metadata
+
+__version__ = importlib.metadata.version("pvfit")
