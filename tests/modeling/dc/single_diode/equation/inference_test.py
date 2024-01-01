@@ -2634,33 +2634,27 @@ def test_fit_benchmark():
 
     # Read in created benchmark file.
     overall_scores_df_got = pandas.read_csv(
-        filepath_or_buffer=TEST_ARTIFACTS_DIRECTORY.joinpath("overall_scores.csv")
+        filepath_or_buffer=TEST_ARTIFACTS_DIRECTORY.joinpath("overall_scores.csv"),
+        index_col="test_set",
     )
 
-    overall_scores_expected_test_set = [
-        "case1",
-        "case2",
-        "case3a",
-        "case3b",
-        "case3c",
-        "case3d",
-    ]
-
-    numpy.testing.assert_array_equal(
-        overall_scores_df_got["test_set"].to_numpy(), overall_scores_expected_test_set
+    overall_scores_got_test_set = set(overall_scores_df_got.index)
+    overall_scores_expected_test_set = set(
+        ("case1", "case2", "case3a", "case3b", "case3c", "case3d")
     )
 
-    overall_scores_expected_score = numpy.array(
-        [
-            30.0000000000000230624,
-            31.0000000000000336641,
-            0.1068342249452320955,
-            0.06836656715157551795,
-            0.06659086185392485641,
-            0.1756979161971756333,
-        ]
-    )
+    assert overall_scores_got_test_set == overall_scores_expected_test_set
 
-    numpy.testing.assert_allclose(
-        overall_scores_df_got["score"].to_numpy(), overall_scores_expected_score
-    )
+    overall_scores_expected_score = {
+        "case1": 30.0000000000000230624,
+        "case2": 31.0000000000000336641,
+        "case3a": 0.1068342249452320955,
+        "case3b": 0.06836656715157551795,
+        "case3c": 0.06659086185392485641,
+        "case3d": 0.1756979161971756333,
+    }
+
+    for key in overall_scores_expected_score:
+        numpy.testing.assert_allclose(
+            overall_scores_df_got.loc[key, "score"], overall_scores_expected_score[key]
+        )
