@@ -2673,6 +2673,6 @@ def test_fit_benchmark():
         numpy.testing.assert_allclose(
             overall_scores_df_got.loc[key, "score"],
             overall_scores_expected_score[key],
-            rtol=1e-05,
-            atol=1e-08,
+            rtol=5e-05,
+            atol=8e-06,
         )

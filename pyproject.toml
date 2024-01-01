@@ -53,7 +53,7 @@ docs = [
 ]
 test = [
     # ivcurves is not currently tagged, so fix a commit to main branch.
-    "ivcurves @ git+https://github.com/cwhanse/ivcurves@9e80a1f28f11fa661830d2cf91f316ce82cfd9c4",
+    "ivcurves @ git+https://github.com/cwhanse/ivcurves@7ae47284b23cfff167932b8cccae53c10ebf9bf9",
     "pandas >=2, <3",
     "pytest >=7, <8",
     "pytest-cov >=4, <5",
