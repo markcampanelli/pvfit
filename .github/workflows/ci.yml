@@ -34,7 +34,7 @@ jobs:
       #     python -m pylint .
       - name: Test with pytest
         run: |
-          pytest --doctest-modules --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-test-results.xml -vv
+          python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-test-results.xml -vv
           mv artifacts/test mv artifacts/test-${{ matrix.python-version }}
       - name: Archive test results
         uses: actions/upload-artifact@v3
