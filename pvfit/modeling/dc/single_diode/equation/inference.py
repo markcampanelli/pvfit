@@ -354,7 +354,7 @@ def estimate_model_parameters_fittable_ic(
     model_parameters_fittable_ic_ = ModelParametersFittable(
         I_ph_A=I_ph_A_ic,
         I_rs_A=I_rs_A_ic,
-        n=n_1_ic,
+        n=n_ic,
         R_s_Ohm=R_s_Ohm_ic,
         G_p_S=G_p_S_ic,
     )

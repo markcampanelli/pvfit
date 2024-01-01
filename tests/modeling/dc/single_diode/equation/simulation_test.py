@@ -25,8 +25,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=7.0,
-                    I_rs_1_A=6.0e-7,
-                    n_1=1.25,
+                    I_rs_A=6.0e-7,
+                    n=1.25,
                     R_s_Ohm=0.1,
                     G_p_S=0.005,
                 ),
@@ -50,8 +50,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=numpy.array(7.0),
-                    I_rs_1_A=numpy.array(6.0e-7),
-                    n_1=numpy.array(1.25),
+                    I_rs_A=numpy.array(6.0e-7),
+                    n=numpy.array(1.25),
                     R_s_Ohm=numpy.array(0.1),
                     G_p_S=numpy.array(0.005),
                 ),
@@ -78,8 +78,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=numpy.array([7.0]),
-                    I_rs_1_A=numpy.array([6.0e-7]),
-                    n_1=numpy.array([1.25]),
+                    I_rs_A=numpy.array([6.0e-7]),
+                    n=numpy.array([1.25]),
                     R_s_Ohm=numpy.array([0.1]),
                     G_p_S=numpy.array([0.005]),
                 ),
@@ -108,8 +108,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=numpy.array([1, 60, 96]),
                     T_degC=numpy.array([T_degC_stc / 2, T_degC_stc, 2 * T_degC_stc]),
                     I_ph_A=numpy.array([7.0, 7.0, 7.0]),
-                    I_rs_1_A=numpy.array([6.0e-7, 6.0e-7, 6.0e-7]),
-                    n_1=numpy.array([1.25, 1.25, 1.25]),
+                    I_rs_A=numpy.array([6.0e-7, 6.0e-7, 6.0e-7]),
+                    n=numpy.array([1.25, 1.25, 1.25]),
                     R_s_Ohm=numpy.array([0.1, 0.1, 0.1]),
                     G_p_S=numpy.array([0.005, 0.005, 0.005]),
                 ),
@@ -163,8 +163,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=7.0,
-                    I_rs_1_A=6.0e-7,
-                    n_1=1.25,
+                    I_rs_A=6.0e-7,
+                    n=1.25,
                     R_s_Ohm=0.1,
                     G_p_S=0.005,
                 ),
@@ -198,8 +198,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=7.0,
-                    I_rs_1_A=numpy.full((1, 3), 6.0e-7),
-                    n_1=numpy.array(1.25),
+                    I_rs_A=numpy.full((1, 3), 6.0e-7),
+                    n=numpy.array(1.25),
                     R_s_Ohm=numpy.array([0.1]),
                     G_p_S=numpy.full((2, 3), 0.005),
                 ),
@@ -250,8 +250,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=7.0,
-                    I_rs_1_A=6.0e-7,
-                    n_1=numpy.array(1.25),
+                    I_rs_A=6.0e-7,
+                    n=numpy.array(1.25),
                     R_s_Ohm=0.1,
                     G_p_S=0.0,
                 ),
@@ -274,8 +274,8 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=7.0,
-                    I_rs_1_A=6.0e-7,
-                    n_1=numpy.array([1.25]),
+                    I_rs_A=6.0e-7,
+                    n=numpy.array([1.25]),
                     R_s_Ohm=0.0,
                     G_p_S=0.0,
                 ),
@@ -320,16 +320,16 @@ def test_I_at_V_explicit():
     N_s = 1
     T_degC = T_degC_stc
     I_ph_A = 0.125
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.0
     G_p_S = 0.001
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -337,7 +337,7 @@ def test_I_at_V_explicit():
     I_A_got = simulation.I_at_V(V_V=V_V, model_parameters=model_parameters)
     I_A_expected = numpy.array(
         I_ph_A
-        - I_rs_1_A * numpy.expm1(q_C * V_V / (N_s * n_1 * k_B_J_per_K * T_K_stc))
+        - I_rs_A * numpy.expm1(q_C * V_V / (N_s * n * k_B_J_per_K * T_K_stc))
         - G_p_S * V_V
     )
 
@@ -352,16 +352,16 @@ def test_I_at_V_implicit():
     N_s = 1
     T_degC = T_degC_stc
     I_ph_A = 0.125
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.5625
     G_p_S = 0.001
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -385,16 +385,16 @@ def test_V_at_I_explicit():
     N_s = 1
     T_degC = T_degC_stc
     I_ph_A = 0.125
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.5625
     G_p_S = 0.0
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -402,11 +402,11 @@ def test_V_at_I_explicit():
     V_V_got = simulation.V_at_I(I_A=I_A, model_parameters=model_parameters)
     V_V_expected = numpy.array(
         N_s
-        * n_1
+        * n
         * k_B_J_per_K
         * T_K_stc
         / q_C
-        * (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A))
+        * (numpy.log(I_ph_A - I_A + I_rs_A) - numpy.log(I_rs_A))
         - I_A * R_s_Ohm
     )
 
@@ -421,16 +421,16 @@ def test_V_at_I_implicit():
     I_ph_A = 0.125
     N_s = 1
     T_degC = T_degC_stc
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.5625
     G_p_S = 0.001
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -454,16 +454,16 @@ def test_dV_dI_at_I_explicit():
     N_s = 1
     T_degC = T_degC_stc
     I_ph_A = 0.125
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.5625
     G_p_S = 0.0
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -473,21 +473,21 @@ def test_dV_dI_at_I_explicit():
     )
     V_V_expected = numpy.array(
         N_s
-        * n_1
+        * n
         * k_B_J_per_K
         * T_K_stc
         / q_C
-        * (numpy.log(I_ph_A - I_A + I_rs_1_A) - numpy.log(I_rs_1_A))
+        * (numpy.log(I_ph_A - I_A + I_rs_A) - numpy.log(I_rs_A))
         - I_A * R_s_Ohm
     )
-    n_1_mod_V = model_parameters["n_1"] * get_scaled_thermal_voltage(
+    n_1_mod_V = model_parameters["n"] * get_scaled_thermal_voltage(
         N_s=N_s, T_degC=T_degC
     )
     # Compute first derivative of voltage with respect to current at specified current.
     dV_dI_Ohm_expected = numpy.array(
         -1.0
         / (
-            I_rs_1_A / n_1_mod_V * numpy.exp((V_V_expected + I_A * R_s_Ohm) / n_1_mod_V)
+            I_rs_A / n_1_mod_V * numpy.exp((V_V_expected + I_A * R_s_Ohm) / n_1_mod_V)
             + G_p_S
         )
         - R_s_Ohm
@@ -508,16 +508,16 @@ def test_P_at_V_explicit():
     N_s = 1
     T_degC = T_degC_stc
     I_ph_A = 0.125
-    I_rs_1_A = 9.24e-7
-    n_1 = 1.5
+    I_rs_A = 9.24e-7
+    n = 1.5
     R_s_Ohm = 0.0
     G_p_S = 0.001
     model_parameters = ModelParameters(
         N_s=N_s,
         T_degC=T_degC,
         I_ph_A=I_ph_A,
-        I_rs_1_A=I_rs_1_A,
-        n_1=n_1,
+        I_rs_A=I_rs_A,
+        n=n,
         R_s_Ohm=R_s_Ohm,
         G_p_S=G_p_S,
     )
@@ -527,7 +527,7 @@ def test_P_at_V_explicit():
         V_V
         * (
             I_ph_A
-            - I_rs_1_A * numpy.expm1(q_C * V_V / (N_s * n_1 * k_B_J_per_K * T_K_stc))
+            - I_rs_A * numpy.expm1(q_C * V_V / (N_s * n * k_B_J_per_K * T_K_stc))
             - G_p_S * V_V
         )
     )
@@ -545,8 +545,8 @@ def test_P_at_V_explicit():
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=0.125,
-                    I_rs_1_A=9.24e-7,
-                    n_1=1.5,
+                    I_rs_A=9.24e-7,
+                    n=1.5,
                     R_s_Ohm=0.5625,
                     G_p_S=0.001,
                 )
@@ -574,8 +574,8 @@ def test_P_at_V_explicit():
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=0.125,
-                    I_rs_1_A=1.23e-6,
-                    n_1=2.0,
+                    I_rs_A=1.23e-6,
+                    n=2.0,
                     R_s_Ohm=0.5625,
                     G_p_S=numpy.array(0.005),
                 )
@@ -603,8 +603,8 @@ def test_P_at_V_explicit():
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=0.125,
-                    I_rs_1_A=numpy.array([9.24e-7, 1.23e-6, 7.54e-11]),
-                    n_1=1.75,
+                    I_rs_A=numpy.array([9.24e-7, 1.23e-6, 7.54e-11]),
+                    n=1.75,
                     R_s_Ohm=0.5625,
                     G_p_S=0.001,
                 )
@@ -632,8 +632,8 @@ def test_P_at_V_explicit():
                     N_s=1,
                     T_degC=T_degC_stc,
                     I_ph_A=0.0,
-                    I_rs_1_A=9.24e-7,
-                    n_1=1.75,
+                    I_rs_A=9.24e-7,
+                    n=1.75,
                     R_s_Ohm=0.5625,
                     G_p_S=0.001,
                 )
