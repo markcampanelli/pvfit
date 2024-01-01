@@ -35,7 +35,7 @@ jobs:
       - name: Test with pytest
         run: |
           python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-test-results.xml -vv
-          mv artifacts/test mv artifacts/test-${{ matrix.python-version }}
+          mv artifacts/test artifacts/test-${{ matrix.python-version }}
       - name: Archive test results
         uses: actions/upload-artifact@v3
         with:
