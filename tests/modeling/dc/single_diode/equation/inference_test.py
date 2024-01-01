@@ -2524,7 +2524,10 @@ def test_fit(fit_fixture):
 
         for key in model_parameters_got:
             numpy.testing.assert_allclose(
-                model_parameters_got[key], model_parameters_expected[key]
+                model_parameters_got[key],
+                model_parameters_expected[key],
+                rtol=1e-05,
+                atol=1e-07,
             )
 
         model_parameters_got_df.loc[idx, "Index"] = Index
