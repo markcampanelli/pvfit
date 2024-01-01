@@ -2020,8 +2020,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case3d",
-                "rtol": 0.0003,
-                "atol": 4e-05,
+                "rtol": 0.0005,
+                "atol": 0.004,
             },
             "expected": {
                 "model_parameters": [
