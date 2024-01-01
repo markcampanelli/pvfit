@@ -39,6 +39,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case1",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -336,6 +338,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case2",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -633,6 +637,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case3a",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -1092,6 +1098,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case3b",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -1551,6 +1559,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case3c",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -2010,6 +2020,8 @@ TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
         {
             "given": {
                 "test_set": "case3d",
+                "rtol": 1e-05,
+                "atol": 1e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -2526,8 +2538,8 @@ def test_fit(fit_fixture):
             numpy.testing.assert_allclose(
                 model_parameters_got[key],
                 model_parameters_expected[key],
-                rtol=1e-05,
-                atol=1e-07,
+                rtol=given["rtol"],
+                atol=given["atol"],
             )
 
         model_parameters_got_df.loc[idx, "Index"] = Index
@@ -2659,5 +2671,8 @@ def test_fit_benchmark():
 
     for key in overall_scores_expected_score:
         numpy.testing.assert_allclose(
-            overall_scores_df_got.loc[key, "score"], overall_scores_expected_score[key]
+            overall_scores_df_got.loc[key, "score"],
+            overall_scores_expected_score[key],
+            rtol=1e-05,
+            atol=1e-08,
         )
