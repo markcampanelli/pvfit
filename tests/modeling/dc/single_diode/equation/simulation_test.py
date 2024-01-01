@@ -297,13 +297,13 @@ def current_sum_at_diode_node_fixture(request):
     return request.param
 
 
-def test_current_sum_at_diode_node(current_sum_at_diode_node_fixture):
+def test_I_sum_diode_anode_at_I_V(current_sum_at_diode_node_fixture):
     # Note: The computation of this function is so straight forward that  we do NOT
     # extensively verify ufunc behavior.
     given = current_sum_at_diode_node_fixture["given"]
     expected = current_sum_at_diode_node_fixture["expected"]
 
-    I_sum_A_got = simulation.I_sum_diode_anode_at_V_I(
+    I_sum_A_got = simulation.I_sum_diode_anode_at_I_V(
         iv_data=given["iv_curve"],
         model_parameters=given["model_parameters"],
     )

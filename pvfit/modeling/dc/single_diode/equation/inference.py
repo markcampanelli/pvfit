@@ -17,7 +17,7 @@ from pvfit.common import (
 )
 from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
 from pvfit.measurement.iv.types import IVCurve, IVCurveParameters
-from pvfit.modeling.dc.common import N_1_IC_MAX, N_1_IC_MIN, get_scaled_thermal_voltage
+from pvfit.modeling.dc.common import N_IC_MAX, N_IC_MIN, get_scaled_thermal_voltage
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParameters,
     ModelParametersFittable,
@@ -111,8 +111,8 @@ def fit(
     def current_sum_at_diode_node(beta, x):
         """The scaled SDE model to fit."""
         I_ph = beta[0]
-        I_rs_1 = numpy.exp(beta[1])
-        n_1 = beta[2]
+        I_rs = numpy.exp(beta[1])
+        n = beta[2]
         R_s = beta[3]
         G_p = beta[4]
 
@@ -123,7 +123,7 @@ def fit(
 
         return (
             I_ph
-            - I_rs_1 * numpy.expm1(V_diode / (n_1 * scaled_thermal_voltage))
+            - I_rs * numpy.expm1(V_diode / (n * scaled_thermal_voltage))
             - G_p * V_diode
             - I
         )
@@ -133,8 +133,8 @@ def fit(
     beta0 = numpy.array(
         [
             model_parameters_fittable_ic_["I_ph_A"] / I_A_scale,
-            numpy.log(model_parameters_fittable_ic_["I_rs_1_A"] / I_A_scale),
-            model_parameters_fittable_ic_["n_1"],
+            numpy.log(model_parameters_fittable_ic_["I_rs_A"] / I_A_scale),
+            model_parameters_fittable_ic_["n"],
             model_parameters_fittable_ic_["R_s_Ohm"] * I_A_scale / V_V_scale,
             model_parameters_fittable_ic_["G_p_S"] * V_V_scale / I_A_scale,
         ]
@@ -142,7 +142,7 @@ def fit(
 
     ifixb = [
         int(model_parameters_fittable_fixed_[key] is False)
-        for key in ("I_ph_A", "I_rs_1_A", "n_1", "R_s_Ohm", "G_p_S")
+        for key in ("I_ph_A", "I_rs_A", "n", "R_s_Ohm", "G_p_S")
     ]
 
     recompute = True
@@ -198,8 +198,8 @@ def fit(
 
     model_parameters_fittable_fit = ModelParametersFittable(
         I_ph_A=output.beta[0] * I_A_scale,
-        I_rs_1_A=numpy.exp(output.beta[1]) * I_A_scale,
-        n_1=output.beta[2],
+        I_rs_A=numpy.exp(output.beta[1]) * I_A_scale,
+        n=output.beta[2],
         R_s_Ohm=output.beta[3] * V_V_scale / I_A_scale,
         G_p_S=output.beta[4] * I_A_scale / V_V_scale,
     )
@@ -260,21 +260,21 @@ def estimate_model_parameters_fittable_ic(
         "G_p_S", 1 / iv_curve_parameters["R_sc_Ohm"]
     )
 
-    # I_rs_1_A and n_1 initial conditions determined together.
-    I_rs_1_A_ic = model_parameters_fittable_ic.get("I_rs_1_A", float("nan"))
-    n_1_ic = model_parameters_fittable_ic.get("n_1", float("nan"))
+    # I_rs_A and n initial conditions determined together.
+    I_rs_A_ic = model_parameters_fittable_ic.get("I_rs_A", float("nan"))
+    n_ic = model_parameters_fittable_ic.get("n", float("nan"))
 
     V_diode_mp_V = (
         iv_curve_parameters["V_mp_V"] + iv_curve_parameters["I_mp_A"] * R_s_Ohm_ic
     )
 
-    if numpy.isnan(I_rs_1_A_ic) and numpy.isnan(n_1_ic):
-        # Approximate exp(x - 1) by exp(x) at Pmp and Voc, and solve for n_1 and
-        # I_rs_1_A.
-        n_1_ic = min(
-            N_1_IC_MAX,
+    if numpy.isnan(I_rs_A_ic) and numpy.isnan(n_ic):
+        # Approximate exp(x - 1) by exp(x) at Pmp and Voc, and solve for n and
+        # I_rs_A.
+        n_ic = min(
+            N_IC_MAX,
             max(
-                N_1_IC_MIN,
+                N_IC_MIN,
                 (
                     (V_diode_mp_V - iv_curve_parameters["V_oc_V"])
                     / (
@@ -292,28 +292,26 @@ def estimate_model_parameters_fittable_ic(
             ),
         )
 
-        I_rs_1_A_ic = (
-            I_ph_A_ic + G_p_S_ic * iv_curve_parameters["V_oc_V"]
-        ) * numpy.exp(
-            -iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_1_ic)
+        I_rs_A_ic = (I_ph_A_ic + G_p_S_ic * iv_curve_parameters["V_oc_V"]) * numpy.exp(
+            -iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_ic)
         ).item()
 
         if (
-            I_rs_1_A_ic <= 0
-            or not numpy.isfinite(I_rs_1_A_ic)
-            or n_1_ic <= 0
-            or not numpy.isfinite(n_1_ic)
+            I_rs_A_ic <= 0
+            or not numpy.isfinite(I_rs_A_ic)
+            or n_ic <= 0
+            or not numpy.isfinite(n_ic)
         ):
             # Fall back to taking zero R_s_Ohm and G_p_S for simplified IC computation.
             warnings.warn(
                 "falling back to alternative estimation of initial conditions for "
-                f"I_rs_1_A and n_1: {I_rs_1_A_ic}, {n_1_ic}"
+                f"I_rs_A and n: {I_rs_A_ic}, {n_ic}"
             )
 
-            n_1_ic = min(
-                N_1_IC_MAX,
+            n_ic = min(
+                N_IC_MAX,
                 max(
-                    N_1_IC_MIN,
+                    N_IC_MIN,
                     (
                         (iv_curve_parameters["V_mp_V"] - iv_curve_parameters["V_oc_V"])
                         / scaled_thermal_voltage_V
@@ -322,22 +320,22 @@ def estimate_model_parameters_fittable_ic(
                 ),
             )
 
-            I_rs_1_A_ic = (
+            I_rs_A_ic = (
                 I_ph_A_ic
                 / numpy.exp(
-                    iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_1_ic)
+                    iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_ic)
                 )
             ).item()
-    elif numpy.isnan(I_rs_1_A_ic) and not numpy.isnan(n_1_ic):
-        I_rs_1_A_ic = (
+    elif numpy.isnan(I_rs_A_ic) and not numpy.isnan(n_ic):
+        I_rs_A_ic = (
             (I_ph_A_ic - G_p_S_ic * V_diode_mp_V - iv_curve_parameters["I_mp_A"])
-            / numpy.expm1(V_diode_mp_V / (scaled_thermal_voltage_V * n_1_ic))
+            / numpy.expm1(V_diode_mp_V / (scaled_thermal_voltage_V * n_ic))
         ).item()
-    elif not numpy.isnan(I_rs_1_A_ic) and numpy.isnan(n_1_ic):
-        n_1_ic = min(
-            N_1_IC_MAX,
+    elif not numpy.isnan(I_rs_A_ic) and numpy.isnan(n_ic):
+        n_ic = min(
+            N_IC_MAX,
             max(
-                N_1_IC_MIN,
+                N_IC_MIN,
                 (
                     V_diode_mp_V
                     / scaled_thermal_voltage_V
@@ -347,7 +345,7 @@ def estimate_model_parameters_fittable_ic(
                             - G_p_S_ic * V_diode_mp_V
                             - iv_curve_parameters["I_mp_A"]
                         )
-                        / I_rs_1_A_ic
+                        / I_rs_A_ic
                     )
                 ).item(),
             ),
@@ -355,8 +353,8 @@ def estimate_model_parameters_fittable_ic(
 
     model_parameters_fittable_ic_ = ModelParametersFittable(
         I_ph_A=I_ph_A_ic,
-        I_rs_1_A=I_rs_1_A_ic,
-        n_1=n_1_ic,
+        I_rs_A=I_rs_A_ic,
+        n=n_1_ic,
         R_s_Ohm=R_s_Ohm_ic,
         G_p_S=G_p_S_ic,
     )

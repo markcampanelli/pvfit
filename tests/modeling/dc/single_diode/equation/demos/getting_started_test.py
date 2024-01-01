@@ -15,7 +15,7 @@ def test_getting_started_equation():
             os.path.join(
                 str(
                     importlib.resources.files(
-                        "pvfit.measurement.spectral_correction.demos"
+                        "pvfit.modeling.dc.single_diode.equation.demos"
                     )
                 ),
                 "getting_started.py",

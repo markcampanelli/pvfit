@@ -24,6 +24,9 @@ c_m_per_s = scipy.constants.c
 # Plank's constant, 6.62607015e-34 J s
 h_J_s = scipy.constants.h
 
+# Absolute zero in degrees Celsius.
+T_degC_abs_zero = scipy.constants.convert_temperature(0, "Kelvin", "Celsius")
+
 # Codes for scipy.odr.ODR.run() results.
 ODR_SUCCESS_CODES = ("1", "2", "3")  # In ones place.
 ODR_NUMERICAL_ERROR_CODE = "6"  # In ten-thousands place.

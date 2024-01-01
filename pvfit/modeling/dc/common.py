@@ -15,9 +15,6 @@ from pvfit.types import FloatArray, FloatBroadcastable, IntBroadcastable
 
 # Temperature.
 
-# Absolute zero in degrees Celsius.
-T_degC_abs_zero = scipy.constants.convert_temperature(0, "Kelvin", "Celsius")
-
 # STC temperature in degrees Celsius.
 T_degC_stc = 25.0
 
@@ -68,8 +65,8 @@ MATERIALS = {
 }
 
 # Limits on ideality factor on first diode.
-N_1_IC_MIN = 1.0
-N_1_IC_MAX = 2.0
+N_IC_MIN = 1.0
+N_IC_MAX = 2.0
 
 
 def get_scaled_thermal_voltage(

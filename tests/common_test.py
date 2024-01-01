@@ -28,3 +28,8 @@ def test_c_m_per_s():
 
 def test_h_J_s():
     assert common.h_J_s == 6.62607015e-34
+
+
+def test_T_degC_abs_zero():
+    assert isinstance(common.T_degC_abs_zero, float)
+    assert common.T_degC_abs_zero == -273.15

@@ -469,7 +469,7 @@ ax1.set_ylabel("I [A]")
 ax2 = ax1.twinx()
 ax2.plot(
     iv_curve.V_V,
-    sde_sim.I_sum_diode_anode_at_V_I(
+    sde_sim.I_sum_diode_anode_at_I_V(
         iv_data=iv_curve,
         model_parameters=model_parameters,
     ),

@@ -16,11 +16,6 @@ def test_T_degC_stc():
     assert common.T_degC_stc == 25.0
 
 
-def test_T_degC_abs_zero():
-    assert isinstance(common.T_degC_abs_zero, float)
-    assert common.T_degC_abs_zero == -273.15
-
-
 def test_T_K_stc():
     assert isinstance(common.T_K_stc, float)
     assert common.T_K_stc == 298.15
@@ -57,14 +52,14 @@ def test_materials():
     numpy.testing.assert_array_equal(common.MATERIALS["x-Si"]["E_g_eV_stc"], 1.121)
 
 
-def test_N_1_IC_MIN():
-    assert isinstance(common.N_1_IC_MIN, float)
-    numpy.testing.assert_array_equal(common.N_1_IC_MIN, 1.0)
+def test_N_IC_MIN():
+    assert isinstance(common.N_IC_MIN, float)
+    numpy.testing.assert_array_equal(common.N_IC_MIN, 1.0)
 
 
-def test_N_1_IC_MAX():
-    assert isinstance(common.N_1_IC_MAX, float)
-    numpy.testing.assert_array_equal(common.N_1_IC_MAX, 2.0)
+def test_N_IC_MAX():
+    assert isinstance(common.N_IC_MAX, float)
+    numpy.testing.assert_array_equal(common.N_IC_MAX, 2.0)
 
 
 @pytest.fixture(

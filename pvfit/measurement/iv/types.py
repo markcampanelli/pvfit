@@ -8,30 +8,103 @@ from typing import TypedDict
 
 import numpy
 
+from pvfit.common import T_degC_abs_zero
 from pvfit.types import FloatArray, FloatBroadcastable, FloatVector
 
 
 class IVData:
-    """Current-voltage (I-V) data at possibly many irradiance and temperature."""
+    """
+    Broadcast-compatible current-voltage (I-V) data at possibly many irradiance and
+    temperature.
+    """
 
-    def __init__(self, *, V_V: FloatBroadcastable, I_A: FloatBroadcastable) -> None:
-        """Initialize I-V data, allowing broadcast-compatible data."""
-        self._V_V, self._I_A = numpy.broadcast_arrays(V_V, I_A)
-
-    @property
-    def V_V(self) -> FloatArray:
-        """Get voltages."""
-        return self._V_V
+    def __init__(self, *, I_A: FloatBroadcastable, V_V: FloatBroadcastable) -> None:
+        """
+        Parameters
+        ----------
+        I_A
+            Terminal currents [A]
+        V_A
+            Terminal voltages [V]
+        """
+        self._I_A, self._V_V = numpy.broadcast_arrays(I_A, V_V)
 
     @property
     def I_A(self) -> FloatArray:
-        """Get currents."""
+        """Get terminal currents."""
         return self._I_A
 
     @property
+    def V_V(self) -> FloatArray:
+        """Get terminal voltages."""
+        return self._V_V
+
+    @property
     def P_W(self) -> FloatArray:
-        """Get powers."""
+        """Get terminal powers."""
         return numpy.array(self._I_A * self._V_V)
+
+
+class FTData:
+    """Broadcast-compatible operation conditions (F-T) data."""
+
+    def __init__(self, *, F: FloatBroadcastable, T_degC: FloatBroadcastable) -> None:
+        """
+        Parameters
+        ----------
+        F
+            Effective-irradiance ratios [·]
+        T_degC
+            Cell temperatures [°C]
+        """
+        if numpy.any(F < 0):
+            raise ValueError("F less than zero")
+
+        if numpy.any(T_degC <= T_degC_abs_zero):
+            raise ValueError("T_degC less than or equal to absolute zero temperature")
+
+        self._F, self._T_degC = numpy.broadcast_arrays(F, T_degC)
+
+    @property
+    def F(self) -> FloatArray:
+        """Get effective-irradiance ratios."""
+        return self._F
+
+    @property
+    def T_degC(self) -> FloatArray:
+        """Get cell temperatures."""
+        return self._T_degC
+
+
+class IVFTData(IVData, FTData):
+    """Broadcast-compatible combined I-V and operating conditions (I-V-F-T) data."""
+
+    def __init__(
+        self,
+        *,
+        I_A: FloatBroadcastable,
+        V_V: FloatBroadcastable,
+        F: FloatBroadcastable,
+        T_degC: FloatBroadcastable,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        I_A
+            Terminal currents [A]
+        V_A
+            Terminal voltages [V]
+        F
+            Effective-irradiance ratios [·]
+        T_degC
+            Cell temperatures [°C]
+        """
+        IVData.__init__(self, I_A=I_A, V_V=V_V)
+        FTData.__init__(self, F=F, T_degC=T_degC)
+        # After super initializations, broadcast everything together.
+        self._I_A, self._V_V, self._F, self._T_degC = numpy.broadcast_arrays(
+            self.I_A, self.V_V, F, T_degC
+        )
 
 
 class IVCurve(IVData):

@@ -8,7 +8,7 @@ from typing import TypedDict
 
 import numpy
 
-from pvfit.modeling.dc.common import T_degC_abs_zero
+from pvfit.common import T_degC_abs_zero
 from pvfit.types import FloatBroadcastable, IntBroadcastable
 
 
@@ -23,8 +23,8 @@ class ModelParameters(TypedDict):
     N_s: IntBroadcastable
     T_degC: FloatBroadcastable
     I_ph_A: FloatBroadcastable
-    I_rs_1_A: FloatBroadcastable
-    n_1: FloatBroadcastable
+    I_rs_A: FloatBroadcastable
+    n: FloatBroadcastable
     R_s_Ohm: FloatBroadcastable
     G_p_S: FloatBroadcastable
 
@@ -60,8 +60,8 @@ class ModelParametersFittable(TypedDict):
     """Fittable model parameters."""
 
     I_ph_A: float
-    I_rs_1_A: float
-    n_1: float
+    I_rs_A: float
+    n: float
     R_s_Ohm: float
     G_p_S: float
 
@@ -74,13 +74,13 @@ def validate_model_parameters_fittable(
     if model_parameters_fittable["I_ph_A"] < 0:
         raise ValueError(f"photocurrent is less than zero: {model_parameters_fittable}")
 
-    if model_parameters_fittable["I_rs_1_A"] <= 0:
+    if model_parameters_fittable["I_rs_A"] <= 0:
         raise ValueError(
             "reverse saturation current is less than or equal to zero: "
             f"{model_parameters_fittable}"
         )
 
-    if model_parameters_fittable["n_1"] <= 0:
+    if model_parameters_fittable["n"] <= 0:
         raise ValueError(
             "diode ideality factor is less than or equal to zero: "
             f"{model_parameters_fittable}"
@@ -111,8 +111,8 @@ class ModelParametersFittableProvided(TypedDict, total=False):
     """Optionally provided fittable model parameters."""
 
     I_ph_A: float
-    I_rs_1_A: float
-    n_1: float
+    I_rs_A: float
+    n: float
     R_s_Ohm: float
     G_p_S: float
 
@@ -121,8 +121,8 @@ class ModelParametersFittableFixed(TypedDict):
     """Fittable model parameters to be fixed for parameter fits."""
 
     I_ph_A: bool
-    I_rs_1_A: bool
-    n_1: bool
+    I_rs_A: bool
+    n: bool
     R_s_Ohm: bool
     G_p_S: bool
 
@@ -132,8 +132,8 @@ def get_model_parameters_fittable_fixed_default() -> ModelParametersFittableFixe
 
     return ModelParametersFittableFixed(
         I_ph_A=False,
-        I_rs_1_A=False,
-        n_1=False,
+        I_rs_A=False,
+        n=False,
         R_s_Ohm=False,
         G_p_S=False,
     )
@@ -143,7 +143,7 @@ class ModelParametersFittableFixedProvided(TypedDict, total=False):
     """Optionally provided fittable model parameters to be fixed for parameter fits."""
 
     I_ph_A: bool
-    I_rs_1_A: bool
-    n_1: bool
+    I_rs_A: bool
+    n: bool
     R_s_Ohm: bool
     G_p_S: bool

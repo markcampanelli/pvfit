@@ -15,14 +15,14 @@ from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
 from pvfit.types import FloatArray, FloatBroadcastable, NewtonOptions
 
 
-def I_sum_diode_anode_at_V_I(
+def I_sum_diode_anode_at_I_V(
     *,
     iv_data: IVData,
     model_parameters: ModelParameters,
 ) -> FloatArray:
     """
     Computes the sum of the currents at the diode's anode in the 5-parameter
-    single-diode equation (SDE) equivalent-circuit model.
+    equivalent-circuit single-diode equation (SDE).
 
     Parameters
     ----------
@@ -37,18 +37,18 @@ def I_sum_diode_anode_at_V_I(
         Sum of currents at diode's anode node [A]
     """
     # Voltage at diode anode.
-    V_1_V = iv_data.V_V + iv_data.I_A * model_parameters["R_s_Ohm"]
+    V_diode_V = iv_data.V_V + iv_data.I_A * model_parameters["R_s_Ohm"]
 
     # Modified ideality factor.
-    n_1_mod_V = model_parameters["n_1"] * get_scaled_thermal_voltage(
+    n_mod_V = model_parameters["n"] * get_scaled_thermal_voltage(
         N_s=model_parameters["N_s"], T_degC=model_parameters["T_degC"]
     )
 
     # Sum of currents at diode node.
     return numpy.array(
         model_parameters["I_ph_A"]
-        - model_parameters["I_rs_1_A"] * numpy.expm1(V_1_V / n_1_mod_V)
-        - model_parameters["G_p_S"] * V_1_V
+        - model_parameters["I_rs_A"] * numpy.expm1(V_diode_V / n_mod_V)
+        - model_parameters["G_p_S"] * V_diode_V
         - iv_data.I_A
     )
 
@@ -84,30 +84,30 @@ def I_at_V(
         newton_options = NewtonOptions()
 
     # Ensure shapes are always full throughout computations.
-    V_V, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S = numpy.broadcast_arrays(
+    V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S = numpy.broadcast_arrays(
         V_V,
         model_parameters["N_s"],
         model_parameters["T_degC"],
         model_parameters["I_ph_A"],
-        model_parameters["I_rs_1_A"],
-        model_parameters["n_1"],
+        model_parameters["I_rs_A"],
+        model_parameters["n"],
         model_parameters["R_s_Ohm"],
         model_parameters["G_p_S"],
     )
 
     # Modified ideality factor.
-    n_1_mod_V = n_1 * get_scaled_thermal_voltage(N_s=N_s, T_degC=T_degC)
+    n_mod_V = n * get_scaled_thermal_voltage(N_s=N_s, T_degC=T_degC)
 
     # Use closures in function definitions for newton() call.
     def I_sum_diode_anode_at_I(I_A: FloatArray) -> FloatArray:
-        return I_sum_diode_anode_at_V_I(
-            iv_data=IVData(V_V=V_V, I_A=I_A),
+        return I_sum_diode_anode_at_I_V(
+            iv_data=IVData(I_A=I_A, V_V=V_V),
             model_parameters=ModelParameters(
                 N_s=N_s,
                 T_degC=T_degC,
                 I_ph_A=I_ph_A,
-                I_rs_1_A=I_rs_1_A,
-                n_1=n_1,
+                I_rs_A=I_rs_A,
+                n=n,
                 R_s_Ohm=R_s_Ohm,
                 G_p_S=G_p_S,
             ),
@@ -115,23 +115,20 @@ def I_at_V(
 
     def dI_sum_diode_anode_dI_at_I(I_A: FloatArray) -> FloatArray:
         return numpy.array(
-            -I_rs_1_A
-            * R_s_Ohm
-            / n_1_mod_V
-            * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+            -I_rs_A * R_s_Ohm / n_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
             - G_p_S * R_s_Ohm
             - 1.0
         )
 
     def d2I_sum_diode_anode_dI2_at_I(I_A: FloatArray) -> FloatArray:
         return numpy.array(
-            -I_rs_1_A
-            * (R_s_Ohm / n_1_mod_V) ** 2
-            * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+            -I_rs_A
+            * (R_s_Ohm / n_mod_V) ** 2
+            * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
         )
 
     # Compute initial condition (IC) for newton solver using zero R_s_Ohm.
-    I_A_ic = numpy.array(I_ph_A - I_rs_1_A * numpy.expm1(V_V / n_1_mod_V) - G_p_S * V_V)
+    I_A_ic = numpy.array(I_ph_A - I_rs_A * numpy.expm1(V_V / n_mod_V) - G_p_S * V_V)
 
     # Solve for I_A using Halley's method.
     newton_result = newton(
@@ -195,15 +192,15 @@ def dI_dV_at_V(
     )
 
     # Modified ideality factor.
-    n_1_mod_V = model_parameters["n_1"] * get_scaled_thermal_voltage(
+    n_mod_V = model_parameters["n"] * get_scaled_thermal_voltage(
         N_s=model_parameters["N_s"], T_degC=model_parameters["T_degC"]
     )
 
     # Compute first derivative of current with respect to voltage at specified voltage.
     expr1 = (
-        model_parameters["I_rs_1_A"]
-        / n_1_mod_V
-        * numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_1_mod_V)
+        model_parameters["I_rs_A"]
+        / n_mod_V
+        * numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_mod_V)
         + model_parameters["G_p_S"]
     )
 
@@ -250,18 +247,18 @@ def d2I_dV2_at_V(
     )
 
     # Modified ideality factor.
-    n_1_mod_V = model_parameters["n_1"] * get_scaled_thermal_voltage(
+    n_mod_V = model_parameters["n"] * get_scaled_thermal_voltage(
         N_s=model_parameters["N_s"], T_degC=model_parameters["T_degC"]
     )
 
-    expr0 = numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_1_mod_V)
-    expr1 = model_parameters["I_rs_1_A"] / n_1_mod_V
+    expr0 = numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_mod_V)
+    expr1 = model_parameters["I_rs_A"] / n_mod_V
     expr2 = expr1 * expr0
     expr3 = expr2 + model_parameters["G_p_S"]
     expr4 = 1.0 + model_parameters["R_s_Ohm"] * expr3
     dI_dV_S = numpy.array(-expr3 / expr4)
     d2I_dV2_S = numpy.array(
-        (-expr2 / n_1_mod_V * (1 + dI_dV_S * model_parameters["R_s_Ohm"])) / expr4
+        (-expr2 / n_mod_V * (1 + dI_dV_S * model_parameters["R_s_Ohm"])) / expr4
     )
 
     return d2I_dV2_S, dI_dV_S, I_A
@@ -298,47 +295,44 @@ def V_at_I(
         newton_options = NewtonOptions()
 
     # Ensure shapes are always full throughout computations.
-    I_A, N_s, T_degC, I_ph_A, I_rs_1_A, n_1, R_s_Ohm, G_p_S = numpy.broadcast_arrays(
+    I_A, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S = numpy.broadcast_arrays(
         I_A,
         model_parameters["N_s"],
         model_parameters["T_degC"],
         model_parameters["I_ph_A"],
-        model_parameters["I_rs_1_A"],
-        model_parameters["n_1"],
+        model_parameters["I_rs_A"],
+        model_parameters["n"],
         model_parameters["R_s_Ohm"],
         model_parameters["G_p_S"],
     )
 
     # Modified ideality factor.
-    n_1_mod_V = n_1 * get_scaled_thermal_voltage(N_s=N_s, T_degC=T_degC)
+    n_mod_V = n * get_scaled_thermal_voltage(N_s=N_s, T_degC=T_degC)
 
     # Use closures in function definitions for newton() call.
     def I_sum_diode_anode_at_V(V_V: FloatArray) -> FloatArray:
-        return I_sum_diode_anode_at_V_I(
-            iv_data=IVData(V_V=V_V, I_A=I_A),
+        return I_sum_diode_anode_at_I_V(
+            iv_data=IVData(I_A=I_A, V_V=V_V),
             model_parameters=ModelParameters(
                 N_s=N_s,
                 T_degC=T_degC,
                 I_ph_A=I_ph_A,
-                I_rs_1_A=I_rs_1_A,
-                n_1=n_1,
+                I_rs_A=I_rs_A,
+                n=n,
                 R_s_Ohm=R_s_Ohm,
                 G_p_S=G_p_S,
             ),
         )
 
     def dI_sum_diode_anode_dV_at_V(V_V: FloatArray) -> FloatArray:
-        return (
-            -I_rs_1_A / n_1_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V) - G_p_S
-        )
+        return -I_rs_A / n_mod_V * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V) - G_p_S
 
     def d2I_sum_diode_anode_dV2_at_V(V_V: FloatArray) -> FloatArray:
-        return -I_rs_1_A / n_1_mod_V**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_1_mod_V)
+        return -I_rs_A / n_mod_V**2 * numpy.exp((V_V + I_A * R_s_Ohm) / n_mod_V)
 
     # Compute initial condition (IC) for newton solver using zero G_p_S.
     V_V_ic = numpy.array(
-        n_1_mod_V * (numpy.log(I_ph_A + I_rs_1_A - I_A) - numpy.log(I_rs_1_A))
-        - I_A * R_s_Ohm
+        n_mod_V * (numpy.log(I_ph_A + I_rs_A - I_A) - numpy.log(I_rs_A)) - I_A * R_s_Ohm
     )
 
     # Solve for V_V using Halley's method.
@@ -404,15 +398,15 @@ def dV_dI_at_I(
     )
 
     # Modified ideality factor.
-    n_1_mod_V = model_parameters["n_1"] * get_scaled_thermal_voltage(
+    n_mod_V = model_parameters["n"] * get_scaled_thermal_voltage(
         N_s=model_parameters["N_s"], T_degC=model_parameters["T_degC"]
     )
 
     # Compute first derivative of voltage with respect to current at specified current.
     expr1 = (
-        model_parameters["I_rs_1_A"]
-        / n_1_mod_V
-        * numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_1_mod_V)
+        model_parameters["I_rs_A"]
+        / n_mod_V
+        * numpy.exp((V_V + I_A * model_parameters["R_s_Ohm"]) / n_mod_V)
         + model_parameters["G_p_S"]
     )
     dV_dI_Ohm = numpy.array(-1.0 / expr1 - model_parameters["R_s_Ohm"])
@@ -696,7 +690,7 @@ def iv_curve_parameters(
     Returns
     -------
     iv_curve_parameters
-        Parameters for I-V curve(s).
+        Parameters for I-V curve(s)
     """
     FF_, I_sc_A, I_mp_A, P_mp_W, V_mp_V, V_oc_V = FF(
         model_parameters=model_parameters,
