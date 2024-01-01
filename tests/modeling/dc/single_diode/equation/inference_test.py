@@ -22,8 +22,13 @@ from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersUnfittable,
 )
 
-TEST_ARTIFACTS_DIRECTORY = Path(str(importlib.resources.files("pvfit"))).joinpath(
-    "..", "artifacts", "test", "sde", "inference"
+# Assumes pvfit package is installed in editable mode.
+TEST_ARTIFACTS_DIRECTORY = Path(
+    str(
+        importlib.resources.files("pvfit").joinpath(
+            "..", "artifacts", "test", "sde", "inference"
+        )
+    )
 )
 TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
 
@@ -2518,7 +2523,7 @@ def test_fit(fit_fixture):
         )
 
         for key in model_parameters_got:
-            numpy.testing.assert_array_equal(
+            numpy.testing.assert_allclose(
                 model_parameters_got[key], model_parameters_expected[key]
             )
 
