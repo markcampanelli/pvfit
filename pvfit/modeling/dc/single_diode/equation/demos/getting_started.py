@@ -14,7 +14,7 @@ import pvfit.modeling.dc.single_diode.equation.inference as sde_inf
 import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
 from pvfit.modeling.dc.single_diode.equation.types import ModelParametersUnfittable
 
-# By convention, variable names include the units of the value.
+# By convention, variable names for numeric values include the units.
 
 # Arguments to functions are always keyword-only, in order to be explicit yet
 # flexible with argument ordering.

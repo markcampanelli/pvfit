@@ -9,6 +9,6 @@ import pytest
 import pvfit.measurement.iv.computation
 
 
-@pytest.mark.skip("TODO")
+@pytest.mark.skip("TODO: Test using ivcurves results.")
 def test_estimate_iv_curve_parameters():
     pass

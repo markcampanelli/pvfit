@@ -45,6 +45,7 @@ dev = [
 ]
 demo = [
     "matplotlib >=3, <4",
+    "pandas >=2, <3",
 ]
 docs = [
     "sphinx >=4, <5",

@@ -7,7 +7,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 import pvfit.measurement.spectral_correction.computation as computation
 import pvfit.measurement.spectral_correction.demos.data as data
 
-# By convention, variable names include the units of the value.
+# By convention, variable names for numeric values include the units.
 
 """
 pvfit.measurement.spectral_correction.computation has several data classes
