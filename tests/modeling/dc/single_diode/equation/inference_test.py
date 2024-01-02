@@ -23,12 +23,19 @@ from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersUnfittable,
 )
 
+PVFIT_PARENT_DIR_PATH = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
 # Informally checks that pvfit package is installed in editable mode.
-PVFIT_PARENT_DIRECTORY = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
-assert PVFIT_PARENT_DIRECTORY.name != "site-packages"
+assert PVFIT_PARENT_DIR_PATH.name != "site-packages"
+
 TEST_ARTIFACTS_PATH = Path(
     os.path.abspath(
-        os.path.join(PVFIT_PARENT_DIRECTORY, "artifacts", "test", "sde", "inference")
+        os.path.join(
+            PVFIT_PARENT_DIR_PATH,
+            "artifacts",
+            "test",
+            "sde",
+            "inference",
+        )
     )
 )
 TEST_ARTIFACTS_PATH.mkdir(parents=True, exist_ok=True)

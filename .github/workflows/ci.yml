@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     runs-on:  ${{ matrix.os }}
 
@@ -23,36 +23,23 @@ jobs:
           python -m pip --version
           python -m pip install --progress-bar off -e .[demo,dev,docs,test]
           python -m pip list
-      - name: Check manifest with check_manifest
+      - name: Check manifest
         run: |
           python -m check_manifest  
-      - name: Check formatting with black
+      - name: Check formatting
         run: |
           python -m black --check .
-      # - name: Lint with pylint
+      # - name: Lint
       #   run: |
       #     python -m pylint .
-      - name: Test with pytest
+      - name: Test
         run: |
-          python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-test-results.xml -vv
-          mv artifacts/test artifacts/test-${{ matrix.python-version }}
-      - name: Archive test results
+          python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-results.xml -vv
+      - name: Archive results
         uses: actions/upload-artifact@v3
         with:
-          name: test-results-${{ matrix.python-version }}
-          path: junit/test-results-${{ matrix.python-version }}.xml
-        if: ${{ always() }}
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-report-${{ matrix.python-version }}
-          path: htmlcov-${{ matrix.python-version }}
-        if: ${{ always() }}
-      - name: Archive test artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-artifacts-${{ matrix.python-version }}
-          path: artifacts/test-${{ matrix.python-version }}
+          name: artifacts-${{ matrix.python-version }}
+          path: artifacts
         if: ${{ always() }}
       - name: Build pure-Python source and wheel disributions
         run: |
@@ -62,3 +49,4 @@ jobs:
         with:
           name: dist-${{ matrix.python-version }}
           path: dist
+        if: ${{ always() }}
