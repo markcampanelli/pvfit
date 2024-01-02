@@ -2505,7 +2505,7 @@ def test_fit(fit_fixture):
         iv_curve_json = json.load(file)
 
     with importlib.resources.as_file(base_path.joinpath(test_set + ".csv")) as file:
-        model_parameters_true_df = pandas.read_csv(filepath_or_buffer=file)
+        model_parameters_true_df = pandas.read_csv(file, encoding="utf-8")
 
     model_parameters_got_df = pandas.DataFrame(
         columns=[
@@ -2658,8 +2658,9 @@ def test_fit_benchmark():
 
     # Read in created benchmark file.
     overall_scores_df_got = pandas.read_csv(
-        filepath_or_buffer=TEST_ARTIFACTS_PATH.joinpath("overall_scores.csv"),
+        TEST_ARTIFACTS_PATH.joinpath("overall_scores.csv"),
         index_col="test_set",
+        encoding="utf-8",
     )
 
     overall_scores_got_test_set = set(overall_scores_df_got.index)

@@ -310,6 +310,7 @@ def test_I_sum_diode_anode_at_I_V(current_sum_at_diode_node_fixture):
     I_sum_A_expected = expected["I_sum_A"]
 
     assert isinstance(I_sum_A_got, type(I_sum_A_expected))
+    assert I_sum_A_got.shape == I_sum_A_expected.shape
     assert I_sum_A_got.dtype == I_sum_A_expected.dtype
     numpy.testing.assert_array_almost_equal(I_sum_A_got, I_sum_A_expected)
 
@@ -342,6 +343,7 @@ def test_I_at_V_explicit():
     )
 
     assert isinstance(I_A_got, type(I_A_expected))
+    assert I_A_got.shape == I_A_expected.shape
     assert I_A_got.dtype == I_A_expected.dtype
     numpy.testing.assert_array_almost_equal(I_A_got, I_A_expected)
 
@@ -370,6 +372,7 @@ def test_I_at_V_implicit():
     I_A_expected = numpy.array(0.09301675954356346)
 
     assert isinstance(I_A_got, type(I_A_expected))
+    assert I_A_got.shape == I_A_expected.shape
     assert I_A_got.dtype == I_A_expected.dtype
     numpy.testing.assert_array_almost_equal(I_A_got, I_A_expected)
 
@@ -411,6 +414,7 @@ def test_V_at_I_explicit():
     )
 
     assert isinstance(V_V_got, type(V_V_expected))
+    assert V_V_got.shape == V_V_expected.shape
     assert V_V_got.dtype == V_V_expected.dtype
     numpy.testing.assert_array_equal(V_V_got, V_V_expected)
 
@@ -439,6 +443,7 @@ def test_V_at_I_implicit():
     V_V_expected = numpy.array(0.33645640565779594)
 
     assert isinstance(V_V_got, type(V_V_expected))
+    assert V_V_got.shape == V_V_expected.shape
     assert V_V_got.dtype == V_V_expected.dtype
     numpy.testing.assert_array_equal(V_V_got, V_V_expected)
 
@@ -494,10 +499,12 @@ def test_dV_dI_at_I_explicit():
     )
 
     assert isinstance(dV_dI_Ohm_got, type(dV_dI_Ohm_expected))
+    assert dV_dI_Ohm_got.shape == dV_dI_Ohm_expected.shape
     assert dV_dI_Ohm_got.dtype == dV_dI_Ohm_expected.dtype
     numpy.testing.assert_array_equal(dV_dI_Ohm_got, dV_dI_Ohm_expected)
 
     assert isinstance(V_V_got, type(V_V_expected))
+    assert V_V_got.shape == V_V_expected.shape
     assert V_V_got.dtype == V_V_expected.dtype
     numpy.testing.assert_array_equal(V_V_got, V_V_expected)
 
@@ -533,6 +540,7 @@ def test_P_at_V_explicit():
     )
 
     assert isinstance(P_W_got, type(P_W_expected))
+    assert P_W_got.shape == P_W_expected.shape
     assert P_W_got.dtype == P_W_expected.dtype
     numpy.testing.assert_array_equal(P_W_got, P_W_expected)
 
@@ -677,6 +685,10 @@ def test_iv_parameters(iv_parameters_fixture):
     for key in iv_curve_parameters_got:
         assert isinstance(
             iv_curve_parameters_got[key], type(iv_curve_parameters_expected[key])
+        )
+        assert (
+            iv_curve_parameters_got[key].shape
+            == iv_curve_parameters_expected[key].shape
         )
         assert (
             iv_curve_parameters_got[key].dtype

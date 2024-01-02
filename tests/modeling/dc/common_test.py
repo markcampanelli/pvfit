@@ -167,6 +167,7 @@ def test_get_scaled_thermal_voltage(get_scaled_thermal_voltage_fixture):
     scaled_thermal_voltage_expected = expected["scaled_thermal_voltage"]
 
     assert isinstance(scaled_thermal_voltage_got, type(scaled_thermal_voltage_expected))
+    assert scaled_thermal_voltage_got.shape == scaled_thermal_voltage_expected.shape
     assert scaled_thermal_voltage_got.dtype == scaled_thermal_voltage_expected.dtype
     numpy.testing.assert_allclose(
         scaled_thermal_voltage_got, scaled_thermal_voltage_expected
