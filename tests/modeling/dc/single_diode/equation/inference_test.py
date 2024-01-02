@@ -14,6 +14,7 @@ import pandas
 import pytest
 import scipy
 
+import pvfit
 from pvfit.measurement.iv.types import IVCurve
 import pvfit.modeling.dc.single_diode.equation.inference as inference
 from pvfit.modeling.dc.single_diode.equation.types import (
@@ -22,15 +23,16 @@ from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersUnfittable,
 )
 
-# Assumes pvfit package is installed in editable mode.
-TEST_ARTIFACTS_DIRECTORY = Path(
-    str(
-        importlib.resources.files("pvfit").joinpath(
-            "..", "artifacts", "test", "sde", "inference"
-        )
+# Informally checks that pvfit package is installed in editable mode.
+PVFIT_PARENT_DIRECTORY = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
+assert PVFIT_PARENT_DIRECTORY.name != "site-packages"
+TEST_ARTIFACTS_PATH = Path(
+    os.path.abspath(
+        os.path.join(PVFIT_PARENT_DIRECTORY, "artifacts", "test", "sde", "inference")
     )
 )
-TEST_ARTIFACTS_DIRECTORY.mkdir(parents=True, exist_ok=True)
+TEST_ARTIFACTS_PATH.mkdir(parents=True, exist_ok=True)
+IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
 
 
 @pytest.fixture(
@@ -2489,15 +2491,14 @@ def test_fit(fit_fixture):
     given = fit_fixture["given"]
     expected = fit_fixture["expected"]
 
-    base_path = Path(importlib.resources.files("ivcurves").joinpath("test_sets"))
+    base_path = IVCURVES_MULTIPLEXED_PATH.joinpath("test_sets")
     test_set = given["test_set"]
 
-    with open(base_path.joinpath(test_set + ".json"), encoding="utf8") as file:
+    with base_path.joinpath(test_set + ".json").open(encoding="utf8") as file:
         iv_curve_json = json.load(file)
 
-    model_parameters_true_df = pandas.read_csv(
-        filepath_or_buffer=base_path.joinpath(test_set + ".csv")
-    )
+    with importlib.resources.as_file(base_path.joinpath(test_set + ".csv")) as file:
+        model_parameters_true_df = pandas.read_csv(filepath_or_buffer=file)
 
     model_parameters_got_df = pandas.DataFrame(
         columns=[
@@ -2628,7 +2629,7 @@ def test_fit(fit_fixture):
 
     # The file output here can be compared using ivcurves/compare_curves.py.
     ivcurves_df.to_csv(
-        path_or_buf=TEST_ARTIFACTS_DIRECTORY.joinpath(test_set + ".csv"),
+        path_or_buf=TEST_ARTIFACTS_PATH.joinpath(test_set + ".csv"),
         index=False,
     )
 
@@ -2636,20 +2637,21 @@ def test_fit(fit_fixture):
 # This must execute after all test_fit cases have finished.
 def test_fit_benchmark():
     """Check ivcurves benchmark scores from test_fit tests."""
-    script_path = importlib.resources.files("ivcurves").joinpath("compare_curves.py")
-
-    # This command creates CSV score files for each test-set case.
-    return_value = os.system(
-        f"python {script_path} {TEST_ARTIFACTS_DIRECTORY} --csv-output-path "
-        f"{TEST_ARTIFACTS_DIRECTORY}"
-    )
+    with importlib.resources.as_file(
+        IVCURVES_MULTIPLEXED_PATH.joinpath("compare_curves.py")
+    ) as script:
+        # This command creates CSV score files for each test-set case.
+        return_value = os.system(
+            f"python {script} {TEST_ARTIFACTS_PATH} --csv-output-path "
+            f"{TEST_ARTIFACTS_PATH}"
+        )
 
     # Check command success.
     assert return_value == 0
 
     # Read in created benchmark file.
     overall_scores_df_got = pandas.read_csv(
-        filepath_or_buffer=TEST_ARTIFACTS_DIRECTORY.joinpath("overall_scores.csv"),
+        filepath_or_buffer=TEST_ARTIFACTS_PATH.joinpath("overall_scores.csv"),
         index_col="test_set",
     )
 
