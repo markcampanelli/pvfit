@@ -44,7 +44,7 @@ dev = [
     "pylint >=2, <3",
 ]
 demo = [
-    "matplotlib >=3, <4",
+    "matplotlib >=3, <3.8",  # Upper limit to avoid prop_cycler issue.
     "pandas >=2, <3",
 ]
 docs = [
