@@ -59,7 +59,7 @@ considered more experimental.
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [python>=3.9,<3.13](https://www.python.org/) with
+`pvfit` minimally requires [python>=3.10,<3.13](https://www.python.org/) with
 [numpy](https://numpy.org/) and [scipy](https://www.scipy.org/). It is tested with
 CPython on recent versions of Ubuntu, macOS, and Windows. We suggest using a suitable
 Python virtual environment that provides [pip](https://pypi.org/project/pip/).

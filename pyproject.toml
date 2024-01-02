@@ -1,9 +1,9 @@
 [build-system]
 
-requires = ["setuptools>=42", "setuptools_scm"]
+requires = ["setuptools >= 61.0", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 # Replace previous two lines with the following two lines for Nuitka wheel builds.
-# requires = ["nuitka", "setuptools>=42", "setuptools_scm", "toml", "wheel"]
+# requires = ["nuitka", "setuptools >= 42", "setuptools_scm", "toml", "wheel"]
 # build-backend = "nuitka.distutils.Build"
 
 [project]
@@ -12,7 +12,7 @@ description = "PVfit: Photovoltaic (PV) Device Performance Measurement and Model
 authors = [{name = "Mark Campanelli", email = "mark.campanelli@gmail.com"}]
 license = {file = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.9, <3.13"
+requires-python = ">=3.10, <3.13"
 classifiers =[
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -24,7 +24,6 @@ classifiers =[
     "Topic :: Software Development :: Libraries",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
