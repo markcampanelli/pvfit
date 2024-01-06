@@ -107,7 +107,7 @@ def validate_model_parameters_fittable(
         )
 
 
-class ModelParametersFittableProvided(TypedDict, total=False):
+class ModelParametersFittableICProvided(TypedDict, total=False):
     """Optionally provided fittable model parameters."""
 
     I_ph_A: float

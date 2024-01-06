@@ -16,12 +16,15 @@ from pvfit.common import (
     ODR_SUCCESS_CODES,
 )
 from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
-from pvfit.measurement.iv.types import IVCurve, IVCurveParameters
-from pvfit.modeling.dc.common import N_IC_MAX, N_IC_MIN, get_scaled_thermal_voltage
+from pvfit.measurement.iv.types import IVCurve
+from pvfit.modeling.dc.common import get_scaled_thermal_voltage
+from pvfit.modeling.dc.single_diode.equation.inference_ic import (
+    estimate_model_parameters_fittable_ic,
+)
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParameters,
     ModelParametersFittable,
-    ModelParametersFittableProvided,
+    ModelParametersFittableICProvided,
     ModelParametersFittableFixedProvided,
     ModelParametersUnfittable,
     get_model_parameters_fittable_fixed_default,
@@ -35,8 +38,10 @@ def fit(
     *,
     iv_curve: IVCurve,
     model_parameters_unfittable: ModelParametersUnfittable,
-    model_parameters_fittable_ic: Optional[ModelParametersFittableProvided] = None,
-    model_parameters_fittable_fixed: Optional[
+    model_parameters_fittable_ic_provided: Optional[
+        ModelParametersFittableICProvided
+    ] = None,
+    model_parameters_fittable_fixed_provided: Optional[
         ModelParametersFittableFixedProvided
     ] = None,
     normalize_iv_curve: bool = True,
@@ -53,10 +58,10 @@ def fit(
         I-V curve data
     model_parameters_unfittable
         Model parameters that are are not fittable
-    model_parameters_fittable_ic (optional)
+    model_parameters_fittable_ic_provided (optional)
         Inititial conditions (IC) for model parameters that are fittable (possibly
             incomplete, missing values are determined automatically)
-    model_parameters_fittable_fixed (optional)
+    model_parameters_fittable_fixed_provided (optional)
         Indicators for model parameters that are to remain fixed at IC value (possibly
             incomplete, missing values are not fixed)
     normalize_iv_curve (optional)
@@ -77,16 +82,16 @@ def fit(
 
     iv_curve_parameters = estimate_iv_curve_parameters(iv_curve=iv_curve)
 
-    model_parameters_fittable_ic_ = estimate_model_parameters_fittable_ic(
+    model_parameters_fittable_ic = estimate_model_parameters_fittable_ic(
         iv_curve_parameters=iv_curve_parameters,
         model_parameters_unfittable=model_parameters_unfittable,
-        model_parameters_fittable_ic=model_parameters_fittable_ic,
+        model_parameters_fittable_provided_ic=model_parameters_fittable_ic_provided,
     )
 
     # Check for provided fit parameters to be fixed, and assign default if None.
-    model_parameters_fittable_fixed_ = get_model_parameters_fittable_fixed_default()
-    if model_parameters_fittable_fixed is not None:
-        model_parameters_fittable_fixed_.update(model_parameters_fittable_fixed)
+    model_parameters_fittable_fixed = get_model_parameters_fittable_fixed_default()
+    if model_parameters_fittable_fixed_provided is not None:
+        model_parameters_fittable_fixed.update(model_parameters_fittable_fixed_provided)
 
     # Check for provided odr parameters, and assign default if None.
     odr_options_ = OdrOptions(maxit=1000)
@@ -132,16 +137,16 @@ def fit(
 
     beta0 = numpy.array(
         [
-            model_parameters_fittable_ic_["I_ph_A"] / I_A_scale,
-            numpy.log(model_parameters_fittable_ic_["I_rs_A"] / I_A_scale),
-            model_parameters_fittable_ic_["n"],
-            model_parameters_fittable_ic_["R_s_Ohm"] * I_A_scale / V_V_scale,
-            model_parameters_fittable_ic_["G_p_S"] * V_V_scale / I_A_scale,
+            model_parameters_fittable_ic["I_ph_A"] / I_A_scale,
+            numpy.log(model_parameters_fittable_ic["I_rs_A"] / I_A_scale),
+            model_parameters_fittable_ic["n"],
+            model_parameters_fittable_ic["R_s_Ohm"] * I_A_scale / V_V_scale,
+            model_parameters_fittable_ic["G_p_S"] * V_V_scale / I_A_scale,
         ]
     )
 
     ifixb = [
-        int(model_parameters_fittable_fixed_[key] is False)
+        int(model_parameters_fittable_fixed[key] is False)
         for key in ("I_ph_A", "I_rs_A", "n", "R_s_Ohm", "G_p_S")
     ]
 
@@ -212,157 +217,3 @@ def fit(
         ModelParameters(**model_parameters_unfittable, **model_parameters_fittable_fit),
         odr,
     )
-
-
-def estimate_model_parameters_fittable_ic(
-    *,
-    iv_curve_parameters: IVCurveParameters,
-    model_parameters_unfittable: ModelParametersUnfittable,
-    model_parameters_fittable_ic: Optional[ModelParametersFittableProvided] = None,
-) -> ModelParametersFittable:
-    """
-    Estimate initial conditions (IC) for fittable model parameters.
-
-    Parameters
-    ----------
-    iv_curve_parameters
-        I-V curve parameters, e.g., Isc, Pmp, Voc, etc.
-    model_parameters_unfittable
-        Model parameters that are are not fittable
-    model_parameters_fittable_ic (optional)
-        Initial conditions (IC) for model parameters that are fittable (possibly
-            incomplete)
-
-    Returns
-    -------
-    model_parameters_fittable_ic
-        Initial conditions (IC) for model parameters that are fittable (complete)
-    """
-    validate_model_parameters_unfittable(
-        model_parameters_unfittable=model_parameters_unfittable
-    )
-
-    scaled_thermal_voltage_V = get_scaled_thermal_voltage(**model_parameters_unfittable)
-
-    if model_parameters_fittable_ic is None:
-        model_parameters_fittable_ic = ModelParametersFittableProvided()
-
-    I_ph_A_ic = model_parameters_fittable_ic.get(
-        "I_ph_A", iv_curve_parameters["I_sc_A"]
-    )
-
-    R_s_Ohm_ic = model_parameters_fittable_ic.get(
-        "R_s_Ohm", iv_curve_parameters["R_oc_Ohm"]
-    )
-
-    # Assumes not dividing by zero in default value.
-    G_p_S_ic = model_parameters_fittable_ic.get(
-        "G_p_S", 1 / iv_curve_parameters["R_sc_Ohm"]
-    )
-
-    # I_rs_A and n initial conditions determined together.
-    I_rs_A_ic = model_parameters_fittable_ic.get("I_rs_A", float("nan"))
-    n_ic = model_parameters_fittable_ic.get("n", float("nan"))
-
-    V_diode_mp_V = (
-        iv_curve_parameters["V_mp_V"] + iv_curve_parameters["I_mp_A"] * R_s_Ohm_ic
-    )
-
-    if numpy.isnan(I_rs_A_ic) and numpy.isnan(n_ic):
-        # Approximate exp(x - 1) by exp(x) at Pmp and Voc, and solve for n and
-        # I_rs_A.
-        n_ic = min(
-            N_IC_MAX,
-            max(
-                N_IC_MIN,
-                (
-                    (V_diode_mp_V - iv_curve_parameters["V_oc_V"])
-                    / (
-                        scaled_thermal_voltage_V
-                        * numpy.log(
-                            (
-                                I_ph_A_ic
-                                + iv_curve_parameters["I_mp_A"]
-                                + G_p_S_ic * V_diode_mp_V
-                            )
-                            / (I_ph_A_ic + G_p_S_ic * iv_curve_parameters["V_oc_V"])
-                        )
-                    )
-                ).item(),
-            ),
-        )
-
-        I_rs_A_ic = (I_ph_A_ic + G_p_S_ic * iv_curve_parameters["V_oc_V"]) * numpy.exp(
-            -iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_ic)
-        ).item()
-
-        if (
-            I_rs_A_ic <= 0
-            or not numpy.isfinite(I_rs_A_ic)
-            or n_ic <= 0
-            or not numpy.isfinite(n_ic)
-        ):
-            # Fall back to taking zero R_s_Ohm and G_p_S for simplified IC computation.
-            warnings.warn(
-                "falling back to alternative estimation of initial conditions for "
-                f"I_rs_A and n: {I_rs_A_ic}, {n_ic}"
-            )
-
-            n_ic = min(
-                N_IC_MAX,
-                max(
-                    N_IC_MIN,
-                    (
-                        (iv_curve_parameters["V_mp_V"] - iv_curve_parameters["V_oc_V"])
-                        / scaled_thermal_voltage_V
-                        / numpy.log(1 - iv_curve_parameters["I_mp_A"] / I_ph_A_ic)
-                    ).item(),
-                ),
-            )
-
-            I_rs_A_ic = (
-                I_ph_A_ic
-                / numpy.exp(
-                    iv_curve_parameters["V_oc_V"] / (scaled_thermal_voltage_V * n_ic)
-                )
-            ).item()
-    elif numpy.isnan(I_rs_A_ic) and not numpy.isnan(n_ic):
-        I_rs_A_ic = (
-            (I_ph_A_ic - G_p_S_ic * V_diode_mp_V - iv_curve_parameters["I_mp_A"])
-            / numpy.expm1(V_diode_mp_V / (scaled_thermal_voltage_V * n_ic))
-        ).item()
-    elif not numpy.isnan(I_rs_A_ic) and numpy.isnan(n_ic):
-        n_ic = min(
-            N_IC_MAX,
-            max(
-                N_IC_MIN,
-                (
-                    V_diode_mp_V
-                    / scaled_thermal_voltage_V
-                    / numpy.log1p(
-                        (
-                            I_ph_A_ic
-                            - G_p_S_ic * V_diode_mp_V
-                            - iv_curve_parameters["I_mp_A"]
-                        )
-                        / I_rs_A_ic
-                    )
-                ).item(),
-            ),
-        )
-
-    model_parameters_fittable_ic_ = ModelParametersFittable(
-        I_ph_A=I_ph_A_ic,
-        I_rs_A=I_rs_A_ic,
-        n=n_ic,
-        R_s_Ohm=R_s_Ohm_ic,
-        G_p_S=G_p_S_ic,
-    )
-
-    # Raise if something didn't work. For example, bad user-provided value or something
-    # computed as NaN.
-    validate_model_parameters_fittable(
-        model_parameters_fittable=model_parameters_fittable_ic_
-    )
-
-    return model_parameters_fittable_ic_

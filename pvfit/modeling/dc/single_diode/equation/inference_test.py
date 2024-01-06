@@ -19,7 +19,7 @@ from pvfit.measurement.iv.types import IVCurve
 import pvfit.modeling.dc.single_diode.equation.inference as inference
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersFittableFixedProvided,
-    ModelParametersFittableProvided,
+    ModelParametersFittableICProvided,
     ModelParametersUnfittable,
 )
 
@@ -2564,7 +2564,7 @@ def test_fit(fit_fixture):
         else:
             idx_true_ic = idx
 
-        model_parameters_fittable_ic_true_ic = ModelParametersFittableProvided(
+        model_parameters_fittable_ic_provided_true = ModelParametersFittableICProvided(
             I_ph_A=model_parameters_true_df.loc[idx_true_ic, "photocurrent"],
             I_rs_A=model_parameters_true_df.loc[idx_true_ic, "saturation_current"],
             n=model_parameters_true_df.loc[idx_true_ic, "n"],
@@ -2576,7 +2576,7 @@ def test_fit(fit_fixture):
         _, _ = inference.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
-            model_parameters_fittable_ic=model_parameters_fittable_ic_true_ic,
+            model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_true,
         )
 
         # Ensure convergence when using true parameters for ICs with all fit parameters
@@ -2584,8 +2584,8 @@ def test_fit(fit_fixture):
         _, _ = inference.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
-            model_parameters_fittable_ic=model_parameters_fittable_ic_true_ic,
-            model_parameters_fittable_fixed=ModelParametersFittableFixedProvided(
+            model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_true,
+            model_parameters_fittable_fixed_provided=ModelParametersFittableFixedProvided(
                 I_ph_A=True,
                 I_rs_A=True,
                 n=True,
