@@ -1,5 +1,5 @@
 """
-PVfit testing: Constants.
+PVfit testing: Common items for DC modeling.
 
 Copyright 2023 Intelligent Measurement Systems LLC
 """

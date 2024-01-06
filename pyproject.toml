@@ -79,4 +79,4 @@ recursive = true
 ignore = ["build"]
 
 [tool.coverage.run]
-omit = ["pvfit/tests/*"]
+omit = ["*_test.py"]
