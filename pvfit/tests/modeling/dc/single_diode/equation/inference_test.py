@@ -23,21 +23,19 @@ from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersUnfittable,
 )
 
-PVFIT_PARENT_DIR_PATH = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
-# Informally checks that pvfit package is installed in editable mode.
-assert PVFIT_PARENT_DIR_PATH.name != "site-packages"
+ARTIFACTS_PARENT_DIR_PATH = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
 
-TEST_ARTIFACTS_PATH = Path(
-    os.path.abspath(
-        os.path.join(
-            PVFIT_PARENT_DIR_PATH,
-            "artifacts",
-            "test",
-            "sde",
-            "inference",
-        )
+if ARTIFACTS_PARENT_DIR_PATH.name == "site-packages":
+    # Covers use case where one is not developing locally or running in CI.
+    TEST_ARTIFACTS_PATH = Path().resolve()  # Current working directory.
+else:
+    TEST_ARTIFACTS_PATH = ARTIFACTS_PARENT_DIR_PATH.joinpath(
+        "artifacts",
+        "test",
+        "sde",
+        "inference",
     )
-)
+
 TEST_ARTIFACTS_PATH.mkdir(parents=True, exist_ok=True)
 IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
 

@@ -77,3 +77,6 @@ include = ["pvfit"]
 max-line-length = 88  # Compatible with default black config.
 recursive = true
 ignore = ["build"]
+
+[tool.coverage.run]
+omit = ["pvfit/tests/*"]
