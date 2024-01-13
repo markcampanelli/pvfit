@@ -6,10 +6,10 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import numpy
 
-from pvfit.measurement.iv.types import IVCurve, IVCurveParameters
+from pvfit.measurement.iv.types import IVCurve, IVCurveParametersScalar
 
 
-def estimate_iv_curve_parameters(*, iv_curve: IVCurve) -> IVCurveParameters:
+def estimate_iv_curve_parameters(*, iv_curve: IVCurve) -> IVCurveParametersScalar:
     """
     Estimate the I-V curve parameters for a single I-V curve without a physical model
     (device illuminated).
@@ -105,7 +105,7 @@ def estimate_iv_curve_parameters(*, iv_curve: IVCurve) -> IVCurveParameters:
     # Take slope at Voc as 1/2 slope from (Vxx, Ixx) to (Voc, 0).
     dI_dV_oc_S = (I_xx_A / (V_xx_V - V_oc_V)) / 2
 
-    return IVCurveParameters(
+    return IVCurveParametersScalar(
         I_sc_A=I_sc_A,
         R_sc_Ohm=-1 / dI_dV_sc_S,
         V_x_V=V_x_V,

@@ -10,7 +10,7 @@ import warnings
 
 import numpy
 
-from pvfit.measurement.iv.types import IVCurveParameters
+from pvfit.measurement.iv.types import IVCurveParametersScalar
 from pvfit.modeling.dc.common import N_IC_MAX, N_IC_MIN, get_scaled_thermal_voltage
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersFittable,
@@ -23,9 +23,9 @@ from pvfit.modeling.dc.single_diode.equation.types import (
 
 def estimate_model_parameters_fittable_ic(
     *,
-    iv_curve_parameters: IVCurveParameters,
+    iv_curve_parameters: IVCurveParametersScalar,
     model_parameters_unfittable: ModelParametersUnfittable,
-    model_parameters_fittable_provided_ic: Optional[
+    model_parameters_fittable_ic_provided: Optional[
         ModelParametersFittableICProvided
     ] = None,
 ) -> ModelParametersFittable:
@@ -38,14 +38,13 @@ def estimate_model_parameters_fittable_ic(
         I-V curve parameters, e.g., Isc, Pmp, Voc, etc.
     model_parameters_unfittable
         Model parameters that are are not fittable
-    model_parameters_fittable_ic (optional)
-        Initial conditions (IC) for model parameters that are fittable (possibly
-            incomplete)
+    model_parameters_fittable_ic_provided (optional)
+        Provided initial conditions (IC) for model parameters that are fittable
 
     Returns
     -------
     model_parameters_fittable_ic
-        Initial conditions (IC) for model parameters that are fittable (complete)
+        Complete initial conditions (IC) for model parameters that are fittable (complete)
     """
     validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable
@@ -53,25 +52,25 @@ def estimate_model_parameters_fittable_ic(
 
     scaled_thermal_voltage_V = get_scaled_thermal_voltage(**model_parameters_unfittable)
 
-    if model_parameters_fittable_provided_ic is None:
-        model_parameters_fittable_provided_ic = ModelParametersFittableICProvided()
+    if model_parameters_fittable_ic_provided is None:
+        model_parameters_fittable_ic_provided = ModelParametersFittableICProvided()
 
-    I_ph_A_ic = model_parameters_fittable_provided_ic.get(
+    I_ph_A_ic = model_parameters_fittable_ic_provided.get(
         "I_ph_A", iv_curve_parameters["I_sc_A"]
     )
 
-    R_s_Ohm_ic = model_parameters_fittable_provided_ic.get(
+    R_s_Ohm_ic = model_parameters_fittable_ic_provided.get(
         "R_s_Ohm", iv_curve_parameters["R_oc_Ohm"]
     )
 
     # Assumes not dividing by zero in default value.
-    G_p_S_ic = model_parameters_fittable_provided_ic.get(
+    G_p_S_ic = model_parameters_fittable_ic_provided.get(
         "G_p_S", 1 / iv_curve_parameters["R_sc_Ohm"]
     )
 
     # I_rs_A and n initial conditions determined together.
-    I_rs_A_ic = model_parameters_fittable_provided_ic.get("I_rs_A", float("nan"))
-    n_ic = model_parameters_fittable_provided_ic.get("n", float("nan"))
+    I_rs_A_ic = model_parameters_fittable_ic_provided.get("I_rs_A", float("nan"))
+    n_ic = model_parameters_fittable_ic_provided.get("n", float("nan"))
 
     V_diode_mp_V = (
         iv_curve_parameters["V_mp_V"] + iv_curve_parameters["I_mp_A"] * R_s_Ohm_ic

@@ -4,11 +4,13 @@ PVfit: Types for current-voltage (I-V) measurement.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
+from collections.abc import Iterable
 from typing import TypedDict
 
 import numpy
 
 from pvfit.common import T_degC_abs_zero
+from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, T_degC_stc
 from pvfit.types import FloatArray, FloatBroadcastable, FloatVector
 
 
@@ -142,7 +144,40 @@ class IVCurve(IVData):
             raise ValueError("I-V curve has no points in positive-power quadrant")
 
 
-class IVCurveParameters(TypedDict):
+class IVPerformanceMatrix():
+    """I-V performance matrix data."""
+
+    def __init__(
+        self,
+        *,
+        iv_curves: Iterable[IVCurve],
+        G_W_per_m2: Iterable[float],
+        T_degC: Iterable[float],
+        G_W_per_m2_0: float = G_hemi_W_per_m2_stc,
+        T_degC_0: float = T_degC_stc,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        iv_curves
+            I-V curve at each operating condition, each minimally with Isc, Pmp, and Voc
+        G_W_per_m2
+            Plane of array irradiance [W/m^2]
+        T_degC
+            Cell temperatures [°C]
+        G_W_per_m2
+            Reference plane of array irradiance [W/m^2]
+        T_degC
+            Reference cell temperatures [°C]
+        """
+        # FIXME
+        # Validations
+        # Ensure same iterable lengths.
+        # Check that I-V curves have an Isc, Voc, and separate Pmp point. If multiple,
+        # nonzero powers, then take max power.
+
+
+class IVCurveParametersScalar(TypedDict):
     """I-V curve parameters (at one operating condition)."""
 
     I_sc_A: float

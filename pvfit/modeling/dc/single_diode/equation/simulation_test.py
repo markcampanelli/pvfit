@@ -9,7 +9,7 @@ import pytest
 from scipy.constants import convert_temperature
 
 from pvfit.common import k_B_J_per_K, q_C
-from pvfit.measurement.iv.types import IVCurveParameters, IVData
+from pvfit.measurement.iv.types import IVCurveParametersScalar, IVData
 from pvfit.modeling.dc.common import T_K_stc, T_degC_stc, get_scaled_thermal_voltage
 import pvfit.modeling.dc.single_diode.equation.simulation as simulation
 from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
@@ -560,7 +560,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParameters(
+                "iv_curve_parameters": IVCurveParametersScalar(
                     I_sc_A=numpy.array(0.12492493),
                     R_sc_Ohm=numpy.array(871.28357523),
                     V_x_V=numpy.array(0.22760037),
@@ -589,7 +589,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParameters(
+                "iv_curve_parameters": IVCurveParametersScalar(
                     I_sc_A=numpy.array(0.12464585),
                     R_sc_Ohm=numpy.array(196.88421221),
                     V_x_V=numpy.array(0.29559654),
@@ -618,7 +618,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParameters(
+                "iv_curve_parameters": IVCurveParametersScalar(
                     I_sc_A=numpy.array([0.12492624, 0.12492509, 0.12492973]),
                     R_sc_Ohm=numpy.array([911.24231276, 885.07975543, 1000.55449615]),
                     V_x_V=numpy.array([0.26552007, 0.25909159, 0.47707191]),
@@ -647,7 +647,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParameters(
+                "iv_curve_parameters": IVCurveParametersScalar(
                     I_sc_A=numpy.array(0.0),
                     R_sc_Ohm=numpy.array(980.42564499),
                     V_x_V=numpy.array(0.0),

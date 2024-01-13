@@ -24,8 +24,8 @@ from pvfit.modeling.dc.single_diode.equation.inference_ic import (
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParameters,
     ModelParametersFittable,
-    ModelParametersFittableICProvided,
     ModelParametersFittableFixedProvided,
+    ModelParametersFittableICProvided,
     ModelParametersUnfittable,
     get_model_parameters_fittable_fixed_default,
     validate_model_parameters_fittable,
@@ -48,9 +48,9 @@ def fit(
     odr_options: Optional[OdrOptions] = None,
 ) -> Tuple[ModelParameters, scipy.odr.ODR]:
     """
-    Use orthogonal distance regression (ODR) to fit the 5-parameter single-diode
-    equation (SDE) equivalent-circuit model given current-voltage (I-V) curve data taken
-    at a single irradiance and temperature.
+    Use orthogonal distance regression (ODR) to fit the implicit 5-parameter
+    equivalent-circuit single-diode equation (SDE) given current-voltage (I-V) curve
+    data taken at a single effective-irradiance ratio and cell temperatures.
 
     Parameters
     ----------
@@ -85,18 +85,8 @@ def fit(
     model_parameters_fittable_ic = estimate_model_parameters_fittable_ic(
         iv_curve_parameters=iv_curve_parameters,
         model_parameters_unfittable=model_parameters_unfittable,
-        model_parameters_fittable_provided_ic=model_parameters_fittable_ic_provided,
+        model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided,
     )
-
-    # Check for provided fit parameters to be fixed, and assign default if None.
-    model_parameters_fittable_fixed = get_model_parameters_fittable_fixed_default()
-    if model_parameters_fittable_fixed_provided is not None:
-        model_parameters_fittable_fixed.update(model_parameters_fittable_fixed_provided)
-
-    # Check for provided odr parameters, and assign default if None.
-    odr_options_ = OdrOptions(maxit=1000)
-    if odr_options is not None:
-        odr_options_.update(odr_options)
 
     if normalize_iv_curve:
         V_V_scale = iv_curve_parameters["V_oc_V"]
@@ -145,10 +135,20 @@ def fit(
         ]
     )
 
+    # Check for provided fit parameters to be fixed, and assign default if None.
+    model_parameters_fittable_fixed = get_model_parameters_fittable_fixed_default()
+    if model_parameters_fittable_fixed_provided is not None:
+        model_parameters_fittable_fixed.update(model_parameters_fittable_fixed_provided)
+
     ifixb = [
         int(model_parameters_fittable_fixed[key] is False)
         for key in ("I_ph_A", "I_rs_A", "n", "R_s_Ohm", "G_p_S")
     ]
+
+    # Check for provided odr parameters, and assign default if None.
+    odr_options_ = OdrOptions(maxit=1000)
+    if odr_options is not None:
+        odr_options_.update(odr_options)
 
     recompute = True
     while recompute:
@@ -201,7 +201,7 @@ def fit(
             beta0[4] = 0.0
             recompute = True
 
-    model_parameters_fittable_fit = ModelParametersFittable(
+    model_parameters_fittable = ModelParametersFittable(
         I_ph_A=output.beta[0] * I_A_scale,
         I_rs_A=numpy.exp(output.beta[1]) * I_A_scale,
         n=output.beta[2],
@@ -210,10 +210,10 @@ def fit(
     )
 
     validate_model_parameters_fittable(
-        model_parameters_fittable=model_parameters_fittable_fit,
+        model_parameters_fittable=model_parameters_fittable,
     )
 
     return (
-        ModelParameters(**model_parameters_unfittable, **model_parameters_fittable_fit),
+        ModelParameters(**model_parameters_unfittable, **model_parameters_fittable),
         odr,
     )

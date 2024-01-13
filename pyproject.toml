@@ -78,5 +78,10 @@ max-line-length = 88  # Compatible with default black config.
 recursive = true
 ignore = ["build"]
 
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
 [tool.coverage.run]
 omit = ["*_test.py"]

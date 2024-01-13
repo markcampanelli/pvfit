@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # Versioning
 project = "pvfit"
-copyright = "2022, Intelligent Measurement Systems LLC"
+copyright = "2022-2024, Intelligent Measurement Systems LLC"
 author = "Mark Campanelli"
 version = __version__
 
