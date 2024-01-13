@@ -16,7 +16,7 @@ from pvfit.common import (
     ODR_NUMERICAL_ERROR_CODE,
     ODR_SUCCESS_CODES,
 )
-from pvfit.common.constants import k_B_J_per_K, k_B_eV_per_K, q_C
+from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.measurement.iv.types import IVFTData
 import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
@@ -128,8 +128,8 @@ def fit(
     validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
     )
-    N_s = validate_model_parameters_unfittable["N_s"]
-    T_degC_0 = validate_model_parameters_unfittable["T_degC_0"]
+    N_s = model_parameters_unfittable["N_s"]
+    T_degC_0 = model_parameters_unfittable["T_degC_0"]
     T_K_0 = convert_temperature(T_degC_0, "Celsius", "Kelvin")
 
     model_parameters_fittable_ic = estimate_model_parameters_fittable_ic(
@@ -190,7 +190,6 @@ def fit(
             fit_prep_result["model_params_ic"]["E_g_eV_0"],
         ]
     )
-
 
     # Check for provided fit parameters to be fixed, and assign default if None.
     # FIXME I_sc_A_0 Is not used in this fit, but it is in the TypedDict.

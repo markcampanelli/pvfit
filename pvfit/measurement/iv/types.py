@@ -144,7 +144,7 @@ class IVCurve(IVData):
             raise ValueError("I-V curve has no points in positive-power quadrant")
 
 
-class IVPerformanceMatrix():
+class IVPerformanceMatrix:
     """I-V performance matrix data."""
 
     def __init__(
