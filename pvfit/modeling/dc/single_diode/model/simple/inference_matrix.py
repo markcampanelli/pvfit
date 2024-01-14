@@ -167,7 +167,7 @@ def fit(
     equivalent-circuit single-diode model (SDM) given current-voltage (I-V) curve
     data taken over a range of effective-irradiance ratio and cell temperature (F-T)
     operating conditions.
- 
+
     Parameters
     ----------
     iv_performance_matrix

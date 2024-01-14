@@ -179,7 +179,14 @@ class IVPerformanceMatrix:
         T_degC_0
             Reference cell temperatures, defaults to STC [°C]
         """
-        if len(I_sc_A) != len(I_mp_A) != len(V_mp_V) != len(V_oc_V) != len(G_W_per_m2) != len(T_degC):
+        if (
+            len(I_sc_A)
+            != len(I_mp_A)
+            != len(V_mp_V)
+            != len(V_oc_V)
+            != len(G_W_per_m2)
+            != len(T_degC)
+        ):
             raise ValueError("input collections must all have the same length")
 
         self._G_W_per_m2_0 = G_W_per_m2_0
@@ -267,7 +274,7 @@ class IVPerformanceMatrix:
     @property
     def F(self) -> FloatVector:
         return self._I_sc_A / self._I_sc_A_0
-    
+
     @property
     def ivft_data(self) -> IVFTData:
         I_A = []
@@ -275,7 +282,9 @@ class IVPerformanceMatrix:
         F = []
         T_degC = []
 
-        for I_sc_A, I_mp_A, V_mp_V, V_oc_V, T_degC_ in zip(self._I_sc_A, self._I_mp_A, self._V_mp_V, self._V_oc_V, self._T_degC ):
+        for I_sc_A, I_mp_A, V_mp_V, V_oc_V, T_degC_ in zip(
+            self._I_sc_A, self._I_mp_A, self._V_mp_V, self._V_oc_V, self._T_degC
+        ):
             I_A.extend([I_sc_A, I_mp_A, 0.0])
             V_V.extend([0.0, V_mp_V, V_oc_V])
             F.extend([I_sc_A, I_sc_A, I_sc_A])  # Currents to be normalized by I_sc_A_0.
