@@ -205,6 +205,10 @@ class IVPerformanceMatrix:
         return self._T_degC_0
 
     @property
+    def T_K_0(self) -> float:
+        return convert_temperature(self._T_degC_0, "Celsius", "Kelvin")
+
+    @property
     def I_sc_A_0(self) -> float:
         return self._I_sc_A_0
 

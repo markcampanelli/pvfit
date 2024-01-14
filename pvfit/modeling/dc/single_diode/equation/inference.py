@@ -65,7 +65,7 @@ def fit(
         Indicators for model parameters that are to remain fixed at IC value (possibly
             incomplete, missing values are not fixed)
     normalize_iv_curve (optional)
-        Indicator for normalizing currents by Isc and voltaged by Voc
+        Indicator for normalizing currents by Isc and voltages by Voc
     odr_options (optional)
         Options for the ODR solver
 

@@ -161,14 +161,40 @@ def fit(
     material: str = "x-Si",
     normalize_iv_curves: bool = True,
     odr_options: Optional[OdrOptions] = None,
-) -> Tuple[types.ModelParameters, scipy.odr.ODR]:
+) -> Tuple[types.ModelParameters, ModelParametersFittable, scipy.odr.ODR]:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 6-parameter
     equivalent-circuit single-diode model (SDM) given current-voltage (I-V) curve
     data taken over a range of effective-irradiance ratio and cell temperature (F-T)
     operating conditions.
+ 
+    Parameters
+    ----------
+    iv_performance_matrix
+        I-V performance matrix data
+    model_parameters_unfittable
+        Model parameters that are are not fittable
+    model_parameters_fittable_ic_provided (optional)
+        Inititial conditions (IC) for model parameters that are fittable (possibly
+            incomplete, missing values are determined automatically)
+    model_parameters_fittable_fixed_provided (optional)
+        Indicators for model parameters that are to remain fixed at IC value (possibly
+            incomplete, missing values are not fixed)
+    material (optional)
+        material system for device, used to determine IC for material band gap
+    normalize_iv_curves (optional)
+        Indicator for normalizing currents by Isc and voltages by Voc
+    odr_options (optional)
+        Options for the ODR solver
 
-    FIXME Add inputs and outputs.
+    Returns
+    -------
+    model_parameters
+        Model parameters from fit
+    model_parameters_fittable_ic
+        Model parameters from fit's initial-condition (IC) calculation
+    odr
+        ODR solver result (for a transformed problem)
     """
     types.validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
@@ -190,12 +216,15 @@ def fit(
         material=material,
     )
 
-    # if normalize_iv_curve:
-    #     V_V_scale = iv_curve_parameters["V_oc_V"]
-    #     I_A_scale = iv_curve_parameters["I_sc_A"]
-    # else:
-    #     V_V_scale = 1.0
-    #     I_A_scale = 1.0
+    # FIXME Implement data scaling?
+    if normalize_iv_curves:
+        V_V_scale = iv_performance_matrix.V_oc_V_0
+        I_A_scale = iv_performance_matrix.I_sc_A_0
+        T_K_scale = iv_performance_matrix.T_K_0
+    else:
+        V_V_scale = 1.0
+        I_A_scale = 1.0
+        T_K_scale = 1.0
 
     data = scipy.odr.Data(
         numpy.vstack(
@@ -299,4 +328,4 @@ def fit(
         E_g_eV_0=output.beta[4],
     )
 
-    return model_parameters, odr
+    return model_parameters, model_parameters_fittable_ic, odr
