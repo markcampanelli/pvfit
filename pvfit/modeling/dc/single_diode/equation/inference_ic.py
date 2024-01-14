@@ -7,14 +7,13 @@ Copyright 2023 Intelligent Measurement Systems LLC
 from typing import Optional
 import warnings
 
-
 import numpy
 
 from pvfit.measurement.iv.types import IVCurveParametersScalar
 from pvfit.modeling.dc.common import N_IC_MAX, N_IC_MIN, get_scaled_thermal_voltage
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersFittable,
-    ModelParametersFittableICProvided,
+    ModelParametersFittableProvided,
     ModelParametersUnfittable,
     validate_model_parameters_fittable,
     validate_model_parameters_unfittable,
@@ -26,7 +25,7 @@ def estimate_model_parameters_fittable_ic(
     iv_curve_parameters: IVCurveParametersScalar,
     model_parameters_unfittable: ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
-        ModelParametersFittableICProvided
+        ModelParametersFittableProvided
     ] = None,
 ) -> ModelParametersFittable:
     """
@@ -53,7 +52,7 @@ def estimate_model_parameters_fittable_ic(
     scaled_thermal_voltage_V = get_scaled_thermal_voltage(**model_parameters_unfittable)
 
     if model_parameters_fittable_ic_provided is None:
-        model_parameters_fittable_ic_provided = ModelParametersFittableICProvided()
+        model_parameters_fittable_ic_provided = ModelParametersFittableProvided()
 
     I_ph_A_ic = model_parameters_fittable_ic_provided.get(
         "I_ph_A", iv_curve_parameters["I_sc_A"]

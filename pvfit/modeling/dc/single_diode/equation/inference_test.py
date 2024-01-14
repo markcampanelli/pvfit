@@ -19,7 +19,7 @@ from pvfit.measurement.iv.types import IVCurve
 import pvfit.modeling.dc.single_diode.equation.inference as inference
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersFittableFixedProvided,
-    ModelParametersFittableICProvided,
+    ModelParametersFittableProvided,
     ModelParametersUnfittable,
 )
 
@@ -2564,7 +2564,7 @@ def test_fit(fit_fixture):
         else:
             idx_true_ic = idx
 
-        model_parameters_fittable_ic_provided_true = ModelParametersFittableICProvided(
+        model_parameters_fittable_ic_provided_true = ModelParametersFittableProvided(
             I_ph_A=model_parameters_true_df.loc[idx_true_ic, "photocurrent"],
             I_rs_A=model_parameters_true_df.loc[idx_true_ic, "saturation_current"],
             n=model_parameters_true_df.loc[idx_true_ic, "n"],

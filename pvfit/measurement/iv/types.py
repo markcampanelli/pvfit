@@ -4,10 +4,10 @@ PVfit: Types for current-voltage (I-V) measurement.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from collections.abc import Iterable
 from typing import TypedDict
 
 import numpy
+from scipy.constants import convert_temperature
 
 from pvfit.common import T_degC_abs_zero
 from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, T_degC_stc
@@ -150,31 +150,139 @@ class IVPerformanceMatrix:
     def __init__(
         self,
         *,
-        iv_curves: Iterable[IVCurve],
-        G_W_per_m2: Iterable[float],
-        T_degC: Iterable[float],
+        I_sc_A: FloatVector,
+        I_mp_A: FloatVector,
+        V_mp_V: FloatVector,
+        V_oc_V: FloatVector,
+        G_W_per_m2: FloatVector,
+        T_degC: FloatVector,
         G_W_per_m2_0: float = G_hemi_W_per_m2_stc,
         T_degC_0: float = T_degC_stc,
     ) -> None:
         """
         Parameters
         ----------
-        iv_curves
-            I-V curve at each operating condition, each minimally with Isc, Pmp, and Voc
+        I_sc_A
+            Currents at short-circuit [A]
+        I_mp_A
+            Currents at maximum power [A]
+        V_mp_V
+            Voltages at maximum power [V]
+        V_oc_V
+            Voltages at open-circuit [V]
         G_W_per_m2
-            Plane of array irradiance [W/m^2]
+            Plane of array irradiances [W/m^2]
         T_degC
             Cell temperatures [°C]
-        G_W_per_m2
-            Reference plane of array irradiance [W/m^2]
-        T_degC
-            Reference cell temperatures [°C]
+        G_W_per_m2_0
+            Reference plane of array irradiance, defaults to STC [W/m^2]
+        T_degC_0
+            Reference cell temperatures, defaults to STC [°C]
         """
-        # FIXME
-        # Validations
-        # Ensure same iterable lengths.
-        # Check that I-V curves have an Isc, Voc, and separate Pmp point. If multiple,
-        # nonzero powers, then take max power.
+        if len(I_sc_A) != len(I_mp_A) != len(V_mp_V) != len(V_oc_V) != len(G_W_per_m2) != len(T_degC):
+            raise ValueError("input collections must all have the same length")
+
+        self._G_W_per_m2_0 = G_W_per_m2_0
+        self._T_degC_0 = T_degC_0
+        ref_idx = numpy.logical_and(G_W_per_m2 == G_W_per_m2_0, T_degC == T_degC_0)
+        self._I_sc_A = I_sc_A
+        self._I_mp_A = I_mp_A
+        self._V_mp_V = V_mp_V
+        self._V_oc_V = V_oc_V
+        self._I_sc_A_0 = I_sc_A[ref_idx].item()
+        self._I_mp_A_0 = I_mp_A[ref_idx].item()
+        self._V_mp_V_0 = V_mp_V[ref_idx].item()
+        self._V_oc_V_0 = V_oc_V[ref_idx].item()
+        self._G_W_per_m2 = G_W_per_m2
+        self._T_degC = T_degC
+
+    @property
+    def G_W_per_m2_0(self) -> float:
+        return self._G_W_per_m2_0
+
+    @property
+    def T_degC_0(self) -> float:
+        return self._T_degC_0
+
+    @property
+    def I_sc_A_0(self) -> float:
+        return self._I_sc_A_0
+
+    @property
+    def I_mp_A_0(self) -> float:
+        return self._I_mp_A_0
+
+    @property
+    def P_mp_W_0(self) -> float:
+        return self._I_mp_A_0 * self._V_mp_V_0
+
+    @property
+    def V_mp_V_0(self) -> float:
+        return self._V_mp_V_0
+
+    @property
+    def V_oc_V_0(self) -> float:
+        return self._V_oc_V_0
+
+    @property
+    def I_sc_A(self) -> FloatVector:
+        return self._I_sc_A
+
+    @property
+    def I_mp_A(self) -> FloatVector:
+        return self._I_mp_A
+
+    @property
+    def V_mp_W(self) -> FloatVector:
+        return self._I_mp_A * self._V_mp_V
+
+    @property
+    def V_mp_V(self) -> FloatVector:
+        return self._V_mp_V
+
+    @property
+    def V_oc_V(self) -> FloatVector:
+        return self._V_oc_V
+
+    @property
+    def G_W_per_m2(self) -> FloatVector:
+        return self._G_W_per_m2
+
+    @property
+    def T_degC(self) -> FloatVector:
+        return self._T_degC
+
+    @property
+    def T_K(self) -> FloatVector:
+        return convert_temperature(self._T_degC, "Celsius", "Kelvin")
+
+    @property
+    def P_mp_W(self) -> FloatVector:
+        return self._I_mp_A * self._V_mp_V
+
+    @property
+    def F(self) -> FloatVector:
+        return self._I_sc_A / self._I_sc_A_0
+    
+    @property
+    def ivft_data(self) -> IVFTData:
+        I_A = []
+        V_V = []
+        F = []
+        T_degC = []
+
+        for I_sc_A, I_mp_A, V_mp_V, V_oc_V, T_degC_ in zip(self._I_sc_A, self._I_mp_A, self._V_mp_V, self._V_oc_V, self._T_degC ):
+            I_A.extend([I_sc_A, I_mp_A, 0.0])
+            V_V.extend([0.0, V_mp_V, V_oc_V])
+            F.extend([I_sc_A, I_sc_A, I_sc_A])  # Currents to be normalized by I_sc_A_0.
+            T_degC.extend([T_degC_, T_degC_, T_degC_])
+
+        I_A = numpy.array(I_A)
+        V_V = numpy.array(V_V)
+        F = numpy.array(F) / self._I_sc_A_0
+        T_degC = numpy.array(T_degC)
+
+        return IVFTData(I_A=I_A, V_V=V_V, F=F, T_degC=T_degC)
 
 
 class IVCurveParametersScalar(TypedDict):

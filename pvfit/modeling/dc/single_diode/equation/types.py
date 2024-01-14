@@ -107,8 +107,10 @@ def validate_model_parameters_fittable(
         )
 
 
-class ModelParametersFittableICProvided(TypedDict, total=False):
-    """Optionally provided initial conditions (IC) for fittable model parameters."""
+class ModelParametersFittableProvided(TypedDict, total=False):
+    """
+    Optionally provided fittable model parameters, e.g., for initial conditions (IC).
+    """
 
     I_ph_A: float
     I_rs_A: float

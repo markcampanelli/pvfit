@@ -3,7 +3,7 @@ Calibrate single-diode model (SDM) from IEC 61853-1 matrix data (or similar) usi
 orthogonal distance regression (ODR).
 """
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TypedDict
 import warnings
 
 import numpy
@@ -17,27 +17,72 @@ from pvfit.common import (
     ODR_SUCCESS_CODES,
 )
 from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
-from pvfit.measurement.iv.types import IVFTData
-import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
+from pvfit.measurement.iv.types import IVPerformanceMatrix
 from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
-from pvfit.modeling.dc.single_diode.model.simple.types import (
-    ModelParameters,
-    ModelParametersFittableFixedProvided,
-    ModelParametersFittableICProvided,
-    ModelParametersUnfittable,
-    get_model_parameters_fittable_fixed_default,
-    validate_model_parameters_unfittable,
-)
+import pvfit.modeling.dc.single_diode.model.simple.types as types
 from pvfit.types import OdrOptions
+
+
+class ModelParametersFittable(TypedDict):
+    """Fittable model parameters."""
+
+    I_rs_A_0: bool
+    n_0: bool
+    R_s_Ohm_0: bool
+    G_p_S_0: bool
+    E_g_eV_0: bool
+
+
+class ModelParametersFittableProvided(TypedDict, total=False):
+    """
+    Optionally provided fittable model parameters, e.g., for initial conditions (IC).
+    """
+
+    I_rs_A_0: float
+    n_0: float
+    R_s_Ohm_0: float
+    G_p_S_0: float
+    E_g_eV_0: float
+
+
+class ModelParametersFittableFixed(TypedDict):
+    """Fittable model parameters to be fixed for parameter fits."""
+
+    I_rs_A_0: bool
+    n_0: bool
+    R_s_Ohm_0: bool
+    G_p_S_0: bool
+    E_g_eV_0: bool
+
+
+def get_model_parameters_fittable_fixed_default() -> ModelParametersFittableFixed:
+    """Get default ModelParametersFittableFixed (no parameter fixing)."""
+
+    return ModelParametersFittableFixed(
+        I_rs_A_0=False,
+        n_0=False,
+        R_s_Ohm_0=False,
+        G_p_S_0=False,
+        E_g_eV_0=False,
+    )
+
+
+class ModelParametersFittableFixedProvided(TypedDict, total=False):
+    """Optionally provided fittable model parameters to be fixed for parameter fits."""
+
+    I_rs_A_0: bool
+    n_0: bool
+    R_s_Ohm_0: bool
+    G_p_S_0: bool
+    E_g_eV_0: bool
 
 
 def fun(beta, x, N_s, T_K_0):
     """FIXME"""
-    I_rs_1_A_0 = numpy.exp(beta[0])
-    n_1_0 = beta[1]
+    I_rs_A_0 = numpy.exp(beta[0])
+    n_0 = beta[1]
     R_s_Ohm_0 = beta[2]
     G_p_S_0 = beta[3]
     E_g_eV_0 = beta[4]
@@ -48,19 +93,19 @@ def fun(beta, x, N_s, T_K_0):
     V_oc_V = x[3, :]
     T_K = x[4, :]
 
-    scaled_thermal_voltage_V = (N_s * n_1_0 * k_B_J_per_K * T_K) / q_C
+    scaled_thermal_voltage_V = (N_s * n_0 * k_B_J_per_K * T_K) / q_C
 
     # Reverse-saturation current.
-    I_rs_1_A = (
-        I_rs_1_A_0
+    I_rs_A = (
+        I_rs_A_0
         * (T_K / T_K_0) ** 3
-        * numpy.exp(E_g_eV_0 / (n_1_0 * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
+        * numpy.exp(E_g_eV_0 / (n_0 * k_B_eV_per_K) * (1 / T_K_0 - 1 / T_K))
     )
 
     # Photocurrent from short-circuit point.
     V_diode_sc_V = I_sc_A * R_s_Ohm_0
     I_ph_A = (
-        I_rs_1_A * numpy.expm1(V_diode_sc_V / scaled_thermal_voltage_V)
+        I_rs_A * numpy.expm1(V_diode_sc_V / scaled_thermal_voltage_V)
         + G_p_S_0 * V_diode_sc_V
         + I_sc_A
     )
@@ -69,7 +114,7 @@ def fun(beta, x, N_s, T_K_0):
     V_diode_mp_V = V_mp_V + I_mp_A * R_s_Ohm_0
     y0 = (
         I_ph_A
-        - I_rs_1_A * numpy.expm1(V_diode_mp_V / scaled_thermal_voltage_V)
+        - I_rs_A * numpy.expm1(V_diode_mp_V / scaled_thermal_voltage_V)
         - G_p_S_0 * V_diode_mp_V
         - I_mp_A
     )
@@ -78,14 +123,14 @@ def fun(beta, x, N_s, T_K_0):
     y1 = (
         (I_mp_A * R_s_Ohm_0 - V_mp_V)
         * (
-            I_rs_1_A
+            I_rs_A
             / scaled_thermal_voltage_V
             * numpy.exp(V_diode_mp_V / scaled_thermal_voltage_V)
             + G_p_S_0
         )
         + I_mp_A
     ) / (
-        I_rs_1_A
+        I_rs_A
         / scaled_thermal_voltage_V
         * numpy.exp(V_diode_mp_V / scaled_thermal_voltage_V)
         + G_p_S_0 * R_s_Ohm_0
@@ -96,7 +141,7 @@ def fun(beta, x, N_s, T_K_0):
     V_diode_oc_V = V_oc_V
     y2 = (
         I_ph_A
-        - I_rs_1_A * numpy.expm1(V_diode_oc_V / scaled_thermal_voltage_V)
+        - I_rs_A * numpy.expm1(V_diode_oc_V / scaled_thermal_voltage_V)
         - G_p_S_0 * V_diode_oc_V
     )
 
@@ -105,10 +150,10 @@ def fun(beta, x, N_s, T_K_0):
 
 def fit(
     *,
-    ivft_data: IVFTData,
-    model_parameters_unfittable: ModelParametersUnfittable,
+    iv_performance_matrix: IVPerformanceMatrix,
+    model_parameters_unfittable: types.ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
-        ModelParametersFittableICProvided
+        ModelParametersFittableProvided
     ] = None,
     model_parameters_fittable_fixed_provided: Optional[
         ModelParametersFittableFixedProvided
@@ -116,7 +161,7 @@ def fit(
     material: str = "x-Si",
     normalize_iv_curves: bool = True,
     odr_options: Optional[OdrOptions] = None,
-) -> Tuple[ModelParameters, scipy.odr.ODR]:
+) -> Tuple[types.ModelParameters, scipy.odr.ODR]:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 6-parameter
     equivalent-circuit single-diode model (SDM) given current-voltage (I-V) curve
@@ -125,17 +170,23 @@ def fit(
 
     FIXME Add inputs and outputs.
     """
-    validate_model_parameters_unfittable(
+    types.validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
     )
     N_s = model_parameters_unfittable["N_s"]
     T_degC_0 = model_parameters_unfittable["T_degC_0"]
     T_K_0 = convert_temperature(T_degC_0, "Celsius", "Kelvin")
 
+    if model_parameters_fittable_ic_provided is None:
+        model_parameters_fittable_ic_provided = ModelParametersFittableProvided()
+
     model_parameters_fittable_ic = estimate_model_parameters_fittable_ic(
-        ivft_data=ivft_data,
+        ivft_data=iv_performance_matrix.ivft_data,
         model_parameters_unfittable=model_parameters_unfittable,
-        model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided,
+        model_parameters_fittable_ic_provided=types.ModelParametersFittableProvided(
+            I_sc_A_0=iv_performance_matrix.I_sc_A_0,
+            **model_parameters_fittable_ic_provided,
+        ),
         material=material,
     )
 
@@ -149,11 +200,11 @@ def fit(
     data = scipy.odr.Data(
         numpy.vstack(
             (
-                I_sc_A,
-                I_mp_A,
-                V_mp_V,
-                V_oc_V,
-                convert_temperature(T_degC, "Celsius", "Kelvin"),
+                iv_performance_matrix.I_sc_A,
+                iv_performance_matrix.I_mp_A,
+                iv_performance_matrix.V_mp_V,
+                iv_performance_matrix.V_oc_V,
+                iv_performance_matrix.T_K,
             )
         ),
         3,
@@ -161,38 +212,17 @@ def fit(
 
     model = scipy.odr.Model(fun, implicit=True, extra_args=(N_s, T_K_0))
 
-    # Prepare initial conditions.
-    # FIXME Use constants for STC values.
-    I_sc_A_0 = I_sc_A[numpy.logical_and(G_W_per_m2 == 1000, T_degC == 25)].item()
-    V_V_matrix = numpy.concatenate((numpy.zeros_like(I_sc_A), V_mp_V, V_oc_V))
-    I_A_matrix = numpy.concatenate((I_sc_A, I_mp_A, numpy.zeros_like(V_oc_V)))
-    F_matrix = numpy.concatenate((I_sc_A, I_sc_A, I_sc_A)) / I_sc_A_0
-    T_degC_matrix = numpy.concatenate((T_degC, T_degC, T_degC))
-
-    fit_prep_result = fit_prep(
-        V_V=V_V_matrix,
-        I_A=I_A_matrix,
-        F=F_matrix,
-        T_degC=T_degC_matrix,
-        N_s=N_s,
-        T_degC_0=T_degC_0,
-        material=material,
-        model_params_ic=model_params_ic,
-        model_params_fixed=model_params_fixed,
-    )
-
     beta0 = numpy.array(
         [
-            numpy.log(fit_prep_result["model_params_ic"]["I_rs_1_A_0"]),
-            fit_prep_result["model_params_ic"]["n_1_0"],
-            fit_prep_result["model_params_ic"]["R_s_Ohm_0"],
-            fit_prep_result["model_params_ic"]["G_p_S_0"],
-            fit_prep_result["model_params_ic"]["E_g_eV_0"],
+            numpy.log(model_parameters_fittable_ic["I_rs_A_0"]),
+            model_parameters_fittable_ic["n_0"],
+            model_parameters_fittable_ic["R_s_Ohm_0"],
+            model_parameters_fittable_ic["G_p_S_0"],
+            model_parameters_fittable_ic["E_g_eV_0"],
         ]
     )
 
     # Check for provided fit parameters to be fixed, and assign default if None.
-    # FIXME I_sc_A_0 Is not used in this fit, but it is in the TypedDict.
     model_parameters_fittable_fixed = get_model_parameters_fittable_fixed_default()
     if model_parameters_fittable_fixed_provided is not None:
         model_parameters_fittable_fixed.update(model_parameters_fittable_fixed_provided)
@@ -259,12 +289,11 @@ def fit(
             recompute = True
 
     # Transform back fit values.
-    model_parameters = ModelParameters(
-        N_s=N_s,
-        T_degC_0=T_degC_0,
-        I_sc_A_0=I_sc_A_0,
-        I_rs_1_A_0=numpy.exp(output.beta[0]),
-        n_1_0=output.beta[1],
+    model_parameters = types.ModelParameters(
+        **model_parameters_unfittable,
+        I_sc_A_0=iv_performance_matrix.I_sc_A_0,
+        I_rs_A_0=numpy.exp(output.beta[0]),
+        n_0=output.beta[1],
         R_s_Ohm_0=output.beta[2],
         G_p_S_0=output.beta[3],
         E_g_eV_0=output.beta[4],

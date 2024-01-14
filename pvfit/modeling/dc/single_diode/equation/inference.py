@@ -25,7 +25,7 @@ from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParameters,
     ModelParametersFittable,
     ModelParametersFittableFixedProvided,
-    ModelParametersFittableICProvided,
+    ModelParametersFittableProvided,
     ModelParametersUnfittable,
     get_model_parameters_fittable_fixed_default,
     validate_model_parameters_fittable,
@@ -39,14 +39,14 @@ def fit(
     iv_curve: IVCurve,
     model_parameters_unfittable: ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
-        ModelParametersFittableICProvided
+        ModelParametersFittableProvided
     ] = None,
     model_parameters_fittable_fixed_provided: Optional[
         ModelParametersFittableFixedProvided
     ] = None,
     normalize_iv_curve: bool = True,
     odr_options: Optional[OdrOptions] = None,
-) -> Tuple[ModelParameters, scipy.odr.ODR]:
+) -> Tuple[ModelParameters, ModelParametersFittable, scipy.odr.ODR]:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 5-parameter
     equivalent-circuit single-diode equation (SDE) given current-voltage (I-V) curve
@@ -73,6 +73,8 @@ def fit(
     -------
     model_parameters
         Model parameters from fit
+    model_parameters_fittable_ic
+        Model parameters from fit's initial-condition (IC) calculation
     odr
         ODR solver result (for a transformed problem)
     """
@@ -103,7 +105,7 @@ def fit(
         get_scaled_thermal_voltage(**model_parameters_unfittable) / V_V_scale
     )
 
-    def current_sum_at_diode_node(beta, x):
+    def I_sum_diode_anode(beta, x):
         """The scaled SDE model to fit."""
         I_ph = beta[0]
         I_rs = numpy.exp(beta[1])
@@ -123,7 +125,7 @@ def fit(
             - I
         )
 
-    model = scipy.odr.Model(current_sum_at_diode_node, implicit=True)
+    model = scipy.odr.Model(I_sum_diode_anode, implicit=True)
 
     beta0 = numpy.array(
         [
@@ -215,5 +217,6 @@ def fit(
 
     return (
         ModelParameters(**model_parameters_unfittable, **model_parameters_fittable),
+        model_parameters_fittable_ic,
         odr,
     )

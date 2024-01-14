@@ -120,8 +120,10 @@ def validate_model_parameters_fittable(
         )
 
 
-class ModelParametersFittableICProvided(TypedDict, total=False):
-    """Optionally provided initial conditions (IC) for fittable model parameters."""
+class ModelParametersFittableProvided(TypedDict, total=False):
+    """
+    Optionally provided fittable model parameters, e.g., for initial conditions (IC).
+    """
 
     I_sc_A_0: float
     I_rs_A_0: float
@@ -143,7 +145,7 @@ class ModelParametersFittableFixed(TypedDict):
 
 
 def get_model_parameters_fittable_fixed_default() -> ModelParametersFittableFixed:
-    """Get default FittableModelParametersFixed (no parameter fixing)."""
+    """Get default ModelParametersFittableFixed (no parameter fixing)."""
 
     return ModelParametersFittableFixed(
         I_sc_A_0=False,

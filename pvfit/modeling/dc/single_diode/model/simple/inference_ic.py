@@ -8,13 +8,15 @@ from typing import Optional
 
 import numpy
 
+from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
 from pvfit.measurement.iv.types import IVCurve, IVFTData
 from pvfit.modeling.dc.common import MATERIALS
 import pvfit.modeling.dc.single_diode.equation.inference as sde_inf
+import pvfit.modeling.dc.single_diode.equation.inference_ic as sde_inf_ic
 import pvfit.modeling.dc.single_diode.equation.types as sde_types
 from pvfit.modeling.dc.single_diode.model.simple.types import (
     ModelParametersFittable,
-    ModelParametersFittableICProvided,
+    ModelParametersFittableProvided,
     ModelParametersUnfittable,
     validate_model_parameters_fittable,
     validate_model_parameters_unfittable,
@@ -26,7 +28,7 @@ def estimate_model_parameters_fittable_ic(
     ivft_data: IVFTData,
     model_parameters_unfittable: ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
-        ModelParametersFittableICProvided
+        ModelParametersFittableProvided
     ] = None,
     material: str = "x-Si",
 ) -> ModelParametersFittable:
@@ -54,10 +56,10 @@ def estimate_model_parameters_fittable_ic(
     )
 
     if model_parameters_fittable_ic_provided is None:
-        model_parameters_fittable_ic_provided = ModelParametersFittableICProvided()
+        model_parameters_fittable_ic_provided = ModelParametersFittableProvided()
 
     I_sc_A_0_ic = model_parameters_fittable_ic_provided.get("I_sc_A_0", None)
-    I_rs_A_0_ic = model_parameters_fittable_ic_provided.get("I_sc_A_0", None)
+    I_rs_A_0_ic = model_parameters_fittable_ic_provided.get("I_rs_A_0", None)
     n_0_ic = model_parameters_fittable_ic_provided.get("n_0", None)
     R_s_Ohm_0_ic = model_parameters_fittable_ic_provided.get("R_s_Ohm_0", None)
     G_p_S_0_ic = model_parameters_fittable_ic_provided.get("G_p_S_0", None)
@@ -85,6 +87,7 @@ def estimate_model_parameters_fittable_ic(
                 V_V=ivft_data.V_V[ref_indices],
                 I_A=ivft_data.I_A[ref_indices] / ivft_data.F[ref_indices],
             )
+            iv_curve_parameters_0 = estimate_iv_curve_parameters(iv_curve=iv_curve_0)
         else:
             raise NotImplementedError(
                 "cannot estimate initial conditions with fewer than three distinct I-V "
@@ -97,7 +100,7 @@ def estimate_model_parameters_fittable_ic(
         )
 
         model_parameters_fittable_ic_provided_sde_0 = (
-            sde_types.ModelParametersFittableICProvided()
+            sde_types.ModelParametersFittableProvided()
         )
 
         if I_sc_A_0_ic is not None:
@@ -117,27 +120,27 @@ def estimate_model_parameters_fittable_ic(
 
         # Use SDE fit at RC to get ICs for all parameters except E_g_eV_0. Try to
         # respect user-selected ICs, but without fixing for better accomodation.
-        model_parameters_sde_0, _ = sde_inf.fit(
-            iv_curve=iv_curve_0,
+        model_parameters_sde_ic_0 = sde_inf_ic.estimate_model_parameters_fittable_ic(
+            iv_curve_parameters=iv_curve_parameters_0,
             model_parameters_unfittable=model_parameters_unfittable_sde,
-            model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_sde_0,
+            # model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_sde_0,
         )
 
         # Update IC's, some of which may have been passed through.
         if I_sc_A_0_ic is None:
-            I_sc_A_0_ic = model_parameters_sde_0["I_ph_A"]
+            I_sc_A_0_ic = model_parameters_sde_ic_0["I_ph_A"]
 
         if I_rs_A_0_ic is None:
-            I_rs_A_0_ic = model_parameters_sde_0["I_rs_A"]
+            I_rs_A_0_ic = model_parameters_sde_ic_0["I_rs_A"]
 
         if n_0_ic is None:
-            n_0_ic = model_parameters_sde_0["n"]
+            n_0_ic = model_parameters_sde_ic_0["n"]
 
-        if R_s_Ohm_0_ic is not None:
-            R_s_Ohm_0_ic = model_parameters_sde_0["R_s_Ohm"]
+        if R_s_Ohm_0_ic is None:
+            R_s_Ohm_0_ic = model_parameters_sde_ic_0["R_s_Ohm"]
 
-        if G_p_S_0_ic is not None:
-            G_p_S_0_ic = model_parameters_sde_0["G_p_S"]
+        if G_p_S_0_ic is None:
+            G_p_S_0_ic = model_parameters_sde_ic_0["G_p_S"]
 
     # Initial condition for E_g_eV_0.
     if E_g_eV_0_ic is None:
