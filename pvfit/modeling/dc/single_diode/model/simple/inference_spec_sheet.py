@@ -333,7 +333,9 @@ def fit(
         "T_degC_0": T_degC_0,
     }
 
-    iv_params_fit_0 = sde_sim.iv_curve_parameters(F=1, T_degC=T_degC_0, **model_params_fit)
+    iv_params_fit_0 = sde_sim.iv_curve_parameters(
+        F=1, T_degC=T_degC_0, **model_params_fit
+    )
     iv_params_fit_0["dI_sc_dT_A_per_degC_0"] = dI_sc_dT_A_per_degC_0
     iv_params_fit_0["dP_mp_dT_W_per_degC_0"] = dP_mp_dT_W_per_degC_0
     iv_params_fit_0["dV_oc_dT_V_per_degC_0"] = dV_oc_dT_V_per_degC_0
