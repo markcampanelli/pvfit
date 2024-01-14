@@ -7,11 +7,15 @@ import numpy
 from scipy.constants import convert_temperature
 from scipy.optimize import least_squares
 
-from pvfit.common.constants import T_degC_stc, k_B_J_per_K, k_B_eV_per_K, q_C, materials
-from pvfit.modeling.inference.dc.single_diode.equation import fit_prep
-from pvfit.modeling.dc.single_diode.simulation.equation import P_mp
-from pvfit.modeling.dc.single_diode.simulation.model import auxiliary_equations
-import pvfit.modeling.dc.single_diode.simulation.model as sim_sdm
+from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
+from pvfit.measurement.iv.types import FTData
+from pvfit.modeling.dc.common import MATERIALS, T_degC_stc
+import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
+from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
+    estimate_model_parameters_fittable_ic,
+)
+from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
 
 delta_T_degC = 0.1
 
@@ -32,23 +36,23 @@ def fun(
     """Computes all the simultaneous constraints produced by SDM at RC."""
 
     # Everything measured at RC, where F=1 and T=T_degC_0.
-    I_rs_1_A_0 = numpy.exp(x[0])
-    n_1_0 = x[1]
+    I_rs_A_0 = numpy.exp(x[0])
+    n_0 = x[1]
     R_s_Ohm_0 = x[2]
     G_p_S_0 = x[3]
     E_g_eV_0 = x[4]
 
     T_K_0 = convert_temperature(T_degC_0, "Celsius", "Kelvin")
-    scaled_thermal_voltage_V_0 = N_s * n_1_0 * k_B_J_per_K * T_K_0 / q_C
+    scaled_thermal_voltage_V_0 = N_s * n_0 * k_B_J_per_K * T_K_0 / q_C
 
     # Derivative of reverse-saturation current w.r.t. temperature at RC.
-    dI_rs_1_dT_A_per_K_0 = (I_rs_1_A_0 / T_K_0) * (
-        3 + E_g_eV_0 / (n_1_0 * k_B_eV_per_K * T_K_0)
+    dI_rs_1_dT_A_per_K_0 = (I_rs_A_0 / T_K_0) * (
+        3 + E_g_eV_0 / (n_0 * k_B_eV_per_K * T_K_0)
     )
 
     # Photocurrent at RC.
     I_ph_A_0 = (
-        I_rs_1_A_0 * numpy.expm1((I_sc_A_0 * R_s_Ohm_0) / scaled_thermal_voltage_V_0)
+        I_rs_A_0 * numpy.expm1((I_sc_A_0 * R_s_Ohm_0) / scaled_thermal_voltage_V_0)
         + G_p_S_0 * I_sc_A_0 * R_s_Ohm_0
         + I_sc_A_0
     )
@@ -57,7 +61,7 @@ def fun(
     dI_ph_dT_A_per_K_0 = (
         dI_rs_1_dT_A_per_K_0
         * numpy.expm1((I_sc_A_0 * R_s_Ohm_0) / scaled_thermal_voltage_V_0)
-        + ((I_rs_1_A_0 * R_s_Ohm_0) / (scaled_thermal_voltage_V_0 * T_K_0))
+        + ((I_rs_A_0 * R_s_Ohm_0) / (scaled_thermal_voltage_V_0 * T_K_0))
         * numpy.exp((I_sc_A_0 * R_s_Ohm_0) / scaled_thermal_voltage_V_0)
         * (T_K_0 * dI_sc_dT_A_per_K_0 - I_sc_A_0)
         + dI_sc_dT_A_per_K_0 * (G_p_S_0 * R_s_Ohm_0 + 1)
@@ -67,13 +71,13 @@ def fun(
     V_diode_mp_V_0 = V_mp_V_0 + I_mp_A_0 * R_s_Ohm_0
     y_0 = (
         I_ph_A_0
-        - I_rs_1_A_0 * numpy.expm1(V_diode_mp_V_0 / scaled_thermal_voltage_V_0)
+        - I_rs_A_0 * numpy.expm1(V_diode_mp_V_0 / scaled_thermal_voltage_V_0)
         - G_p_S_0 * V_diode_mp_V_0
     ) - I_mp_A_0
 
     # Maximum attained at maximum-power point.
     y_1 = (V_mp_V_0 - I_mp_A_0 * R_s_Ohm_0) * (
-        (I_rs_1_A_0 / scaled_thermal_voltage_V_0)
+        (I_rs_A_0 / scaled_thermal_voltage_V_0)
         * numpy.exp(V_diode_mp_V_0 / scaled_thermal_voltage_V_0)
         + G_p_S_0
     ) - I_mp_A_0
@@ -81,25 +85,29 @@ def fun(
     # Open-circuit voltage point.
     y_2 = (
         I_ph_A_0
-        - I_rs_1_A_0 * numpy.expm1(V_oc_V_0 / scaled_thermal_voltage_V_0)
+        - I_rs_A_0 * numpy.expm1(V_oc_V_0 / scaled_thermal_voltage_V_0)
         - V_oc_V_0 * G_p_S_0
     )
 
     # Maximum-power power temperature coefficient.
-    maximum_powers = P_mp(
-        **auxiliary_equations(
-            F=1,
-            T_degC=numpy.array([T_degC_0 - delta_T_degC, T_degC_0 + delta_T_degC]),
-            N_s=N_s,
-            T_degC_0=T_degC_0,
-            I_sc_A_0=I_sc_A_0,
-            I_rs_1_A_0=I_rs_1_A_0,
-            n_1_0=n_1_0,
-            R_s_Ohm_0=R_s_Ohm_0,
-            G_p_S_0=G_p_S_0,
-            E_g_eV_0=E_g_eV_0,
+    maximum_powers = sde_sim.P_mp(
+        model_parameters=sdm_ae.compute_sde_model_parameters(
+            ft_data=FTData(
+                F=1,
+                T_degC=numpy.array([T_degC_0 - delta_T_degC, T_degC_0 + delta_T_degC]),
+            ),
+            model_parameters=ModelParameters(
+                N_s=N_s,
+                T_degC_0=T_degC_0,
+                I_sc_A_0=I_sc_A_0,
+                I_rs_A_0=I_rs_A_0,
+                n_0=n_0,
+                R_s_Ohm_0=R_s_Ohm_0,
+                G_p_S_0=G_p_S_0,
+                E_g_eV_0=E_g_eV_0,
+            ),
         )
-    )["P_mp_W"]
+    )[0]
     y_3 = (
         (maximum_powers[1] - maximum_powers[0]) / (2 * delta_T_degC)
     ) - dP_mp_dT_W_per_K_0
@@ -109,11 +117,11 @@ def fun(
         (
             dI_ph_dT_A_per_K_0
             - dI_rs_1_dT_A_per_K_0 * numpy.expm1(V_oc_V_0 / scaled_thermal_voltage_V_0)
-            + ((I_rs_1_A_0 * V_oc_V_0) / (scaled_thermal_voltage_V_0 * T_K_0))
+            + ((I_rs_A_0 * V_oc_V_0) / (scaled_thermal_voltage_V_0 * T_K_0))
             * numpy.exp(V_oc_V_0 / scaled_thermal_voltage_V_0)
         )
         / (
-            (I_rs_1_A_0 / scaled_thermal_voltage_V_0)
+            (I_rs_A_0 / scaled_thermal_voltage_V_0)
             * numpy.exp(V_oc_V_0 / scaled_thermal_voltage_V_0)
             + G_p_S_0
         )
@@ -205,8 +213,8 @@ def fit(
     )
 
     # Initial condition for E_g_eV_0.
-    if material in materials:
-        fit_prep_result["model_params_ic"]["E_g_eV"] = materials[material]["E_g_eV_stc"]
+    if material in MATERIALS:
+        fit_prep_result["model_params_ic"]["E_g_eV"] = MATERIALS[material]["E_g_eV_stc"]
     else:
         raise ValueError(
             "unrecognized material for determining initial condition for material band "
@@ -287,7 +295,7 @@ def fit(
         + G_p_S_0 * R_s_Ohm_0
         + 1
     )
-    maximum_powers = P_mp(
+    maximum_powers = sde_sim.P_mp(
         **auxiliary_equations(
             F=1,
             T_degC=numpy.array([T_degC_0 - delta_T_degC, T_degC_0 + delta_T_degC]),
@@ -325,7 +333,7 @@ def fit(
         "T_degC_0": T_degC_0,
     }
 
-    iv_params_fit_0 = sim_sdm.iv_params(F=1, T_degC=T_degC_0, **model_params_fit)
+    iv_params_fit_0 = sde_sim.iv_curve_parameters(F=1, T_degC=T_degC_0, **model_params_fit)
     iv_params_fit_0["dI_sc_dT_A_per_degC_0"] = dI_sc_dT_A_per_degC_0
     iv_params_fit_0["dP_mp_dT_W_per_degC_0"] = dP_mp_dT_W_per_degC_0
     iv_params_fit_0["dV_oc_dT_V_per_degC_0"] = dV_oc_dT_V_per_degC_0
@@ -333,7 +341,7 @@ def fit(
     return {
         **fit_prep_result,
         "model_params_fit": model_params_fit,
-        "I_sum_A_fit": sim_sdm.current_sum_at_diode_node(
+        "I_sum_A_fit": sde_sim.I_sum_diode_anode_at_I_V(
             V_V=V_V_vec,
             I_A=I_A_vec,
             F=1,

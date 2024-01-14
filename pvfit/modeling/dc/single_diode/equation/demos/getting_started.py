@@ -405,9 +405,9 @@ model_parameters_unfittable = ModelParametersUnfittable(
     T_degC=25.0,
 )
 
-# Fit model parameters, ignoring second return value, which is the low-level
-# ODR solver result for a transformed problem.
-model_parameters, _ = sde_inf.fit(
+# Fit model parameters, ignoring additional return values, which are initial condition
+# used and low-level ODR solver result for a transformed problem.
+model_parameters, _, _ = sde_inf.fit(
     iv_curve=iv_curve,
     model_parameters_unfittable=model_parameters_unfittable,
 )
