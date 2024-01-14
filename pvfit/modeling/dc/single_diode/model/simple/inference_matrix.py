@@ -11,7 +11,7 @@ from scipy.constants import convert_temperature
 import scipy.odr
 
 
-from pvfit.common import (git
+from pvfit.common import (
     ODR_NOT_FULL_RANK_ERROR_CODE,
     ODR_NUMERICAL_ERROR_CODE,
     ODR_SUCCESS_CODES,
