@@ -10,7 +10,6 @@ from matplotlib import pyplot
 import numpy
 
 from pvfit.measurement.iv.types import FTData
-from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, T_degC_stc
 import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.model.demos.data as data
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
@@ -20,60 +19,23 @@ from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
 # By convention, variable names for numeric values include the units.
 
 N_s = data.HIT_MODULE["N_s"]
-matrix = data.HIT_MODULE["matrix"]
+material = data.HIT_MODULE["material"]
+iv_performance_matrix = data.HIT_MODULE["matrix"]
+ivft_data = iv_performance_matrix.ivft_data
 
 print(f"Performance matrix for HIT module with {N_s} cells in series:")
-print(matrix)
+print(iv_performance_matrix)
 
-# We will flatten all channels from data table into vectors for model fitting.
-V_V_data = numpy.full(0, numpy.nan)
-I_A_data = numpy.copy(V_V_data)
-F_data = numpy.copy(V_V_data)
-T_degC_data = numpy.copy(V_V_data)
-G_data_minimal = numpy.copy(V_V_data)
-F_data_minimal = numpy.copy(V_V_data)
-T_degC_data_minimal = numpy.copy(V_V_data)
-
-# Pick out Isc at STC, which is needed to determine F for each I-V curve.
-I_sc_A_0_meas_row_idx = numpy.logical_and(
-    matrix.loc[:, "T_degC"] == T_degC_stc,
-    matrix.loc[:, "G_W_per_m2"] == G_hemi_W_per_m2_stc,
-)
-I_sc_A_0_meas = matrix.loc[I_sc_A_0_meas_row_idx, "I_sc_A"].iloc[0]
-
-print("I_sc_A_0_meas", I_sc_A_0_meas)
-
-# Ordering of the I-V-F-T points does not matter, as long as it's consistent
-# between vectors.
-for index, row in matrix.iterrows():
-    V_V_data = numpy.concatenate(
-        (V_V_data, numpy.array([0.0, row["V_mp_V"], row["V_oc_V"]]))
-    )
-    I_A_data = numpy.concatenate(
-        (I_A_data, numpy.array([row["I_sc_A"], row["I_mp_A"], 0.0]))
-    )
-    # Use effective irradiance ratio F, not the ratio of irradiances.
-    F = row["I_sc_A"] / I_sc_A_0_meas
-    F_data = numpy.concatenate((F_data, numpy.full(3, F)))
-    T_degC_data = numpy.concatenate((T_degC_data, numpy.full(3, row["T_degC"])))
-    F_data_minimal = numpy.concatenate((F_data_minimal, numpy.array([F])))
-    T_degC_data_minimal = numpy.concatenate(
-        (T_degC_data_minimal, numpy.array([row["T_degC"]]))
-    )
-    G_data_minimal = numpy.concatenate(
-        (G_data_minimal, numpy.array([row["G_W_per_m2"]]))
-    )
-
-print(f"I_sc_A_0_meas = {I_sc_A_0_meas}")
-print(f"I_A_data =\n{I_A_data}")
-print(f"V_V_data =\n{V_V_data}")
-print(f"F_data =\n{F_data}")
-print(f"T_degC_data =\n{T_degC_data}")
+print(f"I_sc_A_0_data = {iv_performance_matrix.I_sc_A_0}")
+print(f"I_A_data =\n{ivft_data.I_A}")
+print(f"V_V_data =\n{ivft_data.V_V}")
+print(f"F_data =\n{ivft_data.F}")
+print(f"T_degC_data =\n{ivft_data.T_degC}")
 
 # TODO Demonstrate how to fit these parameters to data.
 model_parameters_fit = ModelParameters(
     N_s=N_s,
-    T_degC_0=T_degC_stc,
+    T_degC_0=iv_performance_matrix.T_degC_0,
     I_sc_A_0=5.531975277850156,
     I_rs_A_0=7.739216483430394e-11,
     n_0=1.086322575846391,
@@ -85,7 +47,8 @@ model_parameters_fit = ModelParameters(
 # Compute parameters for I-V curve at STC.
 iv_curve_parameters_0 = sde_sim.iv_curve_parameters(
     model_parameters=ae.compute_sde_model_parameters(
-        ft_data=FTData(F=1, T_degC=T_degC_stc), model_parameters=model_parameters_fit
+        ft_data=FTData(F=1, T_degC=iv_performance_matrix.T_degC_0),
+        model_parameters=model_parameters_fit,
     )
 )
 
@@ -127,16 +90,16 @@ print(f"P_mp_W_series = {list(P_mp_W_series)}")
 # Now make a nice plot.
 fig, ax = pyplot.subplots(figsize=(8, 6))
 # Plot the data fits.
-for idx, (F, T_degC) in enumerate(zip(F_data_minimal, T_degC_data_minimal)):
+for idx, (F, T_degC) in enumerate(zip(iv_performance_matrix.F, iv_performance_matrix.T_degC)):
     # Plot Isc, Pmp, and Voc with same colors as fit lines.
     color = next(ax._get_lines.prop_cycler)["color"]
     ax.plot(
-        V_V_data[3 * idx : 3 * idx + 3],
-        I_A_data[3 * idx : 3 * idx + 3],
+        ivft_data.V_V[3 * idx : 3 * idx + 3],
+        ivft_data.I_A[3 * idx : 3 * idx + 3],
         "o",
         color=color,
     )
-    V_V = numpy.linspace(0, V_V_data[3 * idx + 2], 101)
+    V_V = numpy.linspace(0, ivft_data.V_V[3 * idx + 2], 101)
     ax.plot(
         V_V,
         sde_sim.I_at_V(

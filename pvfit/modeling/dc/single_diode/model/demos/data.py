@@ -8,6 +8,7 @@ from io import StringIO
 
 import pandas
 
+from pvfit.measurement.iv.types import IVPerformanceMatrix
 from pvfit.modeling.dc.common import Material
 
 
@@ -15,12 +16,9 @@ from pvfit.modeling.dc.common import Material
 # irradiance and temperature. See https://www.nrel.gov/docs/fy14osti/61610.pdf and
 # bill.marion@nrel.gov for the complete data set.
 
-HIT_MODULE = {
-    "N_s": 72,
-    "material": Material.xSi,
-    "matrix": pandas.read_csv(
-        StringIO(
-            """T_degC,G_W_per_m2,I_sc_A,V_oc_V,I_mp_A,V_mp_V,P_mp_W
+matrix_data = pandas.read_csv(
+    StringIO(
+        """T_degC,G_W_per_m2,I_sc_A,V_oc_V,I_mp_A,V_mp_V,P_mp_W
 15,100,0.558,46.74,0.51,40.1,20.47
 25,100,0.57,45.37,0.526,38.39,20.19
 15,200,1.111,48.23,1.013,41.7,42.25
@@ -39,6 +37,20 @@ HIT_MODULE = {
 25,1100,6.079,50.39,5.632,41.52,233.84
 50,1100,6.101,47.11,5.639,37.87,213.58
 65,1100,6.129,45.16,5.604,35.99,201.73"""
-        )
-    ),
+    )
+)
+
+iv_performance_matrix = IVPerformanceMatrix(
+    I_sc_A=matrix_data["I_sc_A"].to_numpy(),
+    I_mp_A=matrix_data["I_mp_A"].to_numpy(),
+    V_mp_V=matrix_data["V_mp_V"].to_numpy(),
+    V_oc_V=matrix_data["V_oc_V"].to_numpy(),
+    G_W_per_m2=matrix_data["G_W_per_m2"].to_numpy(),
+    T_degC=matrix_data["T_degC"].to_numpy(),
+)
+
+HIT_MODULE = {
+    "N_s": 72,
+    "material": Material.xSi,
+    "matrix": iv_performance_matrix,
 }

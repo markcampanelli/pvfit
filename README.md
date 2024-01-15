@@ -19,10 +19,11 @@ finalized on the `master` branch. Likewise, the documentation badly needs updati
 
 PVfit is currently focused on direct-current (DC) PV module performance measurement and
 modeling. Following the standardized technical approach of most accredited PV
-calibration laboratories for measuring I-V curves using PV reference devices, PVfit
-makes considerable use of the effective irradiance ratio
+calibration laboratories for measuring current-voltage (I-V) curves using PV reference
+devices, PVfit makes considerable use of the effective irradiance ratio
 (F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the *effective* irradiance on a PV
-device, in contrast to the common use of MET-station data
+device, in contrast to the common use of MET-station data. PVfit also supports inference
+of effective-irradiance ratio and cell temperature directly from I-V data, see
 ([poster](https://pvpmc.sandia.gov/download/7302/)). See
 [this paper](https://doi.org/10.1002/ese3.190) for a more detailed introduction. Email
 [Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
