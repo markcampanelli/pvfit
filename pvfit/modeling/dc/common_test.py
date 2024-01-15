@@ -27,35 +27,51 @@ def test_G_hemi_W_per_m2_stc():
 
 
 def test_materials():
-    assert isinstance(common.MATERIALS_INFO["CIGS"]["E_g_eV_stc"], float)
-    numpy.testing.assert_array_equal(common.MATERIALS_INFO["CIGS"]["E_g_eV_stc"], 1.15)
-
-    assert isinstance(common.MATERIALS_INFO["CIS"]["E_g_eV_stc"], float)
-    numpy.testing.assert_array_equal(common.MATERIALS_INFO["CIS"]["E_g_eV_stc"], 1.010)
-
-    assert isinstance(common.MATERIALS_INFO["CdTe"]["E_g_eV_stc"], float)
-    numpy.testing.assert_array_equal(common.MATERIALS_INFO["CdTe"]["E_g_eV_stc"], 1.475)
-
-    assert isinstance(common.MATERIALS_INFO["GaAs"]["E_g_eV_stc"], float)
-    numpy.testing.assert_array_equal(common.MATERIALS_INFO["GaAs"]["E_g_eV_stc"], 1.43)
-
-    assert isinstance(common.MATERIALS_INFO["mono-Si"]["E_g_eV_stc"], float)
+    assert isinstance(common.MATERIALS_INFO[common.Material.CIGS]["E_g_eV_stc"], float)
     numpy.testing.assert_array_equal(
-        common.MATERIALS_INFO["mono-Si"]["E_g_eV_stc"], 1.121
+        common.MATERIALS_INFO[common.Material.CIGS]["E_g_eV_stc"], 1.15
     )
 
-    assert isinstance(common.MATERIALS_INFO["multi-Si"]["E_g_eV_stc"], float)
+    assert isinstance(common.MATERIALS_INFO[common.Material.CIS]["E_g_eV_stc"], float)
     numpy.testing.assert_array_equal(
-        common.MATERIALS_INFO["multi-Si"]["E_g_eV_stc"], 1.121
+        common.MATERIALS_INFO[common.Material.CIS]["E_g_eV_stc"], 1.010
     )
 
-    assert isinstance(common.MATERIALS_INFO["poly-Si"]["E_g_eV_stc"], float)
+    assert isinstance(common.MATERIALS_INFO[common.Material.CdTe]["E_g_eV_stc"], float)
     numpy.testing.assert_array_equal(
-        common.MATERIALS_INFO["poly-Si"]["E_g_eV_stc"], 1.121
+        common.MATERIALS_INFO[common.Material.CdTe]["E_g_eV_stc"], 1.475
     )
 
-    assert isinstance(common.MATERIALS_INFO["x-Si"]["E_g_eV_stc"], float)
-    numpy.testing.assert_array_equal(common.MATERIALS_INFO["x-Si"]["E_g_eV_stc"], 1.121)
+    assert isinstance(common.MATERIALS_INFO[common.Material.GaAs]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(
+        common.MATERIALS_INFO[common.Material.GaAs]["E_g_eV_stc"], 1.43
+    )
+
+    assert isinstance(
+        common.MATERIALS_INFO[common.Material.monoSi]["E_g_eV_stc"], float
+    )
+    numpy.testing.assert_array_equal(
+        common.MATERIALS_INFO[common.Material.monoSi]["E_g_eV_stc"], 1.121
+    )
+
+    assert isinstance(
+        common.MATERIALS_INFO[common.Material.multiSi]["E_g_eV_stc"], float
+    )
+    numpy.testing.assert_array_equal(
+        common.MATERIALS_INFO[common.Material.multiSi]["E_g_eV_stc"], 1.121
+    )
+
+    assert isinstance(
+        common.MATERIALS_INFO[common.Material.polySi]["E_g_eV_stc"], float
+    )
+    numpy.testing.assert_array_equal(
+        common.MATERIALS_INFO[common.Material.polySi]["E_g_eV_stc"], 1.121
+    )
+
+    assert isinstance(common.MATERIALS_INFO[common.Material.xSi]["E_g_eV_stc"], float)
+    numpy.testing.assert_array_equal(
+        common.MATERIALS_INFO[common.Material.xSi]["E_g_eV_stc"], 1.121
+    )
 
 
 def test_N_IC_MIN():
