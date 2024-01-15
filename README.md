@@ -49,7 +49,7 @@ specific functionalities—
         - [Parameter Fitting](pvfit/modeling/simulation/dc/single_diode/equation/inference_iv_curve.py)
         - [Simulation](pvfit/modeling/simulation/dc/single_diode/equation/simulation.py)
       - [Model (variable operating conditions)](pvfit/modeling/simulation/dc/single_diode/model)
-        -[Simple Formulation](pvfit/modeling/simulation/dc/single_diode/model/simple)
+        - [Simple Formulation](pvfit/modeling/simulation/dc/single_diode/model/simple)
           - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_matrix.py)
           - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_spec_sheet.py)
           - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
