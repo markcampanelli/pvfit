@@ -10,7 +10,7 @@ import numpy
 
 from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
 from pvfit.measurement.iv.types import IVCurve, IVFTData
-from pvfit.modeling.dc.common import MATERIALS
+from pvfit.modeling.dc.common import MATERIALS_INFO, Material
 import pvfit.modeling.dc.single_diode.equation.inference_ic as sde_inf_ic
 import pvfit.modeling.dc.single_diode.equation.types as sde_types
 from pvfit.modeling.dc.single_diode.model.simple.types import (
@@ -29,7 +29,7 @@ def estimate_model_parameters_fittable_ic(
     model_parameters_fittable_ic_provided: Optional[
         ModelParametersFittableProvided
     ] = None,
-    material: str = "x-Si",
+    material: Material = Material.xSi,
 ) -> ModelParametersFittable:
     """
     Estimate initial conditions (IC) for fittable model parameters.
@@ -122,7 +122,7 @@ def estimate_model_parameters_fittable_ic(
         model_parameters_sde_ic_0 = sde_inf_ic.estimate_model_parameters_fittable_ic(
             iv_curve_parameters=iv_curve_parameters_0,
             model_parameters_unfittable=model_parameters_unfittable_sde,
-            # model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_sde_0,
+            model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_sde_0,
         )
 
         # Update IC's, some of which may have been passed through.
@@ -143,14 +143,7 @@ def estimate_model_parameters_fittable_ic(
 
     # Initial condition for E_g_eV_0.
     if E_g_eV_0_ic is None:
-        if material in MATERIALS:
-            # This material is recognized.
-            E_g_eV_0_ic = MATERIALS[material]["E_g_eV_stc"]
-        else:
-            raise ValueError(
-                f"unrecognized material = {material} for determining initial condition "
-                "for material band gap at reference condition, E_g_eV_0"
-            )
+        E_g_eV_0_ic = MATERIALS_INFO[material]["E_g_eV_stc"]
 
     model_parameters_fittable_ic = ModelParametersFittable(
         I_sc_A_0=I_sc_A_0_ic,

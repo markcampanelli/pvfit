@@ -8,7 +8,7 @@ import numpy
 import pytest
 
 from pvfit.measurement.iv.types import FTData
-from pvfit.modeling.dc.common import MATERIALS, T_degC_stc
+from pvfit.modeling.dc.common import MATERIALS_INFO, Material, T_degC_stc
 import pvfit.modeling.dc.single_diode.equation.types as sde_types
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
 from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
@@ -28,7 +28,7 @@ from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
                     n_0=1.25,
                     R_s_Ohm_0=0.0,  # Zero series resistance gives exact solution.
                     G_p_S_0=0.005,
-                    E_g_eV_0=MATERIALS["x-Si"]["E_g_eV_stc"],
+                    E_g_eV_0=MATERIALS_INFO[Material.xSi]["E_g_eV_stc"],
                 ),
             },
             "expected": {
@@ -54,7 +54,7 @@ from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
                     n_0=1.25,
                     R_s_Ohm_0=numpy.array([0.024, 9 * 0.024]),
                     G_p_S_0=0.005,
-                    E_g_eV_0=MATERIALS["x-Si"]["E_g_eV_stc"],
+                    E_g_eV_0=MATERIALS_INFO[Material.xSi]["E_g_eV_stc"],
                 ),
             },
             "expected": {

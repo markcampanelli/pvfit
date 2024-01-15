@@ -8,13 +8,16 @@ from io import StringIO
 
 import pandas
 
+from pvfit.modeling.dc.common import Material
+
+
 # Performance-matrix data for a 72-cell HIT module measured over variable
 # irradiance and temperature. See https://www.nrel.gov/docs/fy14osti/61610.pdf and
 # bill.marion@nrel.gov for the complete data set.
 
 HIT_MODULE = {
     "N_s": 72,
-    "material": "x-Si",
+    "material": Material.xSi,
     "matrix": pandas.read_csv(
         StringIO(
             """T_degC,G_W_per_m2,I_sc_A,V_oc_V,I_mp_A,V_mp_V,P_mp_W

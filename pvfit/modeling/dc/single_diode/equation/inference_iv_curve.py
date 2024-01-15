@@ -75,8 +75,8 @@ def fit(
         Model parameters from fit
     model_parameters_fittable_ic
         Model parameters from fit's initial-condition (IC) calculation
-    odr
-        ODR solver result (for a transformed problem)
+    odr_problem
+        ODR problem object with solver result (for a transformed problem)
     """
     validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
@@ -161,8 +161,10 @@ def fit(
 
         # By construction, this loop must stop after at most two recomputes, because
         # once a negative fit parameter is fixed to zero, it must stay fixed at zero.
-        odr = scipy.odr.ODR(data, model, beta0=beta0, ifixb=ifixb, **odr_options_)
-        output = odr.run()
+        odr_problem = scipy.odr.ODR(
+            data, model, beta0=beta0, ifixb=ifixb, **odr_options_
+        )
+        output = odr_problem.run()
 
         odr_code = str(output.info)
         if odr_code not in ODR_SUCCESS_CODES:
@@ -173,7 +175,7 @@ def fit(
                 and odr_code[-1] in ODR_SUCCESS_CODES
             ):
                 warnings.warn(
-                    "ODR solver reported a numerical error despite apparent "
+                    "odr solver reported a numerical error despite apparent "
                     f"convergence, {odr_code}: {output.stopreason}"
                 )
             elif (
@@ -182,12 +184,12 @@ def fit(
                 and odr_code[-1] in ODR_SUCCESS_CODES
             ):
                 warnings.warn(
-                    f"ODR solver reported questionable results, {odr_code}: "
+                    f"odr solver reported questionable results, {odr_code}: "
                     f"{output.stopreason}"
                 )
             else:
                 raise RuntimeError(
-                    f"ODR solver failed to converge to solution, {odr_code}: "
+                    f"odr solver failed to converge to a solution, {odr_code}: "
                     f"{output.stopreason}"
                 )
 
@@ -218,5 +220,5 @@ def fit(
     return (
         ModelParameters(**model_parameters_unfittable, **model_parameters_fittable),
         model_parameters_fittable_ic,
-        odr,
+        odr_problem,
     )

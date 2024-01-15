@@ -16,7 +16,7 @@ import scipy
 
 import pvfit
 from pvfit.measurement.iv.types import IVCurve
-import pvfit.modeling.dc.single_diode.equation.inference as inference
+import pvfit.modeling.dc.single_diode.equation.inference_iv_curve as inference_iv_curve
 from pvfit.modeling.dc.single_diode.equation.types import (
     ModelParametersFittableFixedProvided,
     ModelParametersFittableProvided,
@@ -2535,7 +2535,7 @@ def test_fit(fit_fixture):
         iv_curve = IVCurve(V_V=V_V, I_A=I_A)
         model_parameters_unfittable = ModelParametersUnfittable(N_s=N_s, T_degC=T_degC)
 
-        model_parameters_got, _, _ = inference.fit(
+        model_parameters_got, _, _ = inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
         )
@@ -2573,7 +2573,7 @@ def test_fit(fit_fixture):
         )
 
         # Ensure convergence when using true parameters for ICs.
-        inference.fit(
+        inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
             model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_true,
@@ -2581,7 +2581,7 @@ def test_fit(fit_fixture):
 
         # Ensure convergence when using true parameters for ICs with all fit parameters
         # fixed.
-        inference.fit(
+        inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
             model_parameters_fittable_ic_provided=model_parameters_fittable_ic_provided_true,

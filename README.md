@@ -7,8 +7,8 @@ Programming Interface (API) should be expected to change without warning.
 
 **NOTICE:** We are in the process of open-sourcing the single-diode equation (SDE) and 
 single-diode model (SDM) fitting algorithms (!), and thus moving the related code here.
-The SDE move is reasonably complete, but the code for SDM model fitting is currently
-being prepared for addition to the `master` branch.
+The SDE move is reasonably complete, but the code for SDM model fitting is not yet
+finalized on the `master` branch. Likewise, the documentation badly needs updating.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
@@ -46,16 +46,16 @@ specific functionalities—
   - [Direct Current (DC)](pvfit/modeling/simulation/dc)
     - [Single Diode](pvfit/modeling/simulation/dc/single_diode)
       - [Equation (single operating condition)](pvfit/modeling/simulation/dc/single_diode/equation)
-        - [Parameter Fitting](pvfit/modeling/simulation/dc/single_diode/equation/inference.py)
+        - [Parameter Fitting](pvfit/modeling/simulation/dc/single_diode/equation/inference_iv_curve.py)
         - [Simulation](pvfit/modeling/simulation/dc/single_diode/equation/simulation.py)
-      - [Model (variable operating conditions)](pvfit/modeling/simulation/dc/single_diode/model) (WARNING: Currently missing due to refactor.)
-        - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/simulation/dc/single_diode/model/inference_matrxi.py)
-        - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/simulation/dc/single_diode/model/inference_spec_sheet.py)
-        - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/simulation/dc/single_diode/model/inference_iv_curves.py)
-        - [Simulation](pvfit/modeling/simulation/dc/single_diode/model/simulation.py)
+      - [Model (variable operating conditions)](pvfit/modeling/simulation/dc/single_diode/model)
+        -[Simple Formulation](pvfit/modeling/simulation/dc/single_diode/model/simple)
+          - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_matrix.py)
+          - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_spec_sheet.py)
+          - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
+          - [Auxiliary Equations (for simulation via SDE)](pvfit/modeling/simulation/dc/single_diode/model/simple/auxiliary_equations.py)
 
-The above subpackages are reasonably well tested. Certain other subpackages are
-considered more experimental.
+We still need to improve test coverage for certain subpackages, esp.the simple SDM.
 
 ## Up and Running in 5 Minutes
 

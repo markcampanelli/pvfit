@@ -10,7 +10,7 @@ from matplotlib import pyplot
 import numpy
 
 from pvfit.measurement.iv.types import IVCurve
-import pvfit.modeling.dc.single_diode.equation.inference as sde_inf
+import pvfit.modeling.dc.single_diode.equation.inference_iv_curve as sde_inf_iv
 import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
 from pvfit.modeling.dc.single_diode.equation.types import ModelParametersUnfittable
 
@@ -407,7 +407,7 @@ model_parameters_unfittable = ModelParametersUnfittable(
 
 # Fit model parameters, ignoring additional return values, which are initial condition
 # used and low-level ODR solver result for a transformed problem.
-model_parameters, _, _ = sde_inf.fit(
+model_parameters, _, _ = sde_inf_iv.fit(
     iv_curve=iv_curve,
     model_parameters_unfittable=model_parameters_unfittable,
 )

@@ -18,6 +18,7 @@ from pvfit.common import (
 )
 from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.measurement.iv.types import IVPerformanceMatrix
+from pvfit.modeling.dc.common import Material
 from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
@@ -80,7 +81,9 @@ class ModelParametersFittableFixedProvided(TypedDict, total=False):
 
 
 def fun(beta, x, N_s, T_K_0):
-    """FIXME"""
+    """
+    Implicit system of SDM-derived equations over which model parameters are optimized.
+    """
     I_rs_A_0 = numpy.exp(beta[0])
     n_0 = beta[1]
     R_s_Ohm_0 = beta[2]
@@ -158,7 +161,7 @@ def fit(
     model_parameters_fittable_fixed_provided: Optional[
         ModelParametersFittableFixedProvided
     ] = None,
-    material: str = "x-Si",
+    material: Material = Material.xSi,
     normalize_iv_curves: bool = True,
     odr_options: Optional[OdrOptions] = None,
 ) -> Tuple[types.ModelParameters, ModelParametersFittable, scipy.odr.ODR]:
@@ -193,8 +196,8 @@ def fit(
         Model parameters from fit
     model_parameters_fittable_ic
         Model parameters from fit's initial-condition (IC) calculation
-    odr
-        ODR solver result (for a transformed problem)
+    odr_problem
+        ODR problem object, with solver result (for a transformed problem)
     """
     types.validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
@@ -275,8 +278,10 @@ def fit(
 
         # By construction, this loop must stop after at most two recomputes, because
         # once a negative fit parameter is fixed to zero, it must stay fixed at zero.
-        odr = scipy.odr.ODR(data, model, beta0=beta0, ifixb=ifixb, **odr_options_)
-        output = odr.run()
+        odr_problem = scipy.odr.ODR(
+            data, model, beta0=beta0, ifixb=ifixb, **odr_options_
+        )
+        output = odr_problem.run()
 
         odr_code = str(output.info)
         if odr_code not in ODR_SUCCESS_CODES:
@@ -318,8 +323,7 @@ def fit(
             recompute = True
 
     # Transform back fit values.
-    model_parameters = types.ModelParameters(
-        **model_parameters_unfittable,
+    model_parameters_fittable = types.ModelParametersFittable(
         I_sc_A_0=iv_performance_matrix.I_sc_A_0,
         I_rs_A_0=numpy.exp(output.beta[0]),
         n_0=output.beta[1],
@@ -328,4 +332,15 @@ def fit(
         E_g_eV_0=output.beta[4],
     )
 
-    return model_parameters, model_parameters_fittable_ic, odr
+    # Raise if something didn't work. For example, bad user-provided value or something
+    # computed as NaN.
+    types.validate_model_parameters_fittable(
+        model_parameters_fittable=model_parameters_fittable
+    )
+
+    model_parameters = types.ModelParameters(
+        **model_parameters_unfittable,
+        **model_parameters_fittable,
+    )
+
+    return model_parameters, model_parameters_fittable_ic, odr_problem

@@ -4,13 +4,14 @@ PVfit: Types for current-voltage (I-V) measurement.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
+from dataclasses import dataclass
 from typing import TypedDict
 
 import numpy
 from scipy.constants import convert_temperature
 
 from pvfit.common import T_degC_abs_zero
-from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, T_degC_stc
+from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, Material, T_degC_stc
 from pvfit.types import FloatArray, FloatBroadcastable, FloatVector
 
 
@@ -296,6 +297,26 @@ class IVPerformanceMatrix:
         T_degC = numpy.array(T_degC)
 
         return IVFTData(I_A=I_A, V_V=V_V, F=F, T_degC=T_degC)
+
+
+@dataclass
+class SpecSheetParameters:
+    """
+    Performance parameters at specified reference conditions, typically found on the
+    specification datasheet of a photovoltaic module.
+    """
+
+    material: Material
+    N_s: int
+    G_W_per_m2_0: float
+    T_degC_0: float
+    I_sc_A_0: float
+    I_mp_A_0: float
+    V_mp_V_0: float
+    V_oc_V_0: float
+    dI_sc_dT_A_per_degC_0: float
+    dP_mp_dT_W_per_degC_0: float
+    dV_oc_dT_V_per_degC_0: float
 
 
 class IVCurveParametersScalar(TypedDict):

@@ -4,6 +4,9 @@ PVfit: Common items for DC modeling.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
+from enum import Enum
+from typing import TypedDict
+
 import numpy
 import scipy.constants
 
@@ -27,41 +30,60 @@ T_K_stc = scipy.constants.convert_temperature(T_degC_stc, "Celsius", "Kelvin")
 # plane orientation, spectrum, etc.).
 G_hemi_W_per_m2_stc = 1000.0
 
-# Materials.
-MATERIALS = {
-    "CIGS": {  # Copper Indium Gallium Selenide (CIGS).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.15,
-    },
-    "CIS": {  # Copper Indium diSelenide (CIS).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.010,
-    },
-    "CdTe": {  # Cadmium Telluride (CdTe).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.475,
-    },
-    "GaAs": {  # Gallium Arsenide (GaAs).
-        # Band gap at 300 K, Kittel, C., Intro. to Solid State
-        # Physics, 6th ed. 1986, p 185.
-        "E_g_eV_stc": 1.43,
-    },
-    "mono-Si": {  # Mono-crystalline Silicon (mono-Si).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.121,
-    },
-    "multi-Si": {  # Multi-crystalline Silicon (multi-Si).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.121,
-    },
-    "poly-Si": {  # Poly-crystalline Silicon (poly-Si).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.121,
-    },
-    "x-Si": {  # Crystalline Silicon (x-Si).
-        # Band gap at STC, from De Soto et al. 2006.
-        "E_g_eV_stc": 1.121,
-    },
+
+class Material(Enum):
+    """Photovoltaic materials recognized by PVfit."""
+
+    CIGS = "CIGS"  # Copper Indium Gallium Selenide (CIGS).
+    CIS = "CIS"  # Copper Indium diSelenide (CIS).
+    CdTe = "CdTe"  # Cadmium Telluride (CdTe).
+    GaAs = "GaAs"  # Gallium Arsenide (GaAs).
+    monoSi = "mono-Si"  # Mono-crystalline Silicon (mono-Si).
+    multiSi = "multi-Si"  # Multi-crystalline Silicon (multi-Si).
+    polySi = "poly-Si"  # Poly-crystalline Silicon (poly-Si).
+    xSi = "x-Si"  # Crystalline Silicon (x-Si).
+
+
+class MaterialsInfo(TypedDict):
+    """Information for photovoltaic materials recognized by PVfit."""
+
+    E_g_eV_stc: float
+
+
+# Materials information.
+MATERIALS_INFO = {
+    Material.CIGS: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.15,
+    ),
+    Material.CIS: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.010,
+    ),
+    Material.CdTe: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.475,
+    ),
+    Material.GaAs: MaterialsInfo(
+        # At 300 K, Kittel, C., Intro. to Solid State Physics, 6th ed. 1986, p 185.
+        E_g_eV_stc=1.43,
+    ),
+    Material.monoSi: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.121,
+    ),
+    Material.multiSi: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.121,
+    ),
+    Material.polySi: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.121,
+    ),
+    Material.xSi: MaterialsInfo(
+        # De Soto et al. 2006.
+        E_g_eV_stc=1.121,
+    ),
 }
 
 # Limits on ideality factor on first diode.
