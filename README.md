@@ -179,7 +179,7 @@ python -m check_manifest
 
 Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are
 the only runtime dependencies. In order to ensure a straightforward, consistent, and
-well-tested API, the decision has been made to avoid any dependecy on
+well-tested API, the decision has been made to avoid any dependecy of the core code on
 [`pandas`](https://pandas.pydata.org/). However, a design goal is for straightforward
 integration with consumers that use `pandas`, e.g., integrating computations with
 [Series](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.Series.html)
