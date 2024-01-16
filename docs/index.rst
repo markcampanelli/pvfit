@@ -8,7 +8,7 @@ pvfit
 be expected to change without warning.
 
 To get started using or developing the library, see
-https://github.com/markcampanelli/pvfit/blob/master/README.md.
+https://github.com/markcampanelli/pvfit/blob/main/README.md.
 
 .. toctree::
    :maxdepth: 4
