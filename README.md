@@ -8,10 +8,11 @@ Programming Interface (API) should be expected to change without warning.
 **NOTICE:** We are in the process of open-sourcing the single-diode equation (SDE) and 
 single-diode model (SDM) fitting algorithms (🎉), and thus moving the related code here.
 The SDE move is reasonably complete, but the code for SDM model fitting is not yet
-finalized on the `main` branch. Likewise, the documentation badly needs updating.
+finalized on the `main` branch. Likewise, the documentation badly needs updating, so for
+now we refer users to the `demos/getting_started.py` modules in the various subpackages.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest)
+<!-- [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest) -->
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
