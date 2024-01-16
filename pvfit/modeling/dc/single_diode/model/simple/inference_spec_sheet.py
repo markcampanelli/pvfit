@@ -235,7 +235,6 @@ def fit(
         ),
         method="trf",
         x_scale="jac",
-        verbose=1,
         max_nfev=1000 * (len(kwargs) - 2),
         kwargs=kwargs,
     )

@@ -151,18 +151,24 @@ class IVPerformanceMatrix:
     def __init__(
         self,
         *,
+        material: Material,
+        N_s: int,
         I_sc_A: FloatVector,
         I_mp_A: FloatVector,
         V_mp_V: FloatVector,
         V_oc_V: FloatVector,
         G_W_per_m2: FloatVector,
         T_degC: FloatVector,
-        G_W_per_m2_0: float = G_hemi_W_per_m2_stc,
-        T_degC_0: float = T_degC_stc,
+        G_W_per_m2_0: float,
+        T_degC_0: float,
     ) -> None:
         """
         Parameters
         ----------
+        material
+            material of PV device
+        N_s
+            number of cells in series in each parallel string
         I_sc_A
             Currents at short-circuit [A]
         I_mp_A
@@ -190,19 +196,65 @@ class IVPerformanceMatrix:
         ):
             raise ValueError("input collections must all have the same length")
 
-        self._G_W_per_m2_0 = G_W_per_m2_0
-        self._T_degC_0 = T_degC_0
-        ref_idx = numpy.logical_and(G_W_per_m2 == G_W_per_m2_0, T_degC == T_degC_0)
+        self._material = material
+        self._N_s = N_s
         self._I_sc_A = I_sc_A
         self._I_mp_A = I_mp_A
         self._V_mp_V = V_mp_V
         self._V_oc_V = V_oc_V
+        self._G_W_per_m2 = G_W_per_m2
+        self._T_degC = T_degC
+        self._G_W_per_m2_0 = G_W_per_m2_0
+        self._T_degC_0 = T_degC_0
+        ref_idx = numpy.logical_and(G_W_per_m2 == G_W_per_m2_0, T_degC == T_degC_0)
         self._I_sc_A_0 = I_sc_A[ref_idx].item()
         self._I_mp_A_0 = I_mp_A[ref_idx].item()
         self._V_mp_V_0 = V_mp_V[ref_idx].item()
         self._V_oc_V_0 = V_oc_V[ref_idx].item()
-        self._G_W_per_m2 = G_W_per_m2
-        self._T_degC = T_degC
+
+    @property
+    def material(self) -> Material:
+        return self._material
+
+    @property
+    def N_s(self) -> int:
+        return self._N_s
+
+    @property
+    def I_sc_A(self) -> FloatVector:
+        return self._I_sc_A
+
+    @property
+    def I_mp_A(self) -> FloatVector:
+        return self._I_mp_A
+
+    @property
+    def P_mp_W(self) -> FloatVector:
+        return self._I_mp_A * self._V_mp_V
+
+    @property
+    def V_mp_V(self) -> FloatVector:
+        return self._V_mp_V
+
+    @property
+    def V_oc_V(self) -> FloatVector:
+        return self._V_oc_V
+
+    @property
+    def G_W_per_m2(self) -> FloatVector:
+        return self._G_W_per_m2
+
+    @property
+    def F(self) -> FloatVector:
+        return self._I_sc_A / self._I_sc_A_0
+
+    @property
+    def T_degC(self) -> FloatVector:
+        return self._T_degC
+
+    @property
+    def T_K(self) -> FloatVector:
+        return convert_temperature(self._T_degC, "Celsius", "Kelvin")
 
     @property
     def G_W_per_m2_0(self) -> float:
@@ -237,46 +289,6 @@ class IVPerformanceMatrix:
         return self._V_oc_V_0
 
     @property
-    def I_sc_A(self) -> FloatVector:
-        return self._I_sc_A
-
-    @property
-    def I_mp_A(self) -> FloatVector:
-        return self._I_mp_A
-
-    @property
-    def V_mp_W(self) -> FloatVector:
-        return self._I_mp_A * self._V_mp_V
-
-    @property
-    def V_mp_V(self) -> FloatVector:
-        return self._V_mp_V
-
-    @property
-    def V_oc_V(self) -> FloatVector:
-        return self._V_oc_V
-
-    @property
-    def G_W_per_m2(self) -> FloatVector:
-        return self._G_W_per_m2
-
-    @property
-    def T_degC(self) -> FloatVector:
-        return self._T_degC
-
-    @property
-    def T_K(self) -> FloatVector:
-        return convert_temperature(self._T_degC, "Celsius", "Kelvin")
-
-    @property
-    def P_mp_W(self) -> FloatVector:
-        return self._I_mp_A * self._V_mp_V
-
-    @property
-    def F(self) -> FloatVector:
-        return self._I_sc_A / self._I_sc_A_0
-
-    @property
     def ivft_data(self) -> IVFTData:
         I_A = []
         V_V = []
@@ -308,8 +320,6 @@ class SpecSheetParameters:
 
     material: Material
     N_s: int
-    G_W_per_m2_0: float
-    T_degC_0: float
     I_sc_A_0: float
     I_mp_A_0: float
     V_mp_V_0: float
@@ -317,6 +327,12 @@ class SpecSheetParameters:
     dI_sc_dT_A_per_degC_0: float
     dP_mp_dT_W_per_degC_0: float
     dV_oc_dT_V_per_degC_0: float
+    G_W_per_m2_0: float
+    T_degC_0: float
+
+    @property
+    def P_mp_W_0(self) -> float:
+        return self.I_mp_A_0 * self.V_mp_V_0
 
 
 class IVCurveParametersScalar(TypedDict):

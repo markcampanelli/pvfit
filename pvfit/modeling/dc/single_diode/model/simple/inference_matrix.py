@@ -18,7 +18,6 @@ from pvfit.common import (
 )
 from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
 from pvfit.measurement.iv.types import IVPerformanceMatrix
-from pvfit.modeling.dc.common import Material
 from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
@@ -154,14 +153,12 @@ def fun(beta, x, N_s, T_K_0):
 def fit(
     *,
     iv_performance_matrix: IVPerformanceMatrix,
-    model_parameters_unfittable: types.ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
         ModelParametersFittableProvided
     ] = None,
     model_parameters_fittable_fixed_provided: Optional[
         ModelParametersFittableFixedProvided
     ] = None,
-    material: Material = Material.xSi,
     normalize_iv_curves: bool = True,
     odr_options: Optional[OdrOptions] = None,
 ) -> Tuple[types.ModelParameters, ModelParametersFittable, scipy.odr.ODR]:
@@ -175,16 +172,12 @@ def fit(
     ----------
     iv_performance_matrix
         I-V performance matrix data
-    model_parameters_unfittable
-        Model parameters that are are not fittable
     model_parameters_fittable_ic_provided (optional)
         Inititial conditions (IC) for model parameters that are fittable (possibly
             incomplete, missing values are determined automatically)
     model_parameters_fittable_fixed_provided (optional)
         Indicators for model parameters that are to remain fixed at IC value (possibly
             incomplete, missing values are not fixed)
-    material (optional)
-        material system for device, used to determine IC for material band gap
     normalize_iv_curves (optional)
         Indicator for normalizing currents by Isc and voltages by Voc
     odr_options (optional)
@@ -199,6 +192,10 @@ def fit(
     odr_problem
         ODR problem object, with solver result (for a transformed problem)
     """
+    model_parameters_unfittable = types.ModelParametersUnfittable(
+        N_s=iv_performance_matrix.N_s,
+        T_degC_0=iv_performance_matrix.T_degC_0,
+    )
     types.validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
     )
@@ -216,7 +213,7 @@ def fit(
             I_sc_A_0=iv_performance_matrix.I_sc_A_0,
             **model_parameters_fittable_ic_provided,
         ),
-        material=material,
+        material=iv_performance_matrix.material,
     )
 
     # FIXME Implement data scaling?
