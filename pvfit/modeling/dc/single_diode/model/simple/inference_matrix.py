@@ -1,7 +1,10 @@
 """
-Calibrate single-diode model (SDM) from IEC 61853-1 matrix data (or similar) using
-orthogonal distance regression (ODR).
+PVfit: Calibrate simple single-diode model (SDM) from IEC 61853-1 matrix data (or
+similar) using orthogonal distance regression (ODR).
+
+Copyright 2023 Intelligent Measurement Systems LLC
 """
+
 
 from typing import Optional, Tuple, TypedDict
 import warnings

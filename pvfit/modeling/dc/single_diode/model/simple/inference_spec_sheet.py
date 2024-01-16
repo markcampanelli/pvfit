@@ -1,6 +1,8 @@
 """
-Calibrate single-diode model (SDM) using nonlinear least squares (NLLS) and information
-from photovoltaic device's specification datasheet (spec sheet).
+Calibrate simple single-diode model (SDM) using nonlinear least squares (NLLS) and
+information from photovoltaic device's specification datasheet (spec sheet).
+
+Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from typing import Tuple

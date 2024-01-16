@@ -4,14 +4,13 @@ PVfit: Types for current-voltage (I-V) measurement.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from dataclasses import dataclass
 from typing import TypedDict
 
 import numpy
 from scipy.constants import convert_temperature
 
 from pvfit.common import T_degC_abs_zero
-from pvfit.modeling.dc.common import G_hemi_W_per_m2_stc, Material, T_degC_stc
+from pvfit.modeling.dc.common import Material
 from pvfit.types import FloatArray, FloatBroadcastable, FloatVector
 
 
@@ -182,9 +181,9 @@ class IVPerformanceMatrix:
         T_degC
             Cell temperatures [°C]
         G_W_per_m2_0
-            Reference plane of array irradiance, defaults to STC [W/m^2]
+            Reference plane of array irradiance [W/m^2]
         T_degC_0
-            Reference cell temperatures, defaults to STC [°C]
+            Reference cell temperatures [°C]
         """
         if (
             len(I_sc_A)
@@ -311,24 +310,115 @@ class IVPerformanceMatrix:
         return IVFTData(I_A=I_A, V_V=V_V, F=F, T_degC=T_degC)
 
 
-@dataclass
 class SpecSheetParameters:
     """
     Performance parameters at specified reference conditions, typically found on the
     specification datasheet of a photovoltaic module.
     """
 
-    material: Material
-    N_s: int
-    I_sc_A_0: float
-    I_mp_A_0: float
-    V_mp_V_0: float
-    V_oc_V_0: float
-    dI_sc_dT_A_per_degC_0: float
-    dP_mp_dT_W_per_degC_0: float
-    dV_oc_dT_V_per_degC_0: float
-    G_W_per_m2_0: float
-    T_degC_0: float
+    def __init__(
+        self,
+        *,
+        material: Material,
+        N_s: int,
+        I_sc_A_0: float,
+        I_mp_A_0: float,
+        V_mp_V_0: float,
+        V_oc_V_0: float,
+        dI_sc_dT_A_per_degC_0: float,
+        dP_mp_dT_W_per_degC_0: float,
+        dV_oc_dT_V_per_degC_0: float,
+        G_W_per_m2_0: float,
+        T_degC_0: float,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        material
+            material of PV device
+        N_s
+            number of cells in series in each parallel string
+        I_sc_A_0
+            Current at short-circuit at reference condition [A]
+        I_mp_A_0
+            Current at maximum power at reference condition [A]
+        V_mp_V_0
+            Voltage at maximum power at reference condition [V]
+        V_oc_V_0
+            Voltage at open-circuit at reference condition [V]
+        dI_sc_dT_A_per_degC_0
+            Derivative of current at short-circuit with respect to temperature at
+                reference condition [A/°C]
+        dP_mp_dT_W_per_degC_0
+            Derivative of maximum power with respect to temperature at reference
+                condition [W/°C]
+        dV_oc_dT_V_per_degC_0
+            Derivative of voltage at open-circuit with respect to temperature at
+                reference condition [V/°C]
+        G_W_per_m2_0
+            Reference plane of array irradiance, defaults to STC [W/m^2]
+        T_degC_0
+            Reference cell temperatures, defaults to STC [°C]
+        """
+        self._material = material
+        self._N_s = N_s
+        self._I_sc_A_0 = I_sc_A_0
+        self._I_mp_A_0 = I_mp_A_0
+        self._V_mp_V_0 = V_mp_V_0
+        self._V_oc_V_0 = V_oc_V_0
+        self._dI_sc_dT_A_per_degC_0 = dI_sc_dT_A_per_degC_0
+        self._dP_mp_dT_W_per_degC_0 = dP_mp_dT_W_per_degC_0
+        self._dV_oc_dT_V_per_degC_0 = dV_oc_dT_V_per_degC_0
+        self._G_W_per_m2_0 = G_W_per_m2_0
+        self._T_degC_0 = T_degC_0
+
+    @property
+    def material(self) -> Material:
+        return self._material
+
+    @property
+    def N_s(self) -> int:
+        return self._N_s
+
+    @property
+    def I_sc_A_0(self) -> float:
+        return self._I_sc_A_0
+
+    @property
+    def I_mp_A_0(self) -> float:
+        return self._I_mp_A_0
+
+    @property
+    def V_mp_V_0(self) -> float:
+        return self._V_mp_V_0
+
+    @property
+    def V_oc_V_0(self) -> float:
+        return self._V_oc_V_0
+
+    @property
+    def dI_sc_dT_A_per_degC_0(self) -> float:
+        return self._dI_sc_dT_A_per_degC_0
+
+    @property
+    def dP_mp_dT_W_per_degC_0(self) -> float:
+        return self._dP_mp_dT_W_per_degC_0
+
+    @property
+    def dV_oc_dT_V_per_degC_0(self) -> float:
+        return self._dV_oc_dT_V_per_degC_0
+
+    @property
+    def G_W_per_m2_0(self) -> float:
+        return self._G_W_per_m2_0
+
+    @property
+    def T_degC_0(self) -> float:
+        return self._T_degC_0
+
+    @property
+    def T_K_0(self) -> float:
+        return convert_temperature(self._T_degC_0, "Celsius", "Kelvin")
 
     @property
     def P_mp_W_0(self) -> float:
