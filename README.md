@@ -37,25 +37,29 @@ See the `demos/getting_started.py` in individual subpackages to get started with
 specific functionalities—
 
 - [Measurement](pvfit/measurement)
+  - [Current-Voltage (I-V) Data/Curves](pvfit/measurement/iv)
+    - [I-V Data/Curve Types](pvfit/measurement/iv/types.py)
+    - [I-V Data/Curve Computations](pvfit/measurement/iv/computation.py)
   - [Spectral Mismatch Correction](pvfit/measurement/spectral_correction)
     - [Quantum Efficiency/Spectral Response and Spectrum Types](pvfit/measurement/spectral_correction/types.py)
     - [Spectral Mismatch Correction Computations](pvfit/measurement/spectral_correction/computation.py)
     - Short-Circuit Current Calibration Using Absolute Spectral Response (FUTURE)
-  - [Current-Voltage (I-V) Data/Curves](pvfit/measurement/iv)
-    - [I-V Data/Curve Types](pvfit/measurement/iv/types.py)
-    - [I-V Data/Curve Computations](pvfit/measurement/iv/computation.py)
 - [Modeling](pvfit/modeling)
-  - [Direct Current (DC)](pvfit/modeling/simulation/dc)
-    - [Single Diode](pvfit/modeling/simulation/dc/single_diode)
-      - [Equation (single operating condition)](pvfit/modeling/simulation/dc/single_diode/equation)
-        - [Parameter Fitting](pvfit/modeling/simulation/dc/single_diode/equation/inference_iv_curve.py)
-        - [Simulation](pvfit/modeling/simulation/dc/single_diode/equation/simulation.py)
-      - [Model (variable operating conditions)](pvfit/modeling/simulation/dc/single_diode/model)
-        - [Simple Formulation](pvfit/modeling/simulation/dc/single_diode/model/simple)
-          - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_matrix.py)
-          - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_spec_sheet.py)
-          - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/simulation/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
-          - [Auxiliary Equations (for simulation via SDE)](pvfit/modeling/simulation/dc/single_diode/model/simple/auxiliary_equations.py)
+  - [Direct Current (DC)](pvfit/modeling/dc)
+    - [Single Diode](pvfit/modeling/dc/single_diode)
+      - [Equation (single operating condition)](pvfit/modeling/dc/single_diode/equation)
+        - [Parameter Fitting](pvfit/modeling/dc/single_diode/equation/inference_iv_curve.py)
+        - [Simulation](pvfit/modeling/dc/single_diode/equation/simulation.py)
+      - [Model (variable operating conditions)](pvfit/modeling/dc/single_diode/model)
+        - [Simple Formulation](pvfit/modeling/dc/single_diode/model/simple)
+          - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/dc/single_diode/model/simple/inference_matrix.py)
+          - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/dc/single_diode/model/simple/inference_spec_sheet.py)
+          - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
+          - [Auxiliary Equations (for simulation via SDE)](pvfit/modeling/dc/single_diode/model/simple/auxiliary_equations.py)
+  - [Alternating Current (AC)](pvfit/modeling/ac)
+    - [Sandia Inverter Performance Model](pvfit/modeling/ac/sipm) - Very experimental code here
+      - [Parameter Fitting](pvfit/modeling/ac/sipm/inference.py)
+      - [Simulation](pvfit/modeling/ac/sipm/simulation.py)
 
 We still need to improve test coverage for certain subpackages, esp.the simple SDM.
 
