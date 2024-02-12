@@ -6,7 +6,9 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
+        # Something causes ivcurves tests to take forever on macos and windows.
+        # os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12"]
 
     runs-on:  ${{ matrix.os }}

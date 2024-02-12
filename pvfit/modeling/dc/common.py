@@ -5,7 +5,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from enum import Enum
-from typing import TypedDict
+from typing import Protocol, TypedDict
 
 import numpy
 import scipy.constants
@@ -106,3 +106,27 @@ def get_scaled_thermal_voltage(
             / q_C
         )
     )
+
+
+class IamFunction(Protocol):
+    """Type definition for incident-angle modifier functions."""
+
+    def __call__(self, *, angle_deg: FloatArray) -> FloatArray:
+        ...
+
+
+def iam_factory(*, iam_angle_deg: FloatArray, iam_frac: FloatArray) -> IamFunction:
+    """Generate interpolating function for incident-angle modifier (IAM)."""
+
+    def iam(*, angle_deg: FloatArray) -> FloatArray:
+        if numpy.any(numpy.logical_or(angle_deg < 0, angle_deg > 180)):
+            raise ValueError("angle_deg not between 0 and 180, inclusive")
+
+        iam_ = scipy.interpolate.PchipInterpolator(
+            iam_angle_deg, iam_frac, extrapolate=False
+        )(angle_deg)
+        iam_[90 < angle_deg] = 0.0
+
+        return iam_
+
+    return iam

@@ -85,8 +85,10 @@ NOTES:
 [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) (e.g., using
 [conda](https://docs.conda.io/en/latest/)), otherwise this setup will grab the default
 versions from [PyPI](https://pypi.org/).
-- The `demo` option adds the [matplotlib](https://matplotlib.org/) package in order to
-run all the provided demonstrations in the `demos` directories.
+- The `demo` option adds the [matplotlib](https://matplotlib.org/),
+[pandas](https://pandas.pydata.org/), and
+[pvlib-python](https://pvlib-python.readthedocs.io/) packages in order to run all the
+provided demonstrations in the `demos` directories.
 
 Verify your installation—
 ```terminal

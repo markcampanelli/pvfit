@@ -13,6 +13,7 @@ from pvfit.measurement.iv.types import FTData
 import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.model.demos.data as data
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
+import pvfit.modeling.dc.single_diode.model.simple.goodness_of_fit as goodness_of_fit
 import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
 import pvfit.modeling.dc.single_diode.model.simple.inference_spec_sheet as sdm_simple_inf_spec_sheet
 
@@ -51,8 +52,15 @@ model_parameters_matrix, _, _ = sdm_simple_inf_matrix.fit(
 )
 print("Fitting model parameters to performance matrix...done")
 
+mape_mbpe_matrix, _ = goodness_of_fit.compute_matrix_mape_mbpe(
+    iv_performance_matrix=iv_performance_matrix,
+    model_parameters=model_parameters_matrix,
+)
+
 print("\nModel parameters from fit to performance matrix:")
 pprint(model_parameters_matrix)
+print("\nGoodness of fit:")
+pprint(mape_mbpe_matrix)
 
 # Compute parameters for I-V curve at STC using auxiliary equations to compute the
 # model parameters passed to the single-diode equation (SDE).
@@ -171,8 +179,15 @@ model_parameters_spec_sheet, _, _ = sdm_simple_inf_spec_sheet.fit(
 )
 print("Fitting model parameters to specification datasheet...done")
 
+mape_mbpe_spec_sheet, _ = goodness_of_fit.compute_matrix_mape_mbpe(
+    iv_performance_matrix=iv_performance_matrix,
+    model_parameters=model_parameters_spec_sheet,
+)
+
 print("\nModel parameters from fit to specification datasheet:")
 pprint(model_parameters_spec_sheet)
+print("\nGoodness of fit:")
+pprint(mape_mbpe_spec_sheet)
 
 print("\nI-V curve parameters at STC using specification-datasheet fit:")
 pprint(

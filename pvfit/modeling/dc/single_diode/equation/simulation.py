@@ -349,13 +349,44 @@ def V_at_I(
     if V_V_ic.shape:
         # Non-scalar case.
         V_V = newton_result[0]
+        # Second return value is convergence array.
         converged = newton_result[1]
+        not_converged = numpy.logical_not(converged)
+
+        if numpy.any(not_converged):
+            # Fall back to Newton's method for indices without convergence.
+            newton_result = newton(
+                I_sum_diode_anode_at_V,
+                V_V_ic[not_converged],
+                fprime=dI_sum_diode_anode_dV_at_V,
+                full_output=True,
+                **newton_options,
+            )
+            V_V[not_converged] = newton_result[0]
+
+            if numpy.array(newton_result[0]).shape:
+                # Non-scalar case. Second return value is convergence array.
+                converged[not_converged] = newton_result[1]
+            else:
+                # Scalar case. Second return value is RootResults object.
+                converged[not_converged] = newton_result[1].converged
     else:
         # Scalar case.
-        V_V = numpy.array(newton_result[1].root)
+        # Second return value is RootResults object with scalar converged attribute.
+        if not newton_result[1].converged:
+            # Fall back to Newton's method (which can only be scalar case).
+            newton_result = newton(
+                I_sum_diode_anode_at_V,
+                V_V_ic,
+                fprime=dI_sum_diode_anode_dV_at_V,
+                full_output=True,
+                **newton_options,
+            )
+
+        V_V = numpy.array(newton_result[0])
         converged = numpy.array(newton_result[1].converged)
 
-    # Verify convergence, because newton() documentation says this should be checked.
+    # Verify overall convergence, which newton() documentation says should be checked.
     numpy.testing.assert_equal(converged, True)
 
     return V_V
@@ -511,6 +542,7 @@ def P_mp(
         model_parameters=model_parameters,
         newton_options=newton_options,
     )
+
     V_mp_V_ic = numpy.array(3 / 4 * V_oc_V)
 
     # Solve for V_mp_V using Newton's method.
