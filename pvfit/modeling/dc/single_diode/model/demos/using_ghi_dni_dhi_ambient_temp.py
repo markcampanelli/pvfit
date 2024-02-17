@@ -367,8 +367,11 @@ components["poa_total_iam_corr"] = (
 
 print(components.to_string())
 
-# This expression is derived from SAPM equation for Isc with unity air-mass modifier.
-# Uses IAM- and temperature-corrected POA irradiance as a surrogate for Isc.
+# This expression for F=Isc/Isc0 is derived from the SAPM equation for Isc.
+# Assumes that Isc is linear with IAM-corrected POA irradiance and applies a simple
+# linear temperature correction. Spectral effects are ignored by using a unity air-mass
+# modifier (no correction info available), as well as ignoring spectral effects on the
+# temperature coefficient for Isc.
 F = numpy.maximum(
     0.0,
     components["poa_total_iam_corr"].to_numpy()
