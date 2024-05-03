@@ -22,8 +22,8 @@ def test_T_K_stc():
 
 
 def test_G_hemi_W_per_m2_stc():
-    assert isinstance(common.G_hemi_W_per_m2_stc, float)
-    numpy.testing.assert_array_equal(common.G_hemi_W_per_m2_stc, 1000.0)
+    assert isinstance(common.E_hemi_W_per_m2_stc, float)
+    numpy.testing.assert_array_equal(common.E_hemi_W_per_m2_stc, 1000.0)
 
 
 def test_materials():

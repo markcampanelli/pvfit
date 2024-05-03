@@ -4,6 +4,7 @@ PVfit: Spectral correction computations.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
+from typing import Optional, Union
 import warnings
 
 import numpy
@@ -11,7 +12,9 @@ import scipy.interpolate
 
 from pvfit.measurement.spectral_correction.types import (
     DataFunction,
+    FloatArray,
     SpectralIrradiance,
+    SpectralIrradianceWithTail,
     SpectralResponsivity,
 )
 
@@ -193,3 +196,201 @@ def M(
         warnings.warn("Non-positive M detected.")
 
     return M_
+
+
+def extrapolate_spectral_irradiance(
+    *,
+    spectral_irradiance: SpectralIrradiance,
+    extrapolant: Union[SpectralIrradiance, SpectralIrradianceWithTail],
+    G_total_W_per_m2: Optional[FloatArray] = None,
+) -> Union[SpectralIrradiance, SpectralIrradianceWithTail]:
+    """
+    Extend the ends of a given spectral irradiance curve(s) by a given complete spectral
+    irradiance curve scaled so that the specified total irradiance is acheived.
+    """
+    # 1) Find left wavelength endpoint and interpolate extrapolation spectrum to that value.
+    # 2) Find right wavelength endpoint and interpolate extrapolation spectrum to that value.
+    # 3) Find total irradiance of interpolant.
+    # 4) Find total irradiance of extrapolant (outside of interpolant).
+    # 5) Scale extrapolant so that irradiance of interpolant + irradiance of extrapolant equals specified total.
+    # 6) Create output spectral irradiance using combined result.
+
+    if extrapolant.num_functions != 1:
+        raise ValueError("must extrapolate using only one spectrum")
+
+    lambda_min = spectral_irradiance.lambda_nm[0]
+    lambda_max = spectral_irradiance.lambda_nm[-1]
+    lambda_range = lambda_max - lambda_min
+
+    if extrapolant.lambda_nm[0] > lambda_min or extrapolant.lambda_nm[-1] < lambda_max:
+        raise ValueError(
+            "spectral_irradiance domain not a subdomain of extrapolant domain"
+        )
+
+    extrapolant_interpolator = scipy.interpolate.interp1d(
+        extrapolant.lambda_nm, extrapolant.E_W_per_m2_nm, copy=False
+    )
+
+    # Match integrals of lower overlap.
+    lambda_lower_min = lambda_min
+    fraction_lower = 0.075
+    lambda_lower_max = spectral_irradiance.lambda_nm[
+        numpy.searchsorted(
+            spectral_irradiance.lambda_nm,
+            min(lambda_min + fraction_lower * lambda_range, lambda_max),
+            side="left",
+        )
+    ]
+    G_total_subinterval_lower = spectral_irradiance.get_G_total_subinterval_W_per_m2(
+        lambda_min_nm=lambda_lower_min, lambda_max_nm=lambda_lower_max
+    )
+
+    if extrapolant.lambda_nm[0] < lambda_min:
+        # Lower portion of spectral_irradiance can be extended.
+        # Create sub-spectra for overlapping portions and match integrals.
+        lower_idx = numpy.logical_and(
+            lambda_lower_min <= extrapolant.lambda_nm,
+            extrapolant.lambda_nm <= lambda_lower_max,
+        )
+        lambda_lower = extrapolant.lambda_nm[lower_idx]
+        E_lower = extrapolant.E_W_per_m2_nm[..., lower_idx]
+
+        if lambda_lower_min not in lambda_lower:
+            lambda_lower = numpy.insert(lambda_lower, 0, lambda_lower_min)
+            E_lower = numpy.insert(
+                E_lower, 0, extrapolant_interpolator(lambda_lower_min), axis=-1
+            )
+
+        if lambda_lower_max not in lambda_lower:
+            lambda_lower = numpy.insert(lambda_lower, -1, lambda_lower_max)
+            E_lower = numpy.insert(
+                E_lower, -1, extrapolant_interpolator(lambda_lower_max), axis=-1
+            )
+
+        G_total_lower = SpectralIrradiance(
+            lambda_nm=lambda_lower, E_W_per_m2_nm=E_lower
+        ).G_total_W_per_m2
+
+        extrapolant_scaling_lower = G_total_subinterval_lower / G_total_lower
+    else:
+        lambda_lower = numpy.empty([lambda_lower_min])
+        E_lower = spectral_irradiance.E_W_per_m2_nm[..., 0]
+        G_total_lower = numpy.zeros_like(E_lower)
+        extrapolant_scaling_lower = 0.0
+
+    # Match integrals of upper overlap.
+    fraction_upper = 0.185
+    lambda_upper_min = spectral_irradiance.lambda_nm[
+        numpy.searchsorted(
+            spectral_irradiance.lambda_nm,
+            max(lambda_min, lambda_max - fraction_upper * lambda_range),
+            side="right",
+        )
+        - 1
+    ]
+    lambda_upper_max = lambda_max
+    G_total_subinterval_upper = spectral_irradiance.get_G_total_subinterval_W_per_m2(
+        lambda_min_nm=lambda_upper_min, lambda_max_nm=lambda_upper_max
+    )
+
+    if lambda_max < extrapolant.lambda_nm[-1]:
+        # Upper portion of spectral_irradiance can be extended.
+        # Create sub-spectra for overlapping portions and match integrals.
+        upper_idx = numpy.logical_and(
+            lambda_upper_min <= extrapolant.lambda_nm,
+            extrapolant.lambda_nm <= lambda_upper_max,
+        )
+        lambda_upper = extrapolant.lambda_nm[upper_idx]
+        E_upper = extrapolant.E_W_per_m2_nm[..., upper_idx]
+
+        if lambda_upper_min not in lambda_upper:
+            lambda_upper = numpy.insert(lambda_upper, 0, lambda_upper_min)
+            E_upper = numpy.insert(
+                E_upper, 0, extrapolant_interpolator(lambda_upper_min), axis=-1
+            )
+
+        if lambda_upper_max not in lambda_upper:
+            lambda_upper = numpy.insert(lambda_upper, -1, lambda_upper_max)
+            E_upper = numpy.insert(
+                E_upper, -1, extrapolant_interpolator(lambda_upper_max), axis=-1
+            )
+
+        G_total_upper = SpectralIrradiance(
+            lambda_nm=lambda_upper, E_W_per_m2_nm=E_upper
+        ).G_total_W_per_m2
+
+        extrapolant_scaling_upper = G_total_subinterval_upper / G_total_upper
+    else:
+        lambda_upper = numpy.empty([lambda_upper_max])
+        E_upper = spectral_irradiance.E_W_per_m2_nm[..., -1]
+        G_total_upper = numpy.zeros_like(E_upper)
+        extrapolant_scaling_upper = 0.0
+
+    # Stitch together spectra.
+    lambda_lower_tail_idx = extrapolant.lambda_nm < lambda_min
+    lambda_upper_tail_idx = lambda_max < extrapolant.lambda_nm
+
+    lambda_nm = numpy.concatenate(
+        (
+            extrapolant.lambda_nm[lambda_lower_tail_idx],
+            spectral_irradiance.lambda_nm,
+            extrapolant.lambda_nm[lambda_upper_tail_idx],
+        )
+    )
+
+    lower_shape = (
+        *spectral_irradiance.E_W_per_m2_nm.shape[:-1],
+        numpy.count_nonzero(lambda_lower_tail_idx),
+    )
+    upper_shape = (
+        *spectral_irradiance.E_W_per_m2_nm.shape[:-1],
+        numpy.count_nonzero(lambda_upper_tail_idx),
+    )
+
+    E_W_per_m2_nm = numpy.concatenate(
+        (
+            numpy.expand_dims(extrapolant_scaling_lower, -1)
+            * numpy.broadcast_to(
+                extrapolant.E_W_per_m2_nm[lambda_lower_tail_idx], lower_shape
+            ),
+            spectral_irradiance.E_W_per_m2_nm,
+            numpy.expand_dims(extrapolant_scaling_upper, -1)
+            * numpy.broadcast_to(
+                extrapolant.E_W_per_m2_nm[lambda_upper_tail_idx], upper_shape
+            ),
+        ),
+        axis=-1,
+    )
+
+    if isinstance(extrapolant, SpectralIrradianceWithTail):
+        spectral_irradiance_extended = SpectralIrradianceWithTail(
+            lambda_nm=lambda_nm,
+            E_W_per_m2_nm=E_W_per_m2_nm,
+            G_tail_W_per_m2=extrapolant_scaling_upper * extrapolant.G_tail_W_per_m2,
+        )
+    else:
+        spectral_irradiance_extended = SpectralIrradiance(
+            lambda_nm=lambda_nm,
+            E_W_per_m2_nm=E_W_per_m2_nm,
+        )
+
+    if G_total_W_per_m2 is not None:
+        # Scale extended spectral irradiance to provided total irradiance.
+        total_scaling = G_total_W_per_m2 / spectral_irradiance_extended.G_total_W_per_m2
+
+        if isinstance(spectral_irradiance_extended, SpectralIrradianceWithTail):
+            spectral_irradiance_extended = SpectralIrradianceWithTail(
+                lambda_nm=spectral_irradiance_extended.lambda_nm,
+                E_W_per_m2_nm=numpy.expand_dims(total_scaling, -1)
+                * spectral_irradiance_extended.E_W_per_m2_nm,
+                G_tail_W_per_m2=total_scaling
+                * spectral_irradiance_extended.G_tail_W_per_m2,
+            )
+        else:
+            spectral_irradiance_extended = SpectralIrradiance(
+                lambda_nm=spectral_irradiance_extended.lambda_nm,
+                E_W_per_m2_nm=numpy.expand_dims(total_scaling, -1)
+                * spectral_irradiance_extended.E_W_per_m2_nm,
+            )
+
+    return spectral_irradiance_extended

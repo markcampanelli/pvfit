@@ -156,9 +156,9 @@ class IVPerformanceMatrix:
         I_mp_A: FloatVector,
         V_mp_V: FloatVector,
         V_oc_V: FloatVector,
-        G_W_per_m2: FloatVector,
+        E_W_per_m2: FloatVector,
         T_degC: FloatVector,
-        G_W_per_m2_0: float,
+        E_W_per_m2_0: float,
         T_degC_0: float,
     ) -> None:
         """
@@ -176,11 +176,11 @@ class IVPerformanceMatrix:
             Voltages at maximum power [V]
         V_oc_V
             Voltages at open-circuit [V]
-        G_W_per_m2
+        E_W_per_m2
             Plane of array irradiances [W/m^2]
         T_degC
             Cell temperatures [°C]
-        G_W_per_m2_0
+        E_W_per_m2_0
             Reference plane of array irradiance [W/m^2]
         T_degC_0
             Reference cell temperatures [°C]
@@ -190,7 +190,7 @@ class IVPerformanceMatrix:
             != len(I_mp_A)
             != len(V_mp_V)
             != len(V_oc_V)
-            != len(G_W_per_m2)
+            != len(E_W_per_m2)
             != len(T_degC)
         ):
             raise ValueError("input collections must all have the same length")
@@ -201,11 +201,11 @@ class IVPerformanceMatrix:
         self._I_mp_A = I_mp_A
         self._V_mp_V = V_mp_V
         self._V_oc_V = V_oc_V
-        self._G_W_per_m2 = G_W_per_m2
+        self._E_W_per_m2 = E_W_per_m2
         self._T_degC = T_degC
-        self._G_W_per_m2_0 = G_W_per_m2_0
+        self._E_W_per_m2_0 = E_W_per_m2_0
         self._T_degC_0 = T_degC_0
-        ref_idx = numpy.logical_and(G_W_per_m2 == G_W_per_m2_0, T_degC == T_degC_0)
+        ref_idx = numpy.logical_and(E_W_per_m2 == E_W_per_m2_0, T_degC == T_degC_0)
         self._I_sc_A_0 = I_sc_A[ref_idx].item()
         self._I_mp_A_0 = I_mp_A[ref_idx].item()
         self._V_mp_V_0 = V_mp_V[ref_idx].item()
@@ -240,8 +240,8 @@ class IVPerformanceMatrix:
         return self._V_oc_V
 
     @property
-    def G_W_per_m2(self) -> FloatVector:
-        return self._G_W_per_m2
+    def E_W_per_m2(self) -> FloatVector:
+        return self._E_W_per_m2
 
     @property
     def F(self) -> FloatVector:
@@ -256,8 +256,8 @@ class IVPerformanceMatrix:
         return convert_temperature(self._T_degC, "Celsius", "Kelvin")
 
     @property
-    def G_W_per_m2_0(self) -> float:
-        return self._G_W_per_m2_0
+    def E_W_per_m2_0(self) -> float:
+        return self._E_W_per_m2_0
 
     @property
     def T_degC_0(self) -> float:
@@ -328,7 +328,7 @@ class SpecSheetParameters:
         dI_sc_dT_A_per_degC_0: float,
         dP_mp_dT_W_per_degC_0: float,
         dV_oc_dT_V_per_degC_0: float,
-        G_W_per_m2_0: float,
+        E_W_per_m2_0: float,
         T_degC_0: float,
     ) -> None:
         """
@@ -355,7 +355,7 @@ class SpecSheetParameters:
         dV_oc_dT_V_per_degC_0
             Derivative of voltage at open-circuit with respect to temperature at
                 reference condition [V/°C]
-        G_W_per_m2_0
+        E_W_per_m2_0
             Reference plane of array irradiance, defaults to STC [W/m^2]
         T_degC_0
             Reference cell temperatures, defaults to STC [°C]
@@ -369,7 +369,7 @@ class SpecSheetParameters:
         self._dI_sc_dT_A_per_degC_0 = dI_sc_dT_A_per_degC_0
         self._dP_mp_dT_W_per_degC_0 = dP_mp_dT_W_per_degC_0
         self._dV_oc_dT_V_per_degC_0 = dV_oc_dT_V_per_degC_0
-        self._G_W_per_m2_0 = G_W_per_m2_0
+        self._E_W_per_m2_0 = E_W_per_m2_0
         self._T_degC_0 = T_degC_0
 
     @property
@@ -409,8 +409,8 @@ class SpecSheetParameters:
         return self._dV_oc_dT_V_per_degC_0
 
     @property
-    def G_W_per_m2_0(self) -> float:
-        return self._G_W_per_m2_0
+    def E_W_per_m2_0(self) -> float:
+        return self._E_W_per_m2_0
 
     @property
     def T_degC_0(self) -> float:

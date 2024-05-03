@@ -7,6 +7,8 @@ Copyright 2023 Intelligent Measurement Systems LLC
 from typing import TypedDict
 
 import numpy
+import scipy.odr
+import scipy.optimize
 
 from pvfit.common import T_degC_abs_zero
 from pvfit.types import FloatBroadcastable, IntBroadcastable
@@ -166,3 +168,19 @@ class ModelParametersFittableFixedProvided(TypedDict, total=False):
     R_s_Ohm_0: bool
     G_p_S_0: bool
     E_g_eV_0: bool
+
+
+class FitResultODR(TypedDict):
+    """Fit result that used scipy.odr.ODR."""
+
+    model_parameters_ic: ModelParameters
+    model_parameters: ModelParameters
+    odr_output: scipy.odr.Output
+
+
+class FitResultLeastSquares(TypedDict):
+    """Fit result that used scipy.optimize.least_squares."""
+
+    model_parameters_ic: ModelParameters
+    model_parameters: ModelParameters
+    optimize_result: scipy.optimize.OptimizeResult

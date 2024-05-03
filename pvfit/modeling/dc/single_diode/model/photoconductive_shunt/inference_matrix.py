@@ -1,6 +1,6 @@
 """
-PVfit: Calibrate simple single-diode model (SDM) from IEC 61853-1 matrix data (or
-similar) using orthogonal distance regression (ODR).
+PVfit: Calibrate single-diode model (SDM) with photoconductive shunt from IEC 61853-1
+matrix data (or similar) using orthogonal distance regression (ODR).
 
 Copyright 2023 Intelligent Measurement Systems LLC
 """
@@ -25,11 +25,11 @@ from pvfit.measurement.iv.types import (
     IVPerformanceMatrix,
 )
 import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.auxiliary_equations as sdm_ps_ae
 from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
 from pvfit.modeling.dc.single_diode.model.simple import types
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 from pvfit.types import OdrOptions
 
 
@@ -87,7 +87,7 @@ class ModelParametersFittableFixedProvided(TypedDict, total=False):
     E_g_eV_0: bool
 
 
-def fun(beta, x, N_s, T_K_0):
+def fun(beta, x, N_s, T_K_0, I_sc_A_0):
     """
     Implicit system of SDM-derived equations over which model parameters are optimized.
     """
@@ -103,7 +103,12 @@ def fun(beta, x, N_s, T_K_0):
     V_oc_V = x[3, :]
     T_K = x[4, :]
 
+    F = I_sc_A_0 / I_sc_A
+
     scaled_thermal_voltage_V = (N_s * n_0 * k_B_J_per_K * T_K) / q_C
+
+    # Parallel conductance with photoconductive shunt.
+    G_p_S = F * G_p_S_0
 
     # Reverse-saturation current.
     I_rs_A = (
@@ -116,7 +121,7 @@ def fun(beta, x, N_s, T_K_0):
     V_diode_sc_V = I_sc_A * R_s_Ohm_0
     I_ph_A = (
         I_rs_A * numpy.expm1(V_diode_sc_V / scaled_thermal_voltage_V)
-        + G_p_S_0 * V_diode_sc_V
+        + G_p_S * V_diode_sc_V
         + I_sc_A
     )
 
@@ -125,7 +130,7 @@ def fun(beta, x, N_s, T_K_0):
     y0 = (
         I_ph_A
         - I_rs_A * numpy.expm1(V_diode_mp_V / scaled_thermal_voltage_V)
-        - G_p_S_0 * V_diode_mp_V
+        - G_p_S * V_diode_mp_V
         - I_mp_A
     )
 
@@ -136,14 +141,14 @@ def fun(beta, x, N_s, T_K_0):
             I_rs_A
             / scaled_thermal_voltage_V
             * numpy.exp(V_diode_mp_V / scaled_thermal_voltage_V)
-            + G_p_S_0
+            + G_p_S
         )
         + I_mp_A
     ) / (
         I_rs_A
         / scaled_thermal_voltage_V
         * numpy.exp(V_diode_mp_V / scaled_thermal_voltage_V)
-        + G_p_S_0 * R_s_Ohm_0
+        + G_p_S * R_s_Ohm_0
         + 1
     )
 
@@ -152,7 +157,7 @@ def fun(beta, x, N_s, T_K_0):
     y2 = (
         I_ph_A
         - I_rs_A * numpy.expm1(V_diode_oc_V / scaled_thermal_voltage_V)
-        - G_p_S_0 * V_diode_oc_V
+        - G_p_S * V_diode_oc_V
     )
 
     return numpy.vstack((y0, y1, y2))
@@ -193,14 +198,13 @@ def fit(
 
     Returns
     -------
-    fit_result
-        Collected results of the fit
-            model_parameters
-                Model parameters from fit
-            model_parameters_fittable_ic
-                Model parameters from fit's initial-condition (IC) calculation
-            odr_output
-                ODR output object, with solver result (for a transformed problem)
+    dictionary with the following
+        model_parameters
+            Model parameters from fit
+        model_parameters_fittable_ic
+            Model parameters from fit's initial-condition (IC) calculation
+        odr
+            ODR object, with solver result (for a transformed problem)
     """
     model_parameters_unfittable = types.ModelParametersUnfittable(
         N_s=iv_performance_matrix.N_s,
@@ -249,7 +253,9 @@ def fit(
         3,
     )
 
-    model = scipy.odr.Model(fun, implicit=True, extra_args=(N_s, T_K_0))
+    model = scipy.odr.Model(
+        fun, implicit=True, extra_args=(N_s, T_K_0, iv_performance_matrix.I_sc_A_0)
+    )
 
     beta0 = numpy.array(
         [
@@ -316,13 +322,13 @@ def fit(
                 )
 
         if output.beta[3] < 0:
-            # R_s_Ohm was negative.
+            # R_s_Ohm_0 was negative.
             ifixb[3] = 0
             beta0[3] = 0.0
             recompute = True
 
         if output.beta[4] < 0:
-            # G_p_S was negative.
+            # G_p_S_0 was negative.
             ifixb[4] = 0
             beta0[4] = 0.0
             recompute = True
@@ -361,7 +367,7 @@ def compute_fit_quality(
     """Compute FIXME"""
 
     iv_curve_parameters = sde_sim.iv_curve_parameters(
-        model_parameters=sdm_ae.compute_sde_model_parameters(
+        model_parameters=sdm_ps_ae.compute_sde_model_parameters(
             ft_data=FTData(
                 F=iv_performance_matrix.F, T_degC=iv_performance_matrix.T_degC
             ),

@@ -11,8 +11,8 @@ import numpy
 from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
 from pvfit.measurement.iv.types import IVCurve, IVFTData
 from pvfit.modeling.dc.common import MATERIALS_INFO, Material
-import pvfit.modeling.dc.single_diode.equation.inference_ic as sde_inf_ic
-import pvfit.modeling.dc.single_diode.equation.types as sde_types
+import pvfit.modeling.dc.single_diode.equation.simple.inference_ic as sde_inf_ic
+import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
 from pvfit.modeling.dc.single_diode.model.simple.types import (
     ModelParametersFittable,
     ModelParametersFittableProvided,

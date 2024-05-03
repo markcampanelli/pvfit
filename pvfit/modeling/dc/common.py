@@ -28,7 +28,7 @@ T_K_stc = scipy.constants.convert_temperature(T_degC_stc, "Celsius", "Kelvin")
 
 # Hemispherical irradiance at STC (includes specified sun orientation,
 # plane orientation, spectrum, etc.).
-G_hemi_W_per_m2_stc = 1000.0
+E_hemi_W_per_m2_stc = 1000.0
 
 
 class Material(Enum):
@@ -119,6 +119,7 @@ def iam_factory(*, iam_angle_deg: FloatArray, iam_frac: FloatArray) -> IamFuncti
     """Generate interpolating function for incident-angle modifier (IAM)."""
 
     def iam(*, angle_deg: FloatArray) -> FloatArray:
+        """TODO"""
         if numpy.any(numpy.logical_or(angle_deg < 0, angle_deg > 180)):
             raise ValueError("angle_deg not between 0 and 180, inclusive")
 
@@ -130,3 +131,42 @@ def iam_factory(*, iam_angle_deg: FloatArray, iam_frac: FloatArray) -> IamFuncti
         return iam_
 
     return iam
+
+
+class ConstantThenLinearDegradationFunction(Protocol):
+    """Type definition for constant-then-linear degradation functions."""
+
+    def __call__(self, *, years_since_commissioning: FloatArray) -> FloatArray:
+        ...
+
+
+def constant_then_linear_degredation_factory(
+    *, first_year_degredation: float, subsequent_year_degredation: float
+) -> ConstantThenLinearDegradationFunction:
+    """
+    Constant-then-linear degredation, e.g. from a module warranty.
+
+    No degredation before first year. First year has a constant degredation, which is
+    continuous to linear degredation in subsequent years.
+    """
+
+    def constant_then_linear_degredation(
+        *, years_since_commissioning: FloatArray
+    ) -> FloatArray:
+        """TODO"""
+        fractional_degredation = numpy.empty_like(years_since_commissioning)
+        fractional_degredation[years_since_commissioning < 0] = 0.0
+        fractional_degredation[
+            numpy.logical_and(
+                0 <= years_since_commissioning, years_since_commissioning <= 1
+            )
+        ] = first_year_degredation
+        fractional_degredation[
+            1 < years_since_commissioning
+        ] = first_year_degredation + subsequent_year_degredation * (
+            years_since_commissioning[1 < years_since_commissioning] - 1
+        )
+
+        return fractional_degredation
+
+    return constant_then_linear_degredation

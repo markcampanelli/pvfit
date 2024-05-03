@@ -10,9 +10,9 @@ from matplotlib import pyplot
 import numpy
 
 from pvfit.measurement.iv.types import FTData
-import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.model.demos.data as data
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 import pvfit.modeling.dc.single_diode.model.simple.goodness_of_fit as goodness_of_fit
 import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
 import pvfit.modeling.dc.single_diode.model.simple.inference_spec_sheet as sdm_simple_inf_spec_sheet
@@ -65,7 +65,7 @@ pprint(mape_mbpe_matrix)
 # Compute parameters for I-V curve at STC using auxiliary equations to compute the
 # model parameters passed to the single-diode equation (SDE).
 iv_curve_parameters_0 = sde_sim.iv_curve_parameters(
-    model_parameters=ae.compute_sde_model_parameters(
+    model_parameters=sdm_ae.compute_sde_model_parameters(
         ft_data=FTData(F=1.0, T_degC=iv_performance_matrix.T_degC_0),
         model_parameters=model_parameters_matrix,
     )
@@ -84,7 +84,7 @@ V_oc_V_0 = iv_curve_parameters_0["V_oc_V"]
 F_alt = 0.5
 T_degC_alt = 35.0
 iv_parameters_alt = sde_sim.iv_curve_parameters(
-    model_parameters=ae.compute_sde_model_parameters(
+    model_parameters=sdm_ae.compute_sde_model_parameters(
         ft_data=FTData(F=F_alt, T_degC=T_degC_alt),
         model_parameters=model_parameters_matrix,
     )
@@ -98,7 +98,7 @@ F_series = numpy.array([0.95, 0.97, 0.99, 1.01, 0.97, 0.98])
 T_degC_series = 35.0  # This scalar value will be approapriately broadcast.
 # Ignore additional outputs in the computation of the maximum power series.
 P_mp_W_series, _, _, _ = sde_sim.P_mp(
-    model_parameters=ae.compute_sde_model_parameters(
+    model_parameters=sdm_ae.compute_sde_model_parameters(
         ft_data=FTData(F=F_series, T_degC=T_degC_series),
         model_parameters=model_parameters_matrix,
     )
@@ -131,7 +131,7 @@ for idx, (F, T_degC) in enumerate(
         V_V,
         sde_sim.I_at_V(
             V_V=V_V,
-            model_parameters=ae.compute_sde_model_parameters(
+            model_parameters=sdm_ae.compute_sde_model_parameters(
                 ft_data=FTData(F=F, T_degC=T_degC),
                 model_parameters=model_parameters_matrix,
             ),
@@ -152,7 +152,7 @@ ax.plot(
     V_V,
     sde_sim.I_at_V(
         V_V=V_V,
-        model_parameters=ae.compute_sde_model_parameters(
+        model_parameters=sdm_ae.compute_sde_model_parameters(
             ft_data=FTData(F=F_alt, T_degC=T_degC_alt),
             model_parameters=model_parameters_matrix,
         ),
@@ -192,7 +192,7 @@ pprint(mape_mbpe_spec_sheet)
 print("\nI-V curve parameters at STC using specification-datasheet fit:")
 pprint(
     sde_sim.iv_curve_parameters(
-        model_parameters=ae.compute_sde_model_parameters(
+        model_parameters=sdm_ae.compute_sde_model_parameters(
             ft_data=FTData(F=1.0, T_degC=spec_sheet_parameters.T_degC_0),
             model_parameters=model_parameters_spec_sheet,
         )

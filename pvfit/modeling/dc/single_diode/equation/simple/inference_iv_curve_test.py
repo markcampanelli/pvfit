@@ -16,8 +16,8 @@ import scipy
 
 import pvfit
 from pvfit.measurement.iv.types import IVCurve
-import pvfit.modeling.dc.single_diode.equation.inference_iv_curve as inference_iv_curve
-from pvfit.modeling.dc.single_diode.equation.types import (
+import pvfit.modeling.dc.single_diode.equation.simple.inference_iv_curve as inference_iv_curve
+from pvfit.modeling.dc.single_diode.equation.simple.types import (
     ModelParametersFittableFixedProvided,
     ModelParametersFittableProvided,
     ModelParametersUnfittable,
@@ -2535,10 +2535,10 @@ def test_fit(fit_fixture):
         iv_curve = IVCurve(V_V=V_V, I_A=I_A)
         model_parameters_unfittable = ModelParametersUnfittable(N_s=N_s, T_degC=T_degC)
 
-        model_parameters_got, _, _ = inference_iv_curve.fit(
+        model_parameters_got = inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
-        )
+        )["model_parameters"]
 
         for key in model_parameters_got:
             numpy.testing.assert_allclose(

@@ -9,10 +9,10 @@ import pytest
 from scipy.constants import convert_temperature
 
 from pvfit.common import k_B_J_per_K, q_C
-from pvfit.measurement.iv.types import IVCurveParametersScalar, IVData
+from pvfit.measurement.iv.types import IVCurveParametersArray, IVData
 from pvfit.modeling.dc.common import T_K_stc, T_degC_stc, get_scaled_thermal_voltage
-import pvfit.modeling.dc.single_diode.equation.simulation as simulation
-from pvfit.modeling.dc.single_diode.equation.types import ModelParameters
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as simulation
+from pvfit.modeling.dc.single_diode.equation.simple.types import ModelParameters
 
 
 @pytest.fixture(
@@ -303,16 +303,18 @@ def test_I_sum_diode_anode_at_I_V(current_sum_at_diode_node_fixture):
     given = current_sum_at_diode_node_fixture["given"]
     expected = current_sum_at_diode_node_fixture["expected"]
 
-    I_sum_A_got = simulation.I_sum_diode_anode_at_I_V(
+    I_sum_diode_anode_A_got = simulation.I_sum_diode_anode_at_I_V(
         iv_data=given["iv_curve"],
         model_parameters=given["model_parameters"],
-    )
-    I_sum_A_expected = expected["I_sum_A"]
+    )["I_sum_diode_anode_A"]
+    I_sum_diode_anode_A_expected = expected["I_sum_A"]
 
-    assert isinstance(I_sum_A_got, type(I_sum_A_expected))
-    assert I_sum_A_got.shape == I_sum_A_expected.shape
-    assert I_sum_A_got.dtype == I_sum_A_expected.dtype
-    numpy.testing.assert_array_almost_equal(I_sum_A_got, I_sum_A_expected)
+    assert isinstance(I_sum_diode_anode_A_got, type(I_sum_diode_anode_A_expected))
+    assert I_sum_diode_anode_A_got.shape == I_sum_diode_anode_A_expected.shape
+    assert I_sum_diode_anode_A_got.dtype == I_sum_diode_anode_A_expected.dtype
+    numpy.testing.assert_array_almost_equal(
+        I_sum_diode_anode_A_got, I_sum_diode_anode_A_expected
+    )
 
 
 def test_I_at_V_explicit():
@@ -335,7 +337,7 @@ def test_I_at_V_explicit():
         G_p_S=G_p_S,
     )
 
-    I_A_got = simulation.I_at_V(V_V=V_V, model_parameters=model_parameters)
+    I_A_got = simulation.I_at_V(V_V=V_V, model_parameters=model_parameters)["I_A"]
     I_A_expected = numpy.array(
         I_ph_A
         - I_rs_A * numpy.expm1(q_C * V_V / (N_s * n * k_B_J_per_K * T_K_stc))
@@ -368,7 +370,7 @@ def test_I_at_V_implicit():
         G_p_S=G_p_S,
     )
 
-    I_A_got = simulation.I_at_V(V_V=V_V, model_parameters=model_parameters)
+    I_A_got = simulation.I_at_V(V_V=V_V, model_parameters=model_parameters)["I_A"]
     I_A_expected = numpy.array(0.09301675954356346)
 
     assert isinstance(I_A_got, type(I_A_expected))
@@ -377,7 +379,7 @@ def test_I_at_V_implicit():
     numpy.testing.assert_array_almost_equal(I_A_got, I_A_expected)
 
     # Check "full circle" computation back to V_V.
-    V_V_got = simulation.V_at_I(I_A=I_A_got, model_parameters=model_parameters)
+    V_V_got = simulation.V_at_I(I_A=I_A_got, model_parameters=model_parameters)["V_V"]
 
     numpy.testing.assert_array_almost_equal(V_V_got, V_V)
 
@@ -402,7 +404,7 @@ def test_V_at_I_explicit():
         G_p_S=G_p_S,
     )
 
-    V_V_got = simulation.V_at_I(I_A=I_A, model_parameters=model_parameters)
+    V_V_got = simulation.V_at_I(I_A=I_A, model_parameters=model_parameters)["V_V"]
     V_V_expected = numpy.array(
         N_s
         * n
@@ -439,7 +441,7 @@ def test_V_at_I_implicit():
         G_p_S=G_p_S,
     )
 
-    V_V_got = simulation.V_at_I(I_A=I_A, model_parameters=model_parameters)
+    V_V_got = simulation.V_at_I(I_A=I_A, model_parameters=model_parameters)["V_V"]
     V_V_expected = numpy.array(0.33645640565779594)
 
     assert isinstance(V_V_got, type(V_V_expected))
@@ -447,7 +449,7 @@ def test_V_at_I_implicit():
     assert V_V_got.dtype == V_V_expected.dtype
     numpy.testing.assert_array_equal(V_V_got, V_V_expected)
 
-    I_A_got = simulation.I_at_V(V_V=V_V_got, model_parameters=model_parameters)
+    I_A_got = simulation.I_at_V(V_V=V_V_got, model_parameters=model_parameters)["I_A"]
 
     # Check "full circle" computation back to I_A.
     numpy.testing.assert_array_almost_equal(I_A_got, I_A)
@@ -473,9 +475,7 @@ def test_dV_dI_at_I_explicit():
         G_p_S=G_p_S,
     )
 
-    dV_dI_Ohm_got, V_V_got = simulation.dV_dI_at_I(
-        I_A=I_A, model_parameters=model_parameters
-    )
+    got = simulation.dV_dI_at_I(I_A=I_A, model_parameters=model_parameters)
     V_V_expected = numpy.array(
         N_s
         * n
@@ -498,15 +498,15 @@ def test_dV_dI_at_I_explicit():
         - R_s_Ohm
     )
 
-    assert isinstance(dV_dI_Ohm_got, type(dV_dI_Ohm_expected))
-    assert dV_dI_Ohm_got.shape == dV_dI_Ohm_expected.shape
-    assert dV_dI_Ohm_got.dtype == dV_dI_Ohm_expected.dtype
-    numpy.testing.assert_array_equal(dV_dI_Ohm_got, dV_dI_Ohm_expected)
+    assert isinstance(got["dV_dI_Ohm"], type(dV_dI_Ohm_expected))
+    assert got["dV_dI_Ohm"].shape == dV_dI_Ohm_expected.shape
+    assert got["dV_dI_Ohm"].dtype == dV_dI_Ohm_expected.dtype
+    numpy.testing.assert_array_equal(got["dV_dI_Ohm"], dV_dI_Ohm_expected)
 
-    assert isinstance(V_V_got, type(V_V_expected))
-    assert V_V_got.shape == V_V_expected.shape
-    assert V_V_got.dtype == V_V_expected.dtype
-    numpy.testing.assert_array_equal(V_V_got, V_V_expected)
+    assert isinstance(got["V_V"], type(V_V_expected))
+    assert got["V_V"].shape == V_V_expected.shape
+    assert got["V_V"].dtype == V_V_expected.dtype
+    numpy.testing.assert_array_equal(got["V_V"], V_V_expected)
 
 
 def test_P_at_V_explicit():
@@ -529,7 +529,7 @@ def test_P_at_V_explicit():
         G_p_S=G_p_S,
     )
 
-    P_W_got, _ = simulation.P_at_V(V_V=V_V, model_parameters=model_parameters)
+    got = simulation.P_at_V(V_V=V_V, model_parameters=model_parameters)
     P_W_expected = numpy.array(
         V_V
         * (
@@ -539,10 +539,10 @@ def test_P_at_V_explicit():
         )
     )
 
-    assert isinstance(P_W_got, type(P_W_expected))
-    assert P_W_got.shape == P_W_expected.shape
-    assert P_W_got.dtype == P_W_expected.dtype
-    numpy.testing.assert_array_equal(P_W_got, P_W_expected)
+    assert isinstance(got["P_W"], type(P_W_expected))
+    assert got["P_W"].shape == P_W_expected.shape
+    assert got["P_W"].dtype == P_W_expected.dtype
+    numpy.testing.assert_array_equal(got["P_W"], P_W_expected)
 
 
 @pytest.fixture(
@@ -560,7 +560,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParametersScalar(
+                "iv_curve_parameters": IVCurveParametersArray(
                     I_sc_A=numpy.array(0.12492493),
                     R_sc_Ohm=numpy.array(871.28357523),
                     V_x_V=numpy.array(0.22760037),
@@ -589,7 +589,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParametersScalar(
+                "iv_curve_parameters": IVCurveParametersArray(
                     I_sc_A=numpy.array(0.12464585),
                     R_sc_Ohm=numpy.array(196.88421221),
                     V_x_V=numpy.array(0.29559654),
@@ -618,7 +618,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParametersScalar(
+                "iv_curve_parameters": IVCurveParametersArray(
                     I_sc_A=numpy.array([0.12492624, 0.12492509, 0.12492973]),
                     R_sc_Ohm=numpy.array([911.24231276, 885.07975543, 1000.55449615]),
                     V_x_V=numpy.array([0.26552007, 0.25909159, 0.47707191]),
@@ -647,7 +647,7 @@ def test_P_at_V_explicit():
                 )
             },
             "expected": {
-                "iv_curve_parameters": IVCurveParametersScalar(
+                "iv_curve_parameters": IVCurveParametersArray(
                     I_sc_A=numpy.array(0.0),
                     R_sc_Ohm=numpy.array(980.42564499),
                     V_x_V=numpy.array(0.0),

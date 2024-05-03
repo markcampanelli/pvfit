@@ -11,7 +11,7 @@ import numpy
 
 from pvfit.measurement.iv.types import IVCurveParametersScalar
 from pvfit.modeling.dc.common import N_IC_MAX, N_IC_MIN, get_scaled_thermal_voltage
-from pvfit.modeling.dc.single_diode.equation.types import (
+from pvfit.modeling.dc.single_diode.equation.simple.types import (
     ModelParametersFittable,
     ModelParametersFittableProvided,
     ModelParametersUnfittable,

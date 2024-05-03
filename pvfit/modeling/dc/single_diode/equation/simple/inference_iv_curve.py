@@ -4,7 +4,7 @@ PVfit: Single-diode equation (SDE) inference.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from typing import Optional, Tuple
+from typing import Optional
 import warnings
 
 import numpy
@@ -18,35 +18,26 @@ from pvfit.common import (
 from pvfit.measurement.iv.computation import estimate_iv_curve_parameters
 from pvfit.measurement.iv.types import IVCurve
 from pvfit.modeling.dc.common import get_scaled_thermal_voltage
-from pvfit.modeling.dc.single_diode.equation.inference_ic import (
+from pvfit.modeling.dc.single_diode.equation.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
-from pvfit.modeling.dc.single_diode.equation.types import (
-    ModelParameters,
-    ModelParametersFittable,
-    ModelParametersFittableFixedProvided,
-    ModelParametersFittableProvided,
-    ModelParametersUnfittable,
-    get_model_parameters_fittable_fixed_default,
-    validate_model_parameters_fittable,
-    validate_model_parameters_unfittable,
-)
+import pvfit.modeling.dc.single_diode.equation.simple.types as types
 from pvfit.types import OdrOptions
 
 
 def fit(
     *,
     iv_curve: IVCurve,
-    model_parameters_unfittable: ModelParametersUnfittable,
+    model_parameters_unfittable: types.ModelParametersUnfittable,
     model_parameters_fittable_ic_provided: Optional[
-        ModelParametersFittableProvided
+        types.ModelParametersFittableProvided
     ] = None,
     model_parameters_fittable_fixed_provided: Optional[
-        ModelParametersFittableFixedProvided
+        types.ModelParametersFittableFixedProvided
     ] = None,
     normalize_iv_curve: bool = True,
     odr_options: Optional[OdrOptions] = None,
-) -> Tuple[ModelParameters, ModelParametersFittable, scipy.odr.ODR]:
+) -> types.FitResultODR:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 5-parameter
     equivalent-circuit single-diode equation (SDE) given current-voltage (I-V) curve
@@ -71,14 +62,16 @@ def fit(
 
     Returns
     -------
-    model_parameters
-        Model parameters from fit
-    model_parameters_fittable_ic
-        Model parameters from fit's initial-condition (IC) calculation
-    odr_problem
-        ODR problem object with solver result (for a transformed problem)
+    fit_result
+        Collected results of the fit
+            model_parameters
+                Model parameters from fit
+            model_parameters_fittable_ic
+                Model parameters from fit's initial-condition (IC) calculation
+            odr
+                ODR object, with solver result (for a transformed problem)
     """
-    validate_model_parameters_unfittable(
+    types.validate_model_parameters_unfittable(
         model_parameters_unfittable=model_parameters_unfittable,
     )
 
@@ -138,7 +131,9 @@ def fit(
     )
 
     # Check for provided fit parameters to be fixed, and assign default if None.
-    model_parameters_fittable_fixed = get_model_parameters_fittable_fixed_default()
+    model_parameters_fittable_fixed = (
+        types.get_model_parameters_fittable_fixed_default()
+    )
     if model_parameters_fittable_fixed_provided is not None:
         model_parameters_fittable_fixed.update(model_parameters_fittable_fixed_provided)
 
@@ -161,10 +156,8 @@ def fit(
 
         # By construction, this loop must stop after at most two recomputes, because
         # once a negative fit parameter is fixed to zero, it must stay fixed at zero.
-        odr_problem = scipy.odr.ODR(
-            data, model, beta0=beta0, ifixb=ifixb, **odr_options_
-        )
-        output = odr_problem.run()
+        odr = scipy.odr.ODR(data, model, beta0=beta0, ifixb=ifixb, **odr_options_)
+        output = odr.run()
 
         odr_code = str(output.info)
         if odr_code not in ODR_SUCCESS_CODES:
@@ -205,7 +198,7 @@ def fit(
             beta0[4] = 0.0
             recompute = True
 
-    model_parameters_fittable = ModelParametersFittable(
+    model_parameters_fittable = types.ModelParametersFittable(
         I_ph_A=output.beta[0] * I_A_scale,
         I_rs_A=numpy.exp(output.beta[1]) * I_A_scale,
         n=output.beta[2],
@@ -213,12 +206,16 @@ def fit(
         G_p_S=output.beta[4] * I_A_scale / V_V_scale,
     )
 
-    validate_model_parameters_fittable(
+    types.validate_model_parameters_fittable(
         model_parameters_fittable=model_parameters_fittable,
     )
 
-    return (
-        ModelParameters(**model_parameters_unfittable, **model_parameters_fittable),
-        model_parameters_fittable_ic,
-        odr_problem,
+    return types.FitResultODR(
+        model_parameters_ic=types.ModelParameters(
+            **model_parameters_unfittable, **model_parameters_fittable_ic
+        ),
+        model_parameters=types.ModelParameters(
+            **model_parameters_unfittable, **model_parameters_fittable
+        ),
+        odr_output=output,
     )

@@ -1,5 +1,5 @@
 """
-PVfit: Auxiliary equations for simple single-diode model (SDM).
+PVfit: Auxiliary equations for single-diode model (SDM) with photoconductive shunt.
 
 Copyright 2023 Intelligent Measurement Systems LLC
 """
@@ -20,16 +20,16 @@ def compute_sde_model_parameters(
     model_parameters: ModelParameters,
 ) -> sde_types.ModelParameters:
     """
-    Computes auxiliary equations for simple SDM at the specified effective irradiance
-    ratio and cell temperature and model parameters, producing model parameters for
-    simple SDE.
+    Computes auxiliary equations for SDM with photoconductive shunt at the specified
+    effective irradiance ratio and cell temperature and model parameters, producing
+    model parameters for simple SDE.
 
     Parameters
     ----------
     ft_data
         Operating conditions
     model_parameters
-        Model parameters for simple SDM
+        Model parameters for SDM with photoconductive shunt
 
     Returns
     -------
@@ -59,8 +59,8 @@ def compute_sde_model_parameters(
     # Compute series resistance (constant).
     R_s_Ohm = model_parameters["R_s_Ohm_0"]
 
-    # Compute parallel conductance (constant).
-    G_p_S = model_parameters["G_p_S_0"]
+    # Compute parallel conductance (photoconductive shunt).
+    G_p_S = ft_data.F * model_parameters["G_p_S_0"]
 
     # Compute photo-generated current at F and T_degC (V=0 with I=Isc for this).
     I_sc_A = model_parameters["I_sc_A_0"] * ft_data.F

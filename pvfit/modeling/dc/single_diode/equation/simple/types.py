@@ -7,6 +7,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 from typing import TypedDict
 
 import numpy
+import scipy.odr
 
 from pvfit.common import T_degC_abs_zero
 from pvfit.types import FloatBroadcastable, IntBroadcastable
@@ -149,3 +150,11 @@ class ModelParametersFittableFixedProvided(TypedDict, total=False):
     n: bool
     R_s_Ohm: bool
     G_p_S: bool
+
+
+class FitResultODR(TypedDict):
+    """Fit result that used scipy.odr.ODR."""
+
+    model_parameters_ic: ModelParameters
+    model_parameters: ModelParameters
+    odr_output: scipy.odr.Output

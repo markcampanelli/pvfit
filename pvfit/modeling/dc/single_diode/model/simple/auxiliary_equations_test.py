@@ -1,5 +1,5 @@
 """
-PVfit testing: Single-diode model (SDM) simulation.
+PVfit testing: Auxiliary equations for simple single-diode model (SDM).
 
 Copyright 2023 Intelligent Measurement Systems LLC
 """
@@ -9,8 +9,8 @@ import pytest
 
 from pvfit.measurement.iv.types import FTData
 from pvfit.modeling.dc.common import MATERIALS_INFO, Material, T_degC_stc
-import pvfit.modeling.dc.single_diode.equation.types as sde_types
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as ae
+import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
 
 
@@ -75,7 +75,7 @@ def test_compute(params):
     given = params["given"]
     expected = params["expected"]
 
-    model_parameters_got = ae.compute_sde_model_parameters(
+    model_parameters_got = sdm_ae.compute_sde_model_parameters(
         ft_data=given["ft_data"],
         model_parameters=given["model_parameters"],
     )

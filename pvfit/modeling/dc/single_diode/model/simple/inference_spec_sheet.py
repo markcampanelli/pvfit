@@ -13,15 +13,20 @@ import scipy.optimize
 
 
 from pvfit.common import k_B_eV_per_K
-from pvfit.measurement.iv.types import IVFTData
-from pvfit.measurement.iv.types import FTData, SpecSheetParameters
+from pvfit.measurement.iv.types import (
+    FTData,
+    IVCurveParametersArray,
+    IVFTData,
+    IVPerformanceMatrix,
+    SpecSheetParameters,
+)
 from pvfit.modeling.dc.common import get_scaled_thermal_voltage
-import pvfit.modeling.dc.single_diode.equation.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+from pvfit.modeling.dc.single_diode.model.simple import types
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 from pvfit.modeling.dc.single_diode.model.simple.inference_ic import (
     estimate_model_parameters_fittable_ic,
 )
-import pvfit.modeling.dc.single_diode.model.simple.types as types
 
 delta_T_degC = 0.1
 
@@ -115,7 +120,7 @@ def fun(
             ),
         ),
         newton_options={"maxiter": 1000},
-    )[0]
+    )["P_mp_W"]
     y_3 = (
         (maximum_powers[1] - maximum_powers[0]) / (2 * delta_T_degC)
     ) - dP_mp_dT_W_per_K_0
@@ -141,10 +146,8 @@ def fun(
 
 
 def fit(
-    *, spec_sheet_parameters: SpecSheetParameters
-) -> Tuple[
-    types.ModelParameters, types.ModelParametersFittable, scipy.optimize.OptimizeResult
-]:
+    *, spec_sheet_parameters: SpecSheetParameters, method: str = "trf"
+) -> types.FitResultLeastSquares:
     """
     Use nonlinear least squares (NLLS) to fit the implicit 6-parameter single-diode
     model (SDM) equivalent-circuit model given module specification (spec) sheet data at
@@ -157,12 +160,13 @@ def fit(
 
     Returns
     -------
-    model_parameters
-        Model parameters from fit
-    model_parameters_fittable_ic
-        Model parameters from fit's initial-condition (IC) calculation
-    optimize_result
-        Nonlinear least squares solver result (for a transformed problem)
+    dictionary with the following
+        model_parameters
+            Model parameters from fit
+        model_parameters_fittable_ic
+            Model parameters from fit's initial-condition (IC) calculation
+        optimize_result
+            Nonlinear least squares solver result (for a transformed problem)
     """
 
     # FUTURE Optionally add one more OC at which to fit just three points, not
@@ -227,17 +231,20 @@ def fit(
     }
 
     # NLLS
+    method_kwargs = {"method": method}
+
+    if method == "trf":
+        method_kwargs["jac"] = "3-point"
+
+    if method in ("trf", "dogbox"):
+        method_kwargs["bounds"] = ([-numpy.inf, 0, 0, 0, 0], numpy.inf)
+
     optimize_result = scipy.optimize.least_squares(
         fun,
         x_0,
-        jac="3-point",
-        bounds=(
-            [-numpy.inf, 0, 0, 0, 0],
-            numpy.inf,
-        ),
-        method="trf",
+        **method_kwargs,
         x_scale="jac",
-        max_nfev=1000 * (len(kwargs) - 2),
+        max_nfev=10000 * (len(kwargs) - 2),
         kwargs=kwargs,
     )
 
@@ -263,9 +270,63 @@ def fit(
         model_parameters_fittable=model_parameters_fittable
     )
 
-    model_parameters = types.ModelParameters(
-        **model_parameters_unfittable,
-        **model_parameters_fittable,
+    return types.FitResultLeastSquares(
+        model_parameters_ic=types.ModelParameters(
+            **model_parameters_unfittable,
+            **model_parameters_fittable_ic,
+        ),
+        model_parameters=types.ModelParameters(
+            **model_parameters_unfittable,
+            **model_parameters_fittable,
+        ),
+        optimize_result=optimize_result,
     )
 
-    return model_parameters, model_parameters_fittable_ic, optimize_result
+
+def compute_fit_quality(
+    iv_performance_matrix: IVPerformanceMatrix,
+    model_parameters: types.ModelParameters,
+) -> Tuple[dict, IVCurveParametersArray]:
+    """Compute FIXME"""
+
+    iv_curve_parameters = sde_sim.iv_curve_parameters(
+        model_parameters=sdm_ae.compute_sde_model_parameters(
+            ft_data=FTData(
+                F=iv_performance_matrix.F, T_degC=iv_performance_matrix.T_degC
+            ),
+            model_parameters=model_parameters,
+        )
+    )
+
+    I_sc_pc_error = 100 * (
+        iv_curve_parameters["I_sc_A"] / iv_performance_matrix.I_sc_A - 1
+    )
+    I_mp_pc_error = 100 * (
+        iv_curve_parameters["I_mp_A"] / iv_performance_matrix.I_mp_A - 1
+    )
+    P_mp_pc_error = 100 * (
+        iv_curve_parameters["P_mp_W"] / iv_performance_matrix.P_mp_W - 1
+    )
+    V_mp_pc_error = 100 * (
+        iv_curve_parameters["V_mp_V"] / iv_performance_matrix.V_mp_V - 1
+    )
+    V_oc_pc_error = 100 * (
+        iv_curve_parameters["V_oc_V"] / iv_performance_matrix.V_oc_V - 1
+    )
+
+    return {
+        "mape": {
+            "I_sc_A": numpy.mean(numpy.abs(I_sc_pc_error)),
+            "I_mp_A": numpy.mean(numpy.abs(I_mp_pc_error)),
+            "P_mp_W": numpy.mean(numpy.abs(P_mp_pc_error)),
+            "V_mp_V": numpy.mean(numpy.abs(V_mp_pc_error)),
+            "V_oc_V": numpy.mean(numpy.abs(V_oc_pc_error)),
+        },
+        "mbpe": {
+            "I_sc_A": numpy.mean(I_sc_pc_error),
+            "I_mp_A": numpy.mean(I_mp_pc_error),
+            "P_mp_W": numpy.mean(P_mp_pc_error),
+            "V_mp_V": numpy.mean(V_mp_pc_error),
+            "V_oc_V": numpy.mean(V_oc_pc_error),
+        },
+    }, iv_curve_parameters

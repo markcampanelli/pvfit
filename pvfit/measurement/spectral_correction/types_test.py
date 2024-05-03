@@ -9,7 +9,7 @@ import pytest
 
 from pvfit.measurement.spectral_correction.types import (
     DataFunction,
-    DataFunctionPositiveXNonnegativeY,
+    DataFunctionNonnegativeXNonnegativeY,
     QuantumEfficiency,
     SpectralIrradiance,
     SpectralResponsivity,
@@ -107,13 +107,13 @@ def test_DataFunctionPositiveXNonnegativeY():
     x = numpy.array([0, 100, 200])
     y = numpy.array([0, 0.5, 1.0])
     with pytest.raises(ValueError) as excinfo:
-        DataFunctionPositiveXNonnegativeY(x=x, y=y)
+        DataFunctionNonnegativeXNonnegativeY(x=x, y=y)
     assert "x values must all be positive." in str(excinfo.value)
     # y
     x = numpy.array([100, 200])
     y = numpy.array([-0.5, 1.0])
     with pytest.raises(ValueError) as excinfo:
-        DataFunctionPositiveXNonnegativeY(x=x, y=y)
+        DataFunctionNonnegativeXNonnegativeY(x=x, y=y)
     assert "y values must all be non-negative." in str(excinfo.value)
 
 
