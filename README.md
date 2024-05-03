@@ -48,14 +48,18 @@ specific functionalities—
   - [Direct Current (DC)](pvfit/modeling/dc)
     - [Single Diode](pvfit/modeling/dc/single_diode)
       - [Equation (single operating condition)](pvfit/modeling/dc/single_diode/equation)
-        - [Parameter Fitting](pvfit/modeling/dc/single_diode/equation/inference_iv_curve.py)
-        - [Simulation](pvfit/modeling/dc/single_diode/equation/simulation.py)
+        - [Simple Formulation](pvfit/modeling/dc/single_diode/equation/simple)
+          - [Parameter Fitting](pvfit/modeling/dc/single_diode/equation/simple/inference_iv_curve.py)
+          - [Simulation](pvfit/modeling/dc/single_diode/equation/simple/simulation.py)
       - [Model (variable operating conditions)](pvfit/modeling/dc/single_diode/model)
         - [Simple Formulation](pvfit/modeling/dc/single_diode/model/simple)
           - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/dc/single_diode/model/simple/inference_matrix.py)
           - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/dc/single_diode/model/simple/inference_spec_sheet.py)
           - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
-          - [Auxiliary Equations (for simulation via SDE)](pvfit/modeling/dc/single_diode/model/simple/auxiliary_equations.py)
+          - [Auxiliary Equations (for simulation via simple SDE)](pvfit/modeling/dc/single_diode/model/simple/auxiliary_equations.py)
+        - [Photoconductive-Shunt Formulation](pvfit/modeling/dc/single_diode/model/photoconductive_shunt)
+          - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/dc/single_diode/model/photoconductive_shunt/inference_matrix.py)
+          - [Auxiliary Equations (for simulation via simple SDE)](pvfit/modeling/dc/single_diode/model/photoconductive_shunt/auxiliary_equations.py)
   - [Alternating Current (AC)](pvfit/modeling/ac)
     - [Sandia Inverter Performance Model](pvfit/modeling/ac/sipm) - Very experimental code here
       - [Parameter Fitting](pvfit/modeling/ac/sipm/inference.py)
@@ -74,11 +78,11 @@ Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 
 This package will not be available on [PyPI](https://pypi.org/) until the application
 programming interface (API) is deemed stable and sufficiently tested and documented.
-Meanwhile, install the latest code directly from the GitHub repo using a sufficiently
-recent version of `pip` and `setuptools`—
+Meanwhile, install the latest code on the `main` branch directly from the GitHub repo
+using a sufficiently recent version of `pip` and `setuptools`—
 ```terminal
 python -m pip install --upgrade pip setuptools
-python -m pip install git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+python -m pip install "pvfit[demo] @ git+https://github.com/markcampanelli/pvfit"
 ```
 NOTES:
 - You may want to install your own optimized versions of
@@ -99,9 +103,9 @@ which should print something similar to—
 0.1.dev9+gadf7f38.d20190812
 ```
 
-Likewise, stay up to date with the latest code changes using—
+Likewise, stay up to date with the latest code changes on `main` branch using—
 ```terminal
-python -m pip install --upgrade git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]
+python -m pip install --upgrade "pvfit[demo] @ git+https://github.com/markcampanelli/pvfit"
 ```
 
 You should now be able to explore PVfit's functionality with the `getting_started.py`
