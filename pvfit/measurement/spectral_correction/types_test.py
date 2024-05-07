@@ -100,15 +100,15 @@ def test_DataFunction():
     numpy.testing.assert_array_equal(f.y, numpy.fliplr(y))
 
 
-def test_DataFunctionPositiveXNonnegativeY():
-    """Test DataFunctionPositiveXNonnegativeY class."""
+def test_DataFunctionNonnegativeXNonnegativeY():
+    """Test DataFunctionNonnegativeXNonnegativeY class."""
     # Invaid data cases.
     # x
-    x = numpy.array([0, 100, 200])
+    x = numpy.array([-1, 100, 200])
     y = numpy.array([0, 0.5, 1.0])
     with pytest.raises(ValueError) as excinfo:
         DataFunctionNonnegativeXNonnegativeY(x=x, y=y)
-    assert "x values must all be positive." in str(excinfo.value)
+    assert "x values must all be non-negative." in str(excinfo.value)
     # y
     x = numpy.array([100, 200])
     y = numpy.array([-0.5, 1.0])

@@ -33,3 +33,18 @@ def test_h_J_s():
 def test_T_degC_abs_zero():
     assert isinstance(common.T_degC_abs_zero, float)
     assert common.T_degC_abs_zero == -273.15
+
+
+def test_T_degC_stc():
+    assert isinstance(common.T_degC_stc, float)
+    assert common.T_degC_stc == 25.0
+
+
+def test_T_K_stc():
+    assert isinstance(common.T_K_stc, float)
+    assert common.T_K_stc == 298.15
+
+
+def test_E_hemispherical_tilted_W_per_m2_stc():
+    assert isinstance(common.E_hemispherical_tilted_W_per_m2_stc, float)
+    assert common.E_hemispherical_tilted_W_per_m2_stc == 1000.0

@@ -6,8 +6,9 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import numpy
 
+from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import IVPerformanceMatrix, SpecSheetParameters
-from pvfit.modeling.dc.common import E_hemi_W_per_m2_stc, Material, T_degC_stc
+from pvfit.modeling.dc.common import Material
 
 # Data for a Mission Solar mono-Si PV Module MSE300SQ5T, Measurement ID 19074-007.
 # Thanks to Sandia National Laboratories and The PV Performance Modelling Collaborative.
@@ -203,7 +204,7 @@ iv_performance_matrix = IVPerformanceMatrix(
             75,
         ]
     ),
-    E_W_per_m2_0=E_hemi_W_per_m2_stc,
+    E_W_per_m2_0=E_hemispherical_tilted_W_per_m2_stc,
     T_degC_0=T_degC_stc,
 )
 
@@ -217,7 +218,7 @@ spec_sheet_parameters = SpecSheetParameters(
     dI_sc_dT_A_per_degC_0=0.00314,
     dP_mp_dT_W_per_degC_0=-1.1417,
     dV_oc_dT_V_per_degC_0=-0.1125,
-    E_W_per_m2_0=E_hemi_W_per_m2_stc,
+    E_W_per_m2_0=E_hemispherical_tilted_W_per_m2_stc,
     T_degC_0=T_degC_stc,
 )
 

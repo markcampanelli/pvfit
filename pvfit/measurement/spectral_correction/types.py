@@ -146,12 +146,12 @@ class SpectralIrradiance(DataFunctionNonnegativeXNonnegativeY):
         return self.y
 
     @property
-    def G_total_W_per_m2(self) -> FloatArray:
+    def E_total_W_per_m2(self) -> FloatArray:
         """Return integrated total irradiance(s)."""
         return numpy.trapz(self.E_W_per_m2_nm, x=self.lambda_nm)
 
-    # FIXME This should not be a method.
-    def get_G_total_subinterval_W_per_m2(
+    # FIXME Should this be a method?
+    def get_E_total_subinterval_W_per_m2(
         self, *, lambda_min_nm: float, lambda_max_nm: float
     ) -> FloatArray:
         """Return integrated total irradiance(s) on subinterval."""
@@ -180,30 +180,30 @@ class SpectralIrradianceWithTail(SpectralIrradiance):
         *,
         lambda_nm: FloatVector,
         E_W_per_m2_nm: FloatArray,
-        G_tail_W_per_m2: FloatArray,
+        E_tail_W_per_m2: FloatArray,
     ):
         super().__init__(lambda_nm=lambda_nm, E_W_per_m2_nm=E_W_per_m2_nm)
 
-        if numpy.any(G_tail_W_per_m2 <= 0):
-            raise ValueError("G_tail_W_per_m2 must be positive.")
+        if numpy.any(E_tail_W_per_m2 <= 0):
+            raise ValueError("E_tail_W_per_m2 must be positive.")
 
-        if G_tail_W_per_m2.ndim != E_W_per_m2_nm.ndim - 1:
+        if E_tail_W_per_m2.ndim != E_W_per_m2_nm.ndim - 1:
             raise ValueError(
-                "G_tail_W_per_m2 must have exactly one fewer dimension than "
+                "E_tail_W_per_m2 must have exactly one fewer dimension than "
                 "E_W_per_m2_nm."
             )
 
-        self._G_tail_W_per_m2 = G_tail_W_per_m2
+        self._E_tail_W_per_m2 = E_tail_W_per_m2
 
     @property
-    def G_tail_W_per_m2(self) -> FloatVector:
+    def E_tail_W_per_m2(self) -> FloatVector:
         """Return integrated tail irradiance(s)."""
-        return self._G_tail_W_per_m2
+        return self._E_tail_W_per_m2
 
     @property
-    def G_total_W_per_m2(self) -> FloatArray:
+    def E_total_W_per_m2(self) -> FloatArray:
         """Return integrated total irradiance(s), including integrated tail(s)."""
-        return super().G_total_W_per_m2 + self._G_tail_W_per_m2
+        return super().E_total_W_per_m2 + self._E_tail_W_per_m2
 
 
 class SpectralResponsivity(DataFunctionNonnegativeXNonnegativeY):

@@ -7,8 +7,9 @@ Copyright 2023 Intelligent Measurement Systems LLC
 import numpy
 import pytest
 
+from pvfit.common import T_degC_stc
 from pvfit.measurement.iv.types import FTData
-from pvfit.modeling.dc.common import MATERIALS_INFO, Material, T_degC_stc
+from pvfit.modeling.dc.common import MATERIALS_INFO, Material
 import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters

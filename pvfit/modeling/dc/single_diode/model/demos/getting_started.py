@@ -13,7 +13,6 @@ from pvfit.measurement.iv.types import FTData
 import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.model.demos.data as data
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
-import pvfit.modeling.dc.single_diode.model.simple.goodness_of_fit as goodness_of_fit
 import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
 import pvfit.modeling.dc.single_diode.model.simple.inference_spec_sheet as sdm_simple_inf_spec_sheet
 
@@ -47,19 +46,19 @@ pprint(
 # used convienently in downstream functions, e.g., for power simulation.
 # Additional outputs can be useful, but ignored here.
 print("\nFitting model parameters to performance matrix...")
-model_parameters_matrix, _, _ = sdm_simple_inf_matrix.fit(
+model_parameters_matrix = sdm_simple_inf_matrix.fit(
     iv_performance_matrix=iv_performance_matrix,
-)
+)["model_parameters"]
 print("Fitting model parameters to performance matrix...done")
 
-mape_mbpe_matrix, _ = goodness_of_fit.compute_matrix_mape_mbpe(
+mape_mbpe_matrix, _ = sdm_simple_inf_matrix.compute_fit_quality(
     iv_performance_matrix=iv_performance_matrix,
     model_parameters=model_parameters_matrix,
 )
 
 print("\nModel parameters from fit to performance matrix:")
 pprint(model_parameters_matrix)
-print("\nGoodness of fit:")
+print("\nFit quality:")
 pprint(mape_mbpe_matrix)
 
 # Compute parameters for I-V curve at STC using auxiliary equations to compute the
@@ -135,9 +134,7 @@ for idx, (F, T_degC) in enumerate(
                 ft_data=FTData(F=F, T_degC=T_degC),
                 model_parameters=model_parameters_matrix,
             ),
-        ),
-        label=f"F={F:.2f} suns, T={T_degC:.0f} °C",
-        color=color,
+        )["I_A"],
     )
 # Plot the LIC.
 color = next(ax._get_lines.prop_cycler)["color"]
@@ -156,7 +153,7 @@ ax.plot(
             ft_data=FTData(F=F_alt, T_degC=T_degC_alt),
             model_parameters=model_parameters_matrix,
         ),
-    ),
+    )["I_A"],
     "--",
     label=f"F={F_alt:.2f} suns, T={T_degC_alt:.0f} °C",
     color=color,
@@ -174,19 +171,19 @@ pyplot.show()
 # model_parameters_spec_sheet has both fittable and unfittable parameters.
 # Additional outputs can be useful, but ignored here.
 print("\nFitting model parameters to specification datasheet...")
-model_parameters_spec_sheet, _, _ = sdm_simple_inf_spec_sheet.fit(
+model_parameters_spec_sheet = sdm_simple_inf_spec_sheet.fit(
     spec_sheet_parameters=spec_sheet_parameters,
-)
+)["model_parameters"]
 print("Fitting model parameters to specification datasheet...done")
 
-mape_mbpe_spec_sheet, _ = goodness_of_fit.compute_matrix_mape_mbpe(
+mape_mbpe_spec_sheet, _ = sdm_simple_inf_matrix.compute_fit_quality(
     iv_performance_matrix=iv_performance_matrix,
     model_parameters=model_parameters_spec_sheet,
 )
 
 print("\nModel parameters from fit to specification datasheet:")
 pprint(model_parameters_spec_sheet)
-print("\nGoodness of fit:")
+print("\nFit quality:")
 pprint(mape_mbpe_spec_sheet)
 
 print("\nI-V curve parameters at STC using specification-datasheet fit:")

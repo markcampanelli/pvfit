@@ -34,8 +34,10 @@ import numpy
 import pandas
 import pvlib
 
+
+from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import FTData
-from pvfit.modeling.dc.common import E_hemi_W_per_m2_stc, T_degC_stc, iam_factory
+from pvfit.modeling.dc.common import iam_factory
 
 
 # LG320N1K-A5 320W LG NeON2
@@ -348,7 +350,7 @@ T_degC = pvlib.temperature.sapm_cell_from_module(
     module_temperature=T_degC_module,
     poa_global=components["poa_global"].to_numpy(),
     deltaT=module_config["sapm"]["DeltaT_degC"],
-    irrad_ref=E_hemi_W_per_m2_stc,
+    irrad_ref=E_hemispherical_tilted_W_per_m2_stc,
 )
 output["T_degC"] = T_degC
 
@@ -375,7 +377,7 @@ print(components.to_string())
 F = numpy.maximum(
     0.0,
     components["poa_total_iam_corr"].to_numpy()
-    / E_hemi_W_per_m2_stc
+    / E_hemispherical_tilted_W_per_m2_stc
     * (
         1
         + module_config["dI_sc_dT_A_per_degC_0"]

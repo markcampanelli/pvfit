@@ -8,22 +8,8 @@ import numpy
 import pytest
 from scipy.constants import convert_temperature
 
-import pvfit.modeling.dc.common as common
-
-
-def test_T_degC_stc():
-    assert isinstance(common.T_degC_stc, float)
-    assert common.T_degC_stc == 25.0
-
-
-def test_T_K_stc():
-    assert isinstance(common.T_K_stc, float)
-    assert common.T_K_stc == 298.15
-
-
-def test_G_hemi_W_per_m2_stc():
-    assert isinstance(common.E_hemi_W_per_m2_stc, float)
-    numpy.testing.assert_array_equal(common.E_hemi_W_per_m2_stc, 1000.0)
+from pvfit.common import T_degC_stc
+from pvfit.modeling.dc import common
 
 
 def test_materials():
@@ -89,14 +75,14 @@ def test_N_IC_MAX():
         {
             "given": {
                 "N_s": 72,
-                "T_degC": common.T_degC_stc,
+                "T_degC": T_degC_stc,
             },
             "expected": {
                 "scaled_thermal_voltage": numpy.array(
                     72
                     * (
                         common.k_B_J_per_K
-                        * convert_temperature(common.T_degC_stc, "Celsius", "Kelvin")
+                        * convert_temperature(T_degC_stc, "Celsius", "Kelvin")
                         / common.q_C
                     )
                 )
@@ -105,9 +91,7 @@ def test_N_IC_MAX():
         {
             "given": {
                 "N_s": 60,
-                "T_degC": numpy.array(
-                    [common.T_degC_stc - 1, common.T_degC_stc, common.T_degC_stc + 1]
-                ),
+                "T_degC": numpy.array([T_degC_stc - 1, T_degC_stc, T_degC_stc + 1]),
             },
             "expected": {
                 "scaled_thermal_voltage": 60
@@ -116,9 +100,9 @@ def test_N_IC_MAX():
                     * convert_temperature(
                         numpy.array(
                             [
-                                common.T_degC_stc - 1,
-                                common.T_degC_stc,
-                                common.T_degC_stc + 1,
+                                T_degC_stc - 1,
+                                T_degC_stc,
+                                T_degC_stc + 1,
                             ]
                         ),
                         "Celsius",
@@ -129,13 +113,13 @@ def test_N_IC_MAX():
             },
         },
         {
-            "given": {"N_s": numpy.array([60, 72, 192]), "T_degC": common.T_degC_stc},
+            "given": {"N_s": numpy.array([60, 72, 192]), "T_degC": T_degC_stc},
             "expected": {
                 "scaled_thermal_voltage": numpy.array([60, 72, 192])
                 * (
                     common.k_B_J_per_K
                     * convert_temperature(
-                        common.T_degC_stc,
+                        T_degC_stc,
                         "Celsius",
                         "Kelvin",
                     )
@@ -148,9 +132,9 @@ def test_N_IC_MAX():
                 "N_s": numpy.array([60, 72, 192]),
                 "T_degC": numpy.array(
                     [
-                        common.T_degC_stc - 1,
-                        common.T_degC_stc,
-                        common.T_degC_stc + 1,
+                        T_degC_stc - 1,
+                        T_degC_stc,
+                        T_degC_stc + 1,
                     ]
                 ),
             },
@@ -161,9 +145,9 @@ def test_N_IC_MAX():
                     * convert_temperature(
                         numpy.array(
                             [
-                                common.T_degC_stc - 1,
-                                common.T_degC_stc,
-                                common.T_degC_stc + 1,
+                                T_degC_stc - 1,
+                                T_degC_stc,
+                                T_degC_stc + 1,
                             ]
                         ),
                         "Celsius",
@@ -186,11 +170,12 @@ def test_get_scaled_thermal_voltage(get_scaled_thermal_voltage_fixture):
     scaled_thermal_voltage_got = common.get_scaled_thermal_voltage(
         N_s=given["N_s"], T_degC=given["T_degC"]
     )
-    scaled_thermal_voltage_expected = expected["scaled_thermal_voltage"]
 
-    assert isinstance(scaled_thermal_voltage_got, type(scaled_thermal_voltage_expected))
-    assert scaled_thermal_voltage_got.shape == scaled_thermal_voltage_expected.shape
-    assert scaled_thermal_voltage_got.dtype == scaled_thermal_voltage_expected.dtype
+    assert isinstance(
+        scaled_thermal_voltage_got, type(expected["scaled_thermal_voltage"])
+    )
+    assert scaled_thermal_voltage_got.shape == expected["scaled_thermal_voltage"].shape
+    assert scaled_thermal_voltage_got.dtype == expected["scaled_thermal_voltage"].dtype
     numpy.testing.assert_allclose(
-        scaled_thermal_voltage_got, scaled_thermal_voltage_expected
+        scaled_thermal_voltage_got, expected["scaled_thermal_voltage"]
     )

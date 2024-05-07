@@ -14,22 +14,6 @@ import scipy.constants
 from pvfit.common import k_B_J_per_K, q_C
 from pvfit.types import FloatArray, FloatBroadcastable, IntBroadcastable
 
-# Reference values, including Standard Test Condition (STC).
-
-# Temperature.
-
-# STC temperature in degrees Celsius.
-T_degC_stc = 25.0
-
-# STC temperature in Kelvin.
-T_K_stc = scipy.constants.convert_temperature(T_degC_stc, "Celsius", "Kelvin")
-
-# Total irradiance.
-
-# Hemispherical irradiance at STC (includes specified sun orientation,
-# plane orientation, spectrum, etc.).
-E_hemi_W_per_m2_stc = 1000.0
-
 
 class Material(Enum):
     """Photovoltaic materials recognized by PVfit."""

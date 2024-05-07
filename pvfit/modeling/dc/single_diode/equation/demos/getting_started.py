@@ -409,10 +409,10 @@ model_parameters_unfittable = ModelParametersUnfittable(
 
 # Fit model parameters, ignoring additional return values, which are initial condition
 # used and low-level ODR solver result for a transformed problem.
-model_parameters, _, _ = sde_inf_iv.fit(
+model_parameters = sde_inf_iv.fit(
     iv_curve=iv_curve,
     model_parameters_unfittable=model_parameters_unfittable,
-)
+)["model_parameters"]
 
 print("SDE model parameters fit result:")
 pprint.pprint(model_parameters)
@@ -442,7 +442,7 @@ V_xx_V = (V_mp_V + V_oc_V) / 2
 print("\nAlternative computation of SAPM points:")
 V_V = numpy.array([V_x_V, V_xx_V])
 print(f"[V_x_V, V_xx_V] = {V_V}")
-I_A = sde_sim.I_at_V(V_V=V_V, model_parameters=model_parameters)
+I_A = sde_sim.I_at_V(V_V=V_V, model_parameters=model_parameters)["I_A"]
 print(f"[I_x_A, I_xx_A] = {I_A}")
 
 # Unpack the computed currents for subsequent plot.
@@ -453,7 +453,7 @@ fig, ax1 = pyplot.subplots(figsize=(8, 6))
 
 # Plot the fit I-V curve against the data.
 V_V = numpy.linspace(0.0, V_oc_V, num=100)
-I_A = sde_sim.I_at_V(V_V=V_V, model_parameters=model_parameters)
+I_A = sde_sim.I_at_V(V_V=V_V, model_parameters=model_parameters)["I_A"]
 ax1.plot(iv_curve.V_V, iv_curve.I_A, ".", label="I-V data <-")
 ax1.plot(V_V, I_A, label="fit to data <-")
 ax1.plot(
@@ -467,14 +467,14 @@ ax1.set_xlabel("V [V]")
 ax1.set_ylabel("I [A]")
 
 # Plot the residuals for the sum of currents at the diode node, which is very
-# useful for examining goodness of fit.
+# useful for examining fit quality.
 ax2 = ax1.twinx()
 ax2.plot(
     iv_curve.V_V,
     sde_sim.I_sum_diode_anode_at_I_V(
         iv_data=iv_curve,
         model_parameters=model_parameters,
-    ),
+    )["I_sum_diode_anode_A"],
     "+",
     label="residuals ->",
 )

@@ -1577,7 +1577,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.4997369516623484,
                         "I_rs_A": 1.5061118161802645e-09,
                         "n": 1.3243915674486035,
-                        "R_s_Ohm": 0.005325755005728387,
+                        "R_s_Ohm": 0.005335207899449487,
                         "G_p_S": 0.0002867840070292473,
                     },
                     {
@@ -1631,7 +1631,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.4979649542993845,
                         "I_rs_A": 1.450429718615067e-09,
                         "n": 1.3226563356051992,
-                        "R_s_Ohm": 0.04108526735406071,
+                        "R_s_Ohm": 0.041084803429213605,
                         "G_p_S": 0.0002852853165043752,
                     },
                     {
@@ -1649,7 +1649,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.5036735034066155,
                         "I_rs_A": 1.0653896893724758e-09,
                         "n": 1.3037786481158757,
-                        "R_s_Ohm": 0.08949478187859286,
+                        "R_s_Ohm": 0.089496503409356,
                         "G_p_S": 0.00033126618348088113,
                     },
                     {
@@ -1658,7 +1658,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.503205997714418,
                         "I_rs_A": 7.152984916758761e-10,
                         "n": 1.2807214826521756,
-                        "R_s_Ohm": 0.14431035109284038,
+                        "R_s_Ohm": 0.14430889205546218,
                         "G_p_S": 0.0004414064870092915,
                     },
                     {
@@ -1730,7 +1730,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.50619380092642,
                         "I_rs_A": 1.1354563742499066e-09,
                         "n": 1.3077473738659282,
-                        "R_s_Ohm": 0.07614607557014913,
+                        "R_s_Ohm": 0.07614498153741181,
                         "G_p_S": 0.00037471128906362195,
                     },
                     {
@@ -1865,7 +1865,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.498200473422625,
                         "I_rs_A": 1.16006704888709e-09,
                         "n": 1.308652301488261,
-                        "R_s_Ohm": 0.035332228427260984,
+                        "R_s_Ohm": 0.0353275265572867,
                         "G_p_S": 0.00031928600296305055,
                     },
                     {
@@ -1874,7 +1874,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.50081780778657,
                         "I_rs_A": 1.7426675424997309e-09,
                         "n": 1.3341802039178665,
-                        "R_s_Ohm": 0.016119873716742693,
+                        "R_s_Ohm": 0.016123006437771793,
                         "G_p_S": 0.00031515962354327444,
                     },
                     {
@@ -1901,7 +1901,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.500002176231359,
                         "I_rs_A": 1.3284238108213304e-09,
                         "n": 1.3170748190497321,
-                        "R_s_Ohm": 0.06551972365403658,
+                        "R_s_Ohm": 0.0655180952848773,
                         "G_p_S": 0.0003038087903256503,
                     },
                     {
@@ -1919,7 +1919,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.503807764139565,
                         "I_rs_A": 1.3271412820042015e-09,
                         "n": 1.3167771709818923,
-                        "R_s_Ohm": 0.029968323280707063,
+                        "R_s_Ohm": 0.029965728963499156,
                         "G_p_S": 0.0003946863323266931,
                     },
                     {
@@ -1946,7 +1946,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.504312526935498,
                         "I_rs_A": 9.16276597862128e-10,
                         "n": 1.2948338747287875,
-                        "R_s_Ohm": 0.10687317961466396,
+                        "R_s_Ohm": 0.10687455831056654,
                         "G_p_S": 0.0003774389396401772,
                     },
                     {
@@ -2009,7 +2009,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
                         "I_ph_A": 2.500561669979768,
                         "I_rs_A": 1.1448441812657025e-09,
                         "n": 1.3074352606184865,
-                        "R_s_Ohm": 0.04255858223517297,
+                        "R_s_Ohm": 0.04255794563216341,
                         "G_p_S": 0.00036374220610309077,
                     },
                     {
@@ -2546,6 +2546,7 @@ def test_fit(fit_fixture):
                 model_parameters_expected[key],
                 rtol=given["rtol"],
                 atol=given["atol"],
+                err_msg=f"got {model_parameters_got[key]} for {key}, expected {model_parameters_expected[key]}",
             )
 
         model_parameters_got_df.loc[idx, "Index"] = Index
@@ -2677,10 +2678,10 @@ def test_fit_benchmark():
         "case3d": 0.1756979161971756333,
     }
 
-    for key in overall_scores_expected_score:
+    for case in overall_scores_expected_score:
         numpy.testing.assert_allclose(
-            overall_scores_df_got.loc[key, "score"],
-            overall_scores_expected_score[key],
+            overall_scores_df_got.loc[case, "score"],
+            overall_scores_expected_score[case],
             rtol=5e-05,
             atol=8e-06,
         )
