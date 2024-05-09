@@ -62,7 +62,6 @@ test = [
 
 [project.urls]
 Source = "https://github.com/markcampanelli/pvfit"
-PipInstall = "git+https://github.com/markcampanelli/pvfit#egg=pvfit[demo]"
 BugReports = "https://github.com/markcampanelli/pvfit/issues"
 Developer = "https://intelligentmeasurementsystems.com"
 Discussions = "https://github.com/markcampanelli/pvfit/discussions"
