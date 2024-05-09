@@ -95,8 +95,7 @@ def get_scaled_thermal_voltage(
 class IamFunction(Protocol):
     """Type definition for incident-angle modifier functions."""
 
-    def __call__(self, *, angle_deg: FloatArray) -> FloatArray:
-        ...
+    def __call__(self, *, angle_deg: FloatArray) -> FloatArray: ...
 
 
 def iam_factory(*, iam_angle_deg: FloatArray, iam_frac: FloatArray) -> IamFunction:
@@ -120,8 +119,7 @@ def iam_factory(*, iam_angle_deg: FloatArray, iam_frac: FloatArray) -> IamFuncti
 class ConstantThenLinearDegradationFunction(Protocol):
     """Type definition for constant-then-linear degradation functions."""
 
-    def __call__(self, *, years_since_commissioning: FloatArray) -> FloatArray:
-        ...
+    def __call__(self, *, years_since_commissioning: FloatArray) -> FloatArray: ...
 
 
 def constant_then_linear_degredation_factory(
@@ -145,10 +143,10 @@ def constant_then_linear_degredation_factory(
                 0 <= years_since_commissioning, years_since_commissioning <= 1
             )
         ] = first_year_degredation
-        fractional_degredation[
-            1 < years_since_commissioning
-        ] = first_year_degredation + subsequent_year_degredation * (
-            years_since_commissioning[1 < years_since_commissioning] - 1
+        fractional_degredation[1 < years_since_commissioning] = (
+            first_year_degredation
+            + subsequent_year_degredation
+            * (years_since_commissioning[1 < years_since_commissioning] - 1)
         )
 
         return fractional_degredation

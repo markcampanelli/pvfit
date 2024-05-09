@@ -39,7 +39,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "build >=1.2.1, <2",
-    "black >=23, <24",
+    "black >=24, <25",
     "check-manifest >=0.49, <0.50",
     "pylint >=2, <3",
 ]
