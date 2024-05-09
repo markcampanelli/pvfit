@@ -3,13 +3,13 @@
 **PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling**
 
 **IMPORTANT:** This code is pre-release, and so the code organiztion and Application
-Programming Interface (API) should be expected to change without warning.
+Programming Interface (API) should be expected to change with minimal warning.
 
 **NOTICE:** We are in the process of open-sourcing the single-diode equation (SDE) and 
 single-diode model (SDM) fitting algorithms (🎉), and thus moving the related code here.
-The SDE move is reasonably complete, but the code for SDM model fitting is not yet
-finalized on the `main` branch. Likewise, the documentation badly needs updating, so for
-now we refer users to the `demos/getting_started.py` modules in the various subpackages.
+The move is reasonably complete, but the code for SDM fitting using full I-V curves has
+not yet been ported. Likewise, the documentation badly needs updating, so for now we
+refer users to the `demos/getting_started.py` modules in the various subpackages.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 <!-- [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest) -->
@@ -20,21 +20,18 @@ now we refer users to the `demos/getting_started.py` modules in the various subp
 
 PVfit is currently focused on direct-current (DC) PV module performance measurement and
 modeling. Following the standardized technical approach of most accredited PV
-calibration laboratories for measuring current-voltage (I-V) curves using PV reference
-devices, PVfit makes considerable use of the effective irradiance ratio
-(F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the *effective* irradiance on a PV
-device, in contrast to the common use of MET-station data. PVfit also supports inference
-of effective-irradiance ratio and cell temperature directly from I-V data, see
-([poster](https://pvpmc.sandia.gov/download/7302/)). See
+calibration laboratories for measuring current-voltage (I-V) curves using reference
+devices, PVfit formulates it's DC performance models in terms of the effective
+irradiance ratio (e.g., F = Isc / Isc0 = M * Isc,ref / Isc0,ref) to quantify the
+*effective* irradiance on a PV device. This has benefits for both model calibration and
+performane simulation. PVfit provides extensions for working with common
+irradiance-based MET-station data, and PVfit also supports inference of
+effective-irradiance ratio and cell temperature directly from I-V measurements, see
+([poster](https://pvpmc.sandia.gov/download/3924/?tmstv=1715255668)). See
 [this paper](https://doi.org/10.1002/ese3.190) for a more detailed introduction. Email
-[Mark Campanelli](mailto:mark.campanelli@gmail.com) to be added to the
-[PVfit Slack channel](https://pvfit.slack.com), where you can chat realtime about your
-quesitons/applications. This open-source code complements a model calibration service
-(e.g., single-diode model parameter fitting from I-V curve data) available at
-[https://pvfit.app](https://pvfit.app) and via a REST API.
-
-See the `demos/getting_started.py` in individual subpackages to get started with
-specific functionalities—
+[Mark Campanelli](mailto:mark.campanelli@gmail.com) for support, etc. See the
+`demos/getting_started.py` in individual subpackages to get started with specific
+functionalities—
 
 - [Measurement](pvfit/measurement)
   - [Current-Voltage (I-V) Data/Curves](pvfit/measurement/iv)
@@ -55,7 +52,7 @@ specific functionalities—
         - [Simple Formulation](pvfit/modeling/dc/single_diode/model/simple)
           - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/dc/single_diode/model/simple/inference_matrix.py)
           - [Parameter Fitting to Module Specification Datasheets](pvfit/modeling/dc/single_diode/model/simple/inference_spec_sheet.py)
-          - [Parameter Fitting to I-V Curve Collections](pvfit/modeling/dc/single_diode/model/simple/inference_iv_curves.py) - Not yet available
+          - [Inference of Operating Conditions from I-V Data](pvfit/modeling/dc/single_diode/model/simple/inference_oc.py)
           - [Auxiliary Equations (for simulation via simple SDE)](pvfit/modeling/dc/single_diode/model/simple/auxiliary_equations.py)
         - [Photoconductive-Shunt Formulation](pvfit/modeling/dc/single_diode/model/photoconductive_shunt)
           - [Parameter Fitting to IEC 61853-1 Performance Matrices](pvfit/modeling/dc/single_diode/model/photoconductive_shunt/inference_matrix.py)
@@ -76,14 +73,26 @@ Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 
 ### Download, Install, and Verify Package (non-editable mode)
 
-This package will not be available on [PyPI](https://pypi.org/) until the application
-programming interface (API) is deemed stable and sufficiently tested and documented.
-Meanwhile, install the latest code on the `main` branch directly from the GitHub repo
-using a sufficiently recent version of `pip` and `setuptools`—
+This package is available at [PyPI](https://pypi.org/), but it is still pre-v1. With
+sufficiently recent versions of `pip` and `setuptools`, install `pvfit` with the extra
+packages needed for the demos using—
 ```terminal
 python -m pip install --upgrade pip setuptools
-python -m pip install "pvfit[demo] @ git+https://github.com/markcampanelli/pvfit"
+python -m pip install pvfit[demo]
 ```
+
+Verify your installation—
+```terminal
+python -c "from pvfit import __version__; print(__version__)"
+```
+which should print something similar to—
+```terminal
+0.0.1
+```
+
+You should now be able to explore PVfit's functionality with the `getting_started.py`
+modules in the various `demos` directories of the various subpackages.
+
 NOTES:
 - You may want to install your own optimized versions of
 [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) (e.g., using
@@ -93,29 +102,18 @@ versions from [PyPI](https://pypi.org/).
 [pandas](https://pandas.pydata.org/), and
 [pvlib-python](https://pvlib-python.readthedocs.io/) packages in order to run all the
 provided demonstrations in the `demos` directories.
-
-Verify your installation—
-```terminal
-python -c "from pvfit import __version__; print(__version__)"
-```
-which should print something similar to—
-```terminal
-0.1.dev9+gadf7f38.d20190812
-```
-
-Likewise, stay up to date with the latest code changes on `main` branch using—
-```terminal
+- You can also run `pvfit` on the bleeding edge. If you have `git` installed, then
+install from the `main` branch using—
+```terminal 
 python -m pip install --upgrade "pvfit[demo] @ git+https://github.com/markcampanelli/pvfit"
 ```
-
-You should now be able to explore PVfit's functionality with the `getting_started.py`
-modules in the various `demos` directories of the various subpackages.
 
 ## Developer Notes
 
 ### Download, Install, and Verify Package with Developer and Testing Dependencies (editable mode)
 
-Clone this repo using your preferred git method, and go to the repo's root directory.
+Clone the repo at https://github.com/markcampanelli/pvfit using your preferred git
+method, and go to the repo's root directory.
 
 Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
