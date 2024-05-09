@@ -119,6 +119,7 @@ Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
 python -m pip install --upgrade pip setuptools
 python -m pip install -e .[demo,dev,docs,test]
+python -m pip install --progress-bar off "ivcurves @ git+https://github.com/cwhanse/ivcurves@7ae47284b23cfff167932b8cccae53c10ebf9bf9"
 ```
 This also installs the libraries needed to test, develop the code demonstrations, and
 build documentation and source and wheel distributions.

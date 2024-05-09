@@ -24,6 +24,7 @@ jobs:
           python -m pip install --progress-bar off --upgrade pip setuptools
           python -m pip --version
           python -m pip install --progress-bar off -e .[demo,dev,docs,test]
+          python -m pip install --progress-bar off "ivcurves @ git+https://github.com/cwhanse/ivcurves@7ae47284b23cfff167932b8cccae53c10ebf9bf9"
           python -m pip list
       - name: Check manifest
         run: |
