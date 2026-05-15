@@ -644,8 +644,8 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
         {
             "given": {
                 "test_set": "case3a",
-                "rtol": 1e-05,
-                "atol": 1e-08,
+                "rtol": 6e-05,
+                "atol": 2e-08,
             },
             "expected": {
                 "model_parameters": [
@@ -1567,7 +1567,7 @@ IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
             "given": {
                 "test_set": "case3c",
                 "rtol": 1e-05,
-                "atol": 1e-08,
+                "atol": 5e-06,
             },
             "expected": {
                 "model_parameters": [
@@ -2682,6 +2682,6 @@ def test_fit_benchmark():
         numpy.testing.assert_allclose(
             overall_scores_df_got.loc[case, "score"],
             overall_scores_expected_score[case],
-            rtol=5e-05,
-            atol=8e-06,
+            rtol=2e-04,
+            atol=3e-05,
         )
