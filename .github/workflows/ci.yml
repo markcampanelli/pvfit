@@ -39,7 +39,7 @@ jobs:
         run: |
           python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-results.xml -vv pvfit
       - name: Archive results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts-${{ matrix.python-version }}
           path: artifacts
@@ -48,7 +48,7 @@ jobs:
         run: |
           python -m build
       - name: Archive disributions
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.python-version }}
           path: dist
