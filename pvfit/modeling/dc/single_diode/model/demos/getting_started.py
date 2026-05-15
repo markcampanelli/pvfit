@@ -16,7 +16,6 @@ import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_ae
 import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
 import pvfit.modeling.dc.single_diode.model.simple.inference_spec_sheet as sdm_simple_inf_spec_sheet
 
-
 # By convention, variable names for numeric values include the units.
 
 # Load PV module data.
@@ -113,12 +112,14 @@ print(f"P_mp_W_series = {list(P_mp_W_series)}")
 
 # Now make a nice plot.
 fig, ax = pyplot.subplots(figsize=(8, 6))
+# Create color cycler.
+cycler = pyplot.rcParams["axes.prop_cycle"]()
 # Plot the data fits.
 for idx, (F, T_degC) in enumerate(
     zip(iv_performance_matrix.F, iv_performance_matrix.T_degC)
 ):
     # Plot Isc, Pmp, and Voc with same colors as fit lines.
-    color = next(ax._get_lines.prop_cycler)["color"]
+    color = next(cycler)["color"]
     ax.plot(
         ivft_data.V_V[3 * idx : 3 * idx + 3],
         ivft_data.I_A[3 * idx : 3 * idx + 3],
@@ -136,8 +137,9 @@ for idx, (F, T_degC) in enumerate(
             ),
         )["I_A"],
     )
+
 # Plot the LIC.
-color = next(ax._get_lines.prop_cycler)["color"]
+color = next(cycler)["color"]
 ax.plot(
     [0.0, iv_parameters_alt["V_mp_V"], iv_parameters_alt["V_oc_V"]],
     [iv_parameters_alt["I_sc_A"], iv_parameters_alt["I_mp_A"], 0.0],

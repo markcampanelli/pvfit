@@ -12,7 +12,6 @@ from pvfit.measurement.spectral_correction.types import (
     SpectralIrradianceWithTail,
 )
 
-
 # ASTM G173-03 Hemispherical Tilted. See https://rredc.nrel.gov/solar//spectra/am1.5/
 lambda_G173_hemispherical_tilted_nm = numpy.array(
     [

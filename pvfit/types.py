@@ -10,11 +10,11 @@ import numpy
 import numpy.typing
 
 # Vectors are 1D.
-FloatVector = numpy.typing.NDArray[numpy.float_]
+FloatVector = numpy.typing.NDArray[numpy.float64]
 IntVector = numpy.typing.NDArray[numpy.int_]
 
 # Arrays are ND, inc. 0D and 1D.
-FloatArray = numpy.typing.NDArray[numpy.float_]
+FloatArray = numpy.typing.NDArray[numpy.float64]
 IntArray = numpy.typing.NDArray[numpy.int_]
 
 # Broadcastables indicate that they have broadcast compatibility in the usage context.

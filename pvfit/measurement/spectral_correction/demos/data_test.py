@@ -22,6 +22,6 @@ def test_nist_M():
             E_RD_OC=data.E_sim_NIST,
             S_RD_RC=data.S_RD_NIST,
             E_RD_RC=data.E_G173_global_tilt,
-        )
-        == 0.9982571553509605
+        ).item()
+        == 0.9982571553509618
     )

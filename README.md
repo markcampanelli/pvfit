@@ -2,7 +2,7 @@
 
 **PVfit: Photovoltaic (PV) Device Performance Measurement and Modeling**
 
-**IMPORTANT:** This code is pre-release, and so the code organiztion and Application
+**IMPORTANT:** This code is pre-release, and so the code organization and Application
 Programming Interface (API) should be expected to change with minimal warning.
 
 **NOTICE:** We are in the process of open-sourcing the single-diode equation (SDE) and 
@@ -62,11 +62,11 @@ functionalities—
       - [Parameter Fitting](pvfit/modeling/ac/sipm/inference.py)
       - [Simulation](pvfit/modeling/ac/sipm/simulation.py)
 
-We still need to improve test coverage for certain subpackages, esp.the simple SDM.
+We still need to improve test coverage for certain subpackages, esp. the simple SDM.
 
 ## Up and Running in 5 Minutes
 
-`pvfit` minimally requires [python>=3.10,<3.13](https://www.python.org/) with
+`pvfit` minimally requires [python>=3.11,<3.15](https://www.python.org/) with
 [numpy](https://numpy.org/) and [scipy](https://www.scipy.org/). It is tested with
 CPython on recent versions of Ubuntu, macOS, and Windows. We suggest using a suitable
 Python virtual environment that provides [pip](https://pypi.org/project/pip/).
@@ -74,10 +74,10 @@ Python virtual environment that provides [pip](https://pypi.org/project/pip/).
 ### Download, Install, and Verify Package (non-editable mode)
 
 This package is available at [PyPI](https://pypi.org/), but it is still pre-v1. With
-sufficiently recent versions of `pip` and `setuptools`, install `pvfit` with the extra
-packages needed for the demos using—
+sufficiently recent versions of `pip`, install `pvfit` with the extra packages needed 
+for the demos using—
 ```terminal
-python -m pip install --upgrade pip setuptools
+python -m pip install --upgrade pip
 python -m pip install pvfit[demo]
 ```
 
@@ -117,8 +117,8 @@ method, and go to the repo's root directory.
 
 Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
-python -m pip install --upgrade pip setuptools
-python -m pip install -e .[demo,dev,docs,test]
+python -m pip install --upgrade pip
+python -m pip install -e .[all]
 python -m pip install --progress-bar off "ivcurves @ git+https://github.com/cwhanse/ivcurves@7ae47284b23cfff167932b8cccae53c10ebf9bf9"
 ```
 This also installs the libraries needed to test, develop the code demonstrations, and

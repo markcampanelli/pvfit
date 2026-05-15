@@ -19,7 +19,7 @@ def test_k_B_J_per_K():
 
 def test_k_B_eV_per_K():
     assert isinstance(common.k_B_eV_per_K, float)
-    assert common.k_B_eV_per_K == 8.617333262e-05
+    assert common.k_B_eV_per_K == 8.617333262145179e-05
 
 
 def test_c_m_per_s():

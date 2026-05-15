@@ -148,7 +148,7 @@ class SpectralIrradiance(DataFunctionNonnegativeXNonnegativeY):
     @property
     def E_total_W_per_m2(self) -> FloatArray:
         """Return integrated total irradiance(s)."""
-        return numpy.trapz(self.E_W_per_m2_nm, x=self.lambda_nm)
+        return numpy.trapezoid(self.E_W_per_m2_nm, x=self.lambda_nm)
 
     # FIXME Should this be a method?
     def get_E_total_subinterval_W_per_m2(
@@ -162,7 +162,7 @@ class SpectralIrradiance(DataFunctionNonnegativeXNonnegativeY):
             lambda_min_nm <= self.lambda_nm, self.lambda_nm <= lambda_max_nm
         )
 
-        return numpy.trapz(
+        return numpy.trapezoid(
             self.E_W_per_m2_nm[..., subinterval_idx], x=self.lambda_nm[subinterval_idx]
         )
 

@@ -17,7 +17,7 @@ used to apply the IAM (from IEC 61853-2) to all of the POA irradiance components
 We use the Isc equation from the Sandia Array Performance Model (SAPM) to compute
 effective irradiance ratio F, the Faiman model is used to compute module temperature
 (using IEC 61853-2 measurements of U0 and U1), and then cell temperature T_degC is
-computed from module temperature using the SAPM. 
+computed from module temperature using the SAPM.
 
 References:
 https://pvpmc.sandia.gov/modeling-guide/1-weather-design-inputs/plane-of-array-poa-irradiance/calculating-poa-irradiance/poa-sky-diffuse/perez-sky-diffuse-model/
@@ -38,7 +38,6 @@ import pvlib
 from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import FTData
 from pvfit.modeling.dc.common import iam_factory
-
 
 # LG320N1K-A5 320W LG NeON2
 module_config = {
@@ -324,16 +323,16 @@ sky_diffuse_components = pvlib.irradiance.perez(
 components = pvlib.irradiance.poa_components(
     aoi_deg,
     weather["DNI (W/m2)"].to_numpy(),
-    sky_diffuse_components["sky_diffuse"].to_numpy(),
+    sky_diffuse_components["poa_sky_diffuse"].to_numpy(),
     pvlib.irradiance.get_ground_diffuse(
         location["surface_tilt_deg"],
         weather["GHI (W/m2)"],
         albedo=weather["Albedo"].to_numpy(),
     ).to_numpy(),
 ).fillna(0.0)
-components["poa_isotropic"] = sky_diffuse_components["isotropic"]
-components["poa_circumsolar"] = sky_diffuse_components["circumsolar"]
-components["poa_horizon"] = sky_diffuse_components["horizon"]
+components["poa_isotropic"] = sky_diffuse_components["poa_isotropic"]
+components["poa_circumsolar"] = sky_diffuse_components["poa_circumsolar"]
+components["poa_horizon"] = sky_diffuse_components["poa_horizon"]
 
 # (Back of) module temperature.
 T_degC_module = pvlib.temperature.faiman(
