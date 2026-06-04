@@ -111,3 +111,6 @@ venv.bak/
 # Test-generated files
 artifacts
 *.csv
+
+# Mac specific
+.DS_Store
