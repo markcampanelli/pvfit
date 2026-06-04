@@ -34,6 +34,7 @@ dynamic = ["version"]
 
 dependencies = [
     "numpy >=2, <3",
+    "odrpack ==0.6.0",
     "scipy >=1.5, <2",
 ]
 
@@ -43,7 +44,7 @@ all = [
 ]
 demo = [
     "matplotlib >=3, <4",
-    "pandas >=2, <4",
+    "pandas[excel] >=2, <4",
     "pvlib ==0.15.1",
 ]
 dev = [
@@ -60,6 +61,7 @@ docs = [
 test = [
     # ivcurves is not currently tagged, so fix a commit to main branch. Do this manually due to PyPI issue.
     # "ivcurves @ git+https://github.com/cwhanse/ivcurves@28e1c7e46534599174484f3b8d718090c9808489",
+    "openpyxl >=3.1.5, <4",
     "pandas >=2, <4",
     "pytest >=9, <10",
     "pytest-cov >=7, <8",
@@ -73,8 +75,8 @@ Discussions = "https://github.com/markcampanelli/pvfit/discussions"
 PullRequests = "https://github.com/markcampanelli/pvfit/pulls"
 WebApplication = "https://pvfit.app"
 
-[tool.setuptools.packages.find]
-include = ["pvfit"]
+[tool.setuptools.package-data]
+"pvfit" = ["demos/**"]
 
 [tool.setuptools_scm]
 
