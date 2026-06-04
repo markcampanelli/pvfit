@@ -200,8 +200,8 @@ be appropriately recorded in [pyproject.toml](pyproject.toml).
 
 ### Coding Requirements and Style
 
-- Unit testing is a must, with a "collocation" scheme, i.e., `module_test.py` to test
-`module.py` in the same directory. 100% code coverage is the goal.
+- Unit testing is a must, with tests located separately in a "mirrored" package 
+directory under [tests](tests). 100% code coverage is the goal.
 - [Type hints](https://docs.python.org/3/library/typing.html) should be used
 throughout (WIP).
 - [`pylint`](https://pylint.readthedocs.io/en/latest/?badge=latest) is used for linting,
