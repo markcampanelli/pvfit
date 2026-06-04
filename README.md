@@ -67,9 +67,11 @@ We still need to improve test coverage for certain subpackages, esp. the simple 
 ## Up and Running in 5 Minutes
 
 `pvfit` minimally requires [python>=3.12,<3.15](https://www.python.org/) with
-[numpy](https://numpy.org/) and [scipy](https://www.scipy.org/). It is tested with
-CPython on recent versions of Ubuntu, macOS, and Windows. We suggest using a suitable
-Python virtual environment that provides [pip](https://pypi.org/project/pip/).
+[numpy](https://numpy.org/), 
+[odrpack-python](https://hugomvale.github.io/odrpack-python/), and 
+[scipy](https://www.scipy.org/). It is tested with CPython on recent versions of 
+Ubuntu, macOS, and Windows. We suggest using a suitable Python virtual environment 
+that provides [pip](https://pypi.org/project/pip/).
 
 ### Download, Install, and Verify Package (non-editable mode)
 
@@ -119,7 +121,6 @@ Install `pvfit` with all extras in editable (development) mode with `pip`—
 ```terminal
 python -m pip install --upgrade pip
 python -m pip install -e .[all]
-python -m pip install --progress-bar off "ivcurves @ git+https://github.com/cwhanse/ivcurves@7ae47284b23cfff167932b8cccae53c10ebf9bf9"
 ```
 This also installs the libraries needed to test, develop the code demonstrations, and
 build documentation and source and wheel distributions.

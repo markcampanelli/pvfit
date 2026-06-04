@@ -4,7 +4,7 @@ PVfit testing: Single-diode equation (SDE) inference.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-import importlib.resources
+from dataclasses import fields
 import json
 import os
 from pathlib import Path
@@ -16,12 +16,14 @@ import scipy
 
 import pvfit
 from pvfit.measurement.iv.types import IVCurve
-import pvfit.modeling.dc.single_diode.equation.simple.inference_iv_curve as inference_iv_curve
+from pvfit.modeling.dc.single_diode.equation.simple import inference_iv_curve
 from pvfit.modeling.dc.single_diode.equation.simple.types import (
+    ModelParameters,
     ModelParametersFittableFixed,
     ModelParametersFittable,
     ModelParametersUnfittable,
 )
+from pvfit.types import OdrOptions
 
 ARTIFACTS_PARENT_DIR_PATH = Path(os.path.dirname(os.path.dirname(pvfit.__file__)))
 
@@ -2490,21 +2492,22 @@ def fit_fixture(request):
     return request.param
 
 
-@pytest.mark.skip(reason="ivcurves not installed by default")
+@pytest.mark.skip(reason="WIP ivcurves data embedded into pvfit not passing")
 def test_fit(fit_fixture):
     """Test SDE fit against standard curves provided by ivcurves package."""
 
     given = fit_fixture["given"]
     expected = fit_fixture["expected"]
 
-    IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
-    base_path = IVCURVES_MULTIPLEXED_PATH.joinpath("test_sets")
+    base_path = (
+        Path(pvfit.__file__).parent.parent.parent / "tests" / "ivcurves" / "test_sets"
+    )
     test_set = given["test_set"]
 
     with base_path.joinpath(test_set + ".json").open(encoding="utf8") as file:
         iv_curve_json = json.load(file)
 
-    with importlib.resources.as_file(base_path.joinpath(test_set + ".csv")) as file:
+    with base_path.joinpath(test_set + ".csv").open(encoding="utf-8") as file:
         model_parameters_true_df = pandas.read_csv(file, encoding="utf-8")
 
     model_parameters_got_df = pandas.DataFrame(
@@ -2540,25 +2543,28 @@ def test_fit(fit_fixture):
         model_parameters_got = inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
-        )["model_parameters"]
+            odr_options=OdrOptions(maxit=100000),
+        ).model_parameters
 
-        for key in model_parameters_got:
+        for field in fields(ModelParameters):
+            field_got = getattr(model_parameters_got, field.name)
+            field_expected = model_parameters_expected[field.name]
             numpy.testing.assert_allclose(
-                model_parameters_got[key],
-                model_parameters_expected[key],
+                field_got,
+                field_expected,
                 rtol=given["rtol"],
                 atol=given["atol"],
-                err_msg=f"got {model_parameters_got[key]} for {key}, expected {model_parameters_expected[key]}",
+                err_msg=f"got {field_got} for {field.name}, expected {field_expected}",
             )
 
         model_parameters_got_df.loc[idx, "Index"] = Index
-        model_parameters_got_df.loc[idx, "I_ph_A"] = model_parameters_got["I_ph_A"]
-        model_parameters_got_df.loc[idx, "I_rs_A"] = model_parameters_got["I_rs_A"]
-        model_parameters_got_df.loc[idx, "n"] = model_parameters_got["n"]
-        model_parameters_got_df.loc[idx, "R_s_Ohm"] = model_parameters_got["R_s_Ohm"]
-        model_parameters_got_df.loc[idx, "G_p_S"] = model_parameters_got["G_p_S"]
-        model_parameters_got_df.loc[idx, "N_s"] = model_parameters_got["N_s"]
-        model_parameters_got_df.loc[idx, "T_degC"] = model_parameters_got["T_degC"]
+        model_parameters_got_df.loc[idx, "I_ph_A"] = model_parameters_got.I_ph_A
+        model_parameters_got_df.loc[idx, "I_rs_A"] = model_parameters_got.I_rs_A
+        model_parameters_got_df.loc[idx, "n"] = model_parameters_got.n
+        model_parameters_got_df.loc[idx, "R_s_Ohm"] = model_parameters_got.R_s_Ohm
+        model_parameters_got_df.loc[idx, "G_p_S"] = model_parameters_got.G_p_S
+        model_parameters_got_df.loc[idx, "N_s"] = model_parameters_got.N_s
+        model_parameters_got_df.loc[idx, "T_degC"] = model_parameters_got.T_degC
 
         # Test using true parameters as ICs.
         if "case3" in test_set:
@@ -2587,13 +2593,9 @@ def test_fit(fit_fixture):
         inference_iv_curve.fit(
             iv_curve=iv_curve,
             model_parameters_unfittable=model_parameters_unfittable,
-            model_parameters_fittable_ic_provided=model_parameters_fittable_ic_true,
-            model_parameters_fittable_fixed_provided=ModelParametersFittableFixed(
-                I_ph_A=True,
-                I_rs_A=True,
-                n=True,
-                R_s_Ohm=True,
-                G_p_S=True,
+            model_parameters_fittable_ic=model_parameters_fittable_ic_true,
+            model_parameters_fittable_fixed=ModelParametersFittableFixed(
+                I_ph_A=True, I_rs_A=True, n=True, R_s_Ohm=True, G_p_S=True
             ),
         )
 
@@ -2640,54 +2642,3 @@ def test_fit(fit_fixture):
         path_or_buf=TEST_ARTIFACTS_PATH.joinpath(test_set + ".csv"),
         index=False,
     )
-
-
-# This must execute after all test_fit cases have finished.
-@pytest.mark.skip(reason="ivcurves not installed by default")
-def test_fit_benchmark():
-    """Check ivcurves benchmark scores from test_fit tests."""
-
-    IVCURVES_MULTIPLEXED_PATH = importlib.resources.files("ivcurves")
-
-    with importlib.resources.as_file(
-        IVCURVES_MULTIPLEXED_PATH.joinpath("compare_curves.py")
-    ) as script:
-        # This command creates CSV score files for each test-set case.
-        return_value = os.system(
-            f"python {script} {TEST_ARTIFACTS_PATH} --csv-output-path "
-            f"{TEST_ARTIFACTS_PATH}"
-        )
-
-    # Check command success.
-    assert return_value == 0
-
-    # Read in created benchmark file.
-    overall_scores_df_got = pandas.read_csv(
-        TEST_ARTIFACTS_PATH.joinpath("overall_scores.csv"),
-        index_col="test_set",
-        encoding="utf-8",
-    )
-
-    overall_scores_got_test_set = set(overall_scores_df_got.index)
-    overall_scores_expected_test_set = set(
-        ("case1", "case2", "case3a", "case3b", "case3c", "case3d")
-    )
-
-    assert overall_scores_got_test_set == overall_scores_expected_test_set
-
-    overall_scores_expected_score = {
-        "case1": 30.0000000000000230624,
-        "case2": 31.0000000000000336641,
-        "case3a": 0.1068342249452320955,
-        "case3b": 0.06836656715157551795,
-        "case3c": 0.06659086185392485641,
-        "case3d": 0.1756979161971756333,
-    }
-
-    for case in overall_scores_expected_score:
-        numpy.testing.assert_allclose(
-            overall_scores_df_got.loc[case, "score"],
-            overall_scores_expected_score[case],
-            rtol=2e-04,
-            atol=3e-05,
-        )

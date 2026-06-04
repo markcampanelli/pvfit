@@ -58,10 +58,7 @@ docs = [
     "sphinx_rtd_theme >=1, <2",
 ]
 test = [
-    # ivcurves is not currently tagged, so fix a commit to main branch. Do this manually due to PyPI issue.
-    # "ivcurves @ git+https://github.com/cwhanse/ivcurves@28e1c7e46534599174484f3b8d718090c9808489",
-    "openpyxl >=3.1.5, <4",
-    "pandas >=2, <4",
+    "pvfit[demo]",
     "pytest >=9, <10",
     "pytest-cov >=7, <8",
 ]
@@ -88,6 +85,3 @@ ignore = ["build"]
 addopts = [
     "--import-mode=importlib",
 ]
-
-[tool.coverage.run]
-omit = ["*_test.py"]
