@@ -32,7 +32,13 @@ https://pvpmc.sandia.gov/model-validation/2023-blind-modeling-comparisons/
 
 import numpy
 import pandas
-import pvlib
+try:
+    import pvlib
+except ImportError:
+    raise ImportError(
+        "pvlib is required for this demo but is not yet not fully supported on Python "
+        "3.15."
+    )
 
 from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import FTData

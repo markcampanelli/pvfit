@@ -123,7 +123,8 @@ repo root, initialize using—
 uv sync --all-groups --extra all 
 ```
 This installs all the dependencies needed to test, develop the code demonstrations, and
-build documentation.
+build documentation. You can use the `--python` flag to specify a Python version to
+`uv`.
 
 Verify your installation by running the installed version script—
 ```terminal
