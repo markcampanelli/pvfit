@@ -22,7 +22,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
       - name: uv sync and display dependency tree
         run: |
-          uv sync --all-groups
+          uv sync --all-groups --extra all 
           uv tree
       - name: Lint
         run: |
