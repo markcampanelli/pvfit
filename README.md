@@ -179,11 +179,6 @@ A platfrom-specific `*.whl` file is placed in the `dist` directory (not committe
 included Python extension module has the same interface. Users may wish to remove
 tests and demos before generating such wheel files.
 
-Finally, the distribution manifests (cf. `MANIFEST.in`) are checked using--
-```terminal
-python -m check_manifest
-```
-
 ### Dependencies
 
 Currently, [`numpy`](https://www.numpy.org/) and [`scipy`](https://www.scipy.org/) are

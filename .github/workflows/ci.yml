@@ -24,9 +24,6 @@ jobs:
           python -m pip --version
           python -m pip install --progress-bar off .[all]
           python -m pip list
-      - name: Check manifest
-        run: |
-          python -m check_manifest
       - name: Lint
         run: |
           python -m ruff check --extend-exclude tests

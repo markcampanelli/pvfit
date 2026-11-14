@@ -49,7 +49,6 @@ demo = [
 ]
 dev = [
     "build >=1.2.1, <2",
-    "check-manifest >=0.49, <0.50",
     "ruff ==0.15.13",
 ]
 docs = [
