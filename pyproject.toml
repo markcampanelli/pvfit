@@ -36,7 +36,7 @@ all = [
 demo = [
     "matplotlib >=3, <4",
     "pandas[excel] >=2, <4",
-    "pvlib ==0.16.1",
+    "pvlib ==0.16.1; python_version <'3.15'",
 ]
 
 [dependency-groups]
