@@ -209,7 +209,7 @@ print(
 )
 print(f"F_series = {F_series}")
 print(f"T_degC (fixed) = {T_degC_series}")
-print(f"P_mp_W_series = {P_mp_W_series["P_mp_W"]}")
+print(f"P_mp_W_series = {P_mp_W_series['P_mp_W']}")
 
 # Fit photoconductive-shunt single-diode model (SDM) to I-V performance matrix data.
 
@@ -285,7 +285,7 @@ print(
 )
 print(f"F_series = {F_series}")
 print(f"T_degC (fixed) = {T_degC_series}")
-print(f"P_mp_W_series_ps = {P_mp_W_series_ps["P_mp_W"]}")
+print(f"P_mp_W_series_ps = {P_mp_W_series_ps['P_mp_W']}")
 
 # Now make a nice comparison plot.
 fig, axs = pyplot.subplots(1, 2, figsize=(12, 6))

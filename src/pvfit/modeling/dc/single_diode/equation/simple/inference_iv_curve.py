@@ -100,7 +100,7 @@ def fit(
         G_p = beta[4]
 
         V = x[0]
-        I = x[1]
+        I = x[1]  # noqa: E741
 
         V_diode = V + I * R_s
 

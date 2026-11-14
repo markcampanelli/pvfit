@@ -92,14 +92,14 @@ def fit(
         model_parameters_fittable_fixed = ModelParametersFittableFixed()
 
     # FIXME Implement data scaling.
-    if normalize_iv_performance_matrix:
-        V_V_scale = iv_performance_matrix.V_oc_V_0
-        I_A_scale = iv_performance_matrix.I_sc_A_0
-        T_K_scale = T_K_0
-    else:
-        V_V_scale = 1.0
-        I_A_scale = 1.0
-        T_K_scale = 1.0
+    # if normalize_iv_performance_matrix:
+    #     V_V_scale = iv_performance_matrix.V_oc_V_0
+    #     I_A_scale = iv_performance_matrix.I_sc_A_0
+    #     T_K_scale = T_K_0
+    # else:
+    #     V_V_scale = 1.0
+    #     I_A_scale = 1.0
+    #     T_K_scale = 1.0
 
     def f(x: numpy.ndarray, beta: numpy.ndarray) -> numpy.ndarray:
         """

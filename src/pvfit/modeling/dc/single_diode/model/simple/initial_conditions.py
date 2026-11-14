@@ -9,7 +9,6 @@ from typing import Optional
 import numpy
 import scipy.optimize
 
-from pvfit.common import T_degC_abs_zero
 from pvfit.measurement.iv.types import FTData, IVCurve, IVData, IVFTData
 from pvfit.modeling.dc.common import MATERIALS_INFO, Material
 import pvfit.modeling.dc.single_diode.equation.simple.initial_conditions as sde_ic

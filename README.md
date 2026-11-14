@@ -13,7 +13,6 @@ refer users to the modules in `demos` for the various subpackages.
 
 ![CI](https://github.com/markcampanelli/pvfit/actions/workflows/ci.yml/badge.svg)
 <!-- [![Documentation Status](https://readthedocs.org/projects/pvfit/badge/?version=latest)](https://pvfit.readthedocs.io/en/latest/?badge=latest) -->
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
 ## So What Can PVfit Do for Me?
@@ -205,18 +204,16 @@ be appropriately recorded in [pyproject.toml](pyproject.toml).
 directory under [tests](tests). 100% code coverage is the goal.
 - [Type hints](https://docs.python.org/3/library/typing.html) should be used
 throughout (WIP).
-- [`pylint`](https://pylint.readthedocs.io/en/latest/?badge=latest) is used for linting,
-with `black`'s default 88-character line limit (configured in 
-[pyproject.toml](pyproject.toml)). Check before committing code using--
+- [`ruff`](https://pypi.org/project/ruff/) is used for linting. Check before committing
+code using--
 ```terminal
-python -m pylint .
+python -m ruff check --extend-exclude tests
 ```
-Skip troublesome lines (sparingly) with the suffix `# pylint: disable=<code>`.
-- [`black`](https://black.readthedocs.io/en/stable/index.html) is used to autoformat
-code. Autoformat before committing
-code, using--
+Skip troublesome lines (sparingly) with the suffix `# noqa: <code>`.
+- [`ruff`](https://pypi.org/project/ruff/) is also used to autoformat code. Autoformat
+before committing code, using--
 ```terminal
-python -m black .
+python -m ruff format
 ```
 
 ## About the Author and Maintainer
