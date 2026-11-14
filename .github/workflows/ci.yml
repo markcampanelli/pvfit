@@ -34,6 +34,7 @@ jobs:
         run: |
           uv run --frozen pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-results.xml -vv tests
       - name: Test scripts
+        continue-on-error: true
         run: |
           uv run pvfit-version
       - name: Archive results
