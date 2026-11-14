@@ -22,8 +22,7 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
       - name: Generate lock
         run: |
-          uv lock
-          cat uv.lock
+          uv tree
       - name: Lint
         run: |
           uv run ruff check --extend-exclude tests
