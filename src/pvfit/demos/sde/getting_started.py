@@ -6,12 +6,12 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import pprint
 
-from matplotlib import pyplot
 import numpy
+from matplotlib import pyplot
 
-from pvfit.measurement.iv.types import IVCurve
 import pvfit.modeling.dc.single_diode.equation.simple.inference_iv_curve as sde_inf_iv
 import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+from pvfit.measurement.iv.types import IVCurve
 from pvfit.modeling.dc.single_diode.equation.simple.types import (
     ModelParametersUnfittable,
 )

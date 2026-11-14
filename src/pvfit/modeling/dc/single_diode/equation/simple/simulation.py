@@ -5,7 +5,6 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from dataclasses import asdict
-from typing import Optional
 
 import numpy
 from scipy.optimize import brentq, newton
@@ -61,7 +60,7 @@ def I_at_V(
     *,
     V_V: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute terminal current at specified terminal voltage.
@@ -165,7 +164,7 @@ def dI_dV_at_V(
     *,
     V_V: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute 1st derivative of terminal current with respect to terminal voltage at
@@ -219,7 +218,7 @@ def d2I_dV2_at_V(
     *,
     V_V: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute 2nd derivative of terminal current with respect to terminal voltage at
@@ -275,7 +274,7 @@ def V_at_I(
     *,
     I_A: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute terminal voltage at specified terminal current.
@@ -404,7 +403,7 @@ def dV_dI_at_I(
     *,
     I_A: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute 1st derivative of terminal voltage with respect to terminal current at
@@ -458,7 +457,7 @@ def P_at_V(
     *,
     V_V: FloatBroadcastable,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute terminal power at specified terminal voltage.
@@ -496,7 +495,7 @@ def P_at_V(
 def P_mp(
     *,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute maximum terminal power.
@@ -578,27 +577,39 @@ def P_mp(
     # Verify convergence, because newton() documentation says this should be checked.
     numpy.testing.assert_equal(converged, True)
 
+    def dP_dV(V_V, N_s, T_degC, I_ph_A, I_rs_A, n, R_s_Ohm, G_p_S):
+        result = dI_dV_at_V(
+            V_V=V_V,
+            model_parameters=ModelParameters(
+                N_s=N_s,
+                T_degC=T_degC,
+                I_ph_A=I_ph_A,
+                I_rs_A=I_rs_A,
+                n=n,
+                R_s_Ohm=R_s_Ohm,
+                G_p_S=G_p_S,
+            ),
+            newton_options=newton_options,
+        )
+
+        return numpy.array(result["dI_dV_S"] * V_V + result["I_A"])
+
     for idx, V_mp_V_ in numpy.ndenumerate(V_mp_V):
         if not numpy.isfinite(V_mp_V_):
-
-            def dP_dV(V_V):
-                result = dI_dV_at_V(
-                    V_V=V_V,
-                    model_parameters=ModelParameters(
-                        N_s=model_parameters.N_s[idx],
-                        T_degC=model_parameters.T_degC[idx],
-                        I_ph_A=model_parameters.I_ph_A[idx],
-                        I_rs_A=model_parameters.I_rs_A[idx],
-                        n=model_parameters.n[idx],
-                        R_s_Ohm=model_parameters.R_s_Ohm[idx],
-                        G_p_S=model_parameters.G_p_S[idx],
-                    ),
-                    newton_options=newton_options,
-                )
-
-                return numpy.array(result["dI_dV_S"] * V_V + result["I_A"])
-
-            V_mp_V[idx] = brentq(dP_dV, 0.0, V_oc_V[idx])
+            V_mp_V[idx] = brentq(
+                dP_dV,
+                0.0,
+                V_oc_V[idx],
+                args=(
+                    model_parameters.N_s[idx],
+                    model_parameters.T_degC[idx],
+                    model_parameters.I_ph_A[idx],
+                    model_parameters.I_rs_A[idx],
+                    model_parameters.n[idx],
+                    model_parameters.R_s_Ohm[idx],
+                    model_parameters.G_p_S[idx],
+                ),
+            )
 
     I_mp_A = I_at_V(
         V_V=V_mp_V, model_parameters=model_parameters, newton_options=newton_options
@@ -611,7 +622,7 @@ def P_mp(
 def FF(
     *,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute fill factor (unitless fraction).
@@ -664,7 +675,7 @@ def FF(
 def R_at_sc(
     *,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute terminal resistance at short circuit in Ohms.
@@ -698,7 +709,7 @@ def R_at_sc(
 def R_at_oc(
     *,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> dict:
     """
     Compute terminal resistance at open circuit in Ohms.
@@ -738,7 +749,7 @@ def R_at_oc(
 def iv_curve_parameters(
     *,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
+    newton_options: NewtonOptions | None = None,
 ) -> IVCurveParametersArray:
     """
     Compute I-V curve parameters.

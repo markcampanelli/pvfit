@@ -4,17 +4,15 @@ PVfit: Initial conditions (IC) for single-diode model (SDM) inference.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from typing import Optional
-
 import numpy
 import scipy.optimize
 
-from pvfit.measurement.iv.types import FTData, IVCurve, IVData, IVFTData
-from pvfit.modeling.dc.common import MATERIALS_INFO, Material
 import pvfit.modeling.dc.single_diode.equation.simple.initial_conditions as sde_ic
 import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
 import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
 import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
+from pvfit.measurement.iv.types import FTData, IVCurve, IVData, IVFTData
+from pvfit.modeling.dc.common import MATERIALS_INFO, Material
 from pvfit.modeling.dc.single_diode.model.simple.types import (
     ModelParameters,
     ModelParametersFittable,
@@ -25,13 +23,13 @@ from pvfit.modeling.dc.single_diode.model.simple.types import (
 
 def determine_model_parameters_fittable_ic(
     *,
-    model_parameters_unfittable: Optional[ModelParametersUnfittable] = None,
-    ivft_data: Optional[IVFTData] = None,
-    I_rs_A_0: Optional[float] = None,
-    n_0: Optional[float] = None,
-    R_s_Ohm_0: Optional[float] = None,
-    G_p_S_0: Optional[float] = None,
-    E_g_eV_0: Optional[float] = None,
+    model_parameters_unfittable: ModelParametersUnfittable | None = None,
+    ivft_data: IVFTData | None = None,
+    I_rs_A_0: float | None = None,
+    n_0: float | None = None,
+    R_s_Ohm_0: float | None = None,
+    G_p_S_0: float | None = None,
+    E_g_eV_0: float | None = None,
     material: Material = Material.xSi,
 ) -> ModelParametersFittable:
     """
@@ -130,10 +128,10 @@ def determine_model_parameters_fittable_ic(
 
 def determine_operating_conditions_ic(
     *,
-    model_parameters: Optional[ModelParameters],
-    iv_data: Optional[IVData] = None,
-    F: Optional[float] = None,
-    T_degC: Optional[float] = None,
+    model_parameters: ModelParameters | None,
+    iv_data: IVData | None = None,
+    F: float | None = None,
+    T_degC: float | None = None,
 ) -> OperatingConditions:
     """
     Estimate initial conditions (IC) for operating conditions (OC).

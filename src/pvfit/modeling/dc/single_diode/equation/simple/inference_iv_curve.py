@@ -5,7 +5,6 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from dataclasses import asdict
-from typing import Optional
 
 import numpy
 import odrpack
@@ -30,10 +29,10 @@ def fit(
     *,
     iv_curve: IVCurve,
     model_parameters_unfittable: ModelParametersUnfittable,
-    model_parameters_fittable_ic: Optional[ModelParametersFittable] = None,
-    model_parameters_fittable_fixed: Optional[ModelParametersFittableFixed] = None,
+    model_parameters_fittable_ic: ModelParametersFittable | None = None,
+    model_parameters_fittable_fixed: ModelParametersFittableFixed | None = None,
     normalize_iv_curve: bool = True,
-    odr_options: Optional[OdrOptions] = None,
+    odr_options: OdrOptions | None = None,
 ) -> FitResultODR:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 5-parameter
@@ -100,7 +99,7 @@ def fit(
         G_p = beta[4]
 
         V = x[0]
-        I = x[1]  # noqa: E741
+        I = x[1]
 
         V_diode = V + I * R_s
 
@@ -126,7 +125,7 @@ def fit(
     bounds[0][1] = -numpy.inf  # Log of reverse saturation current.
     fix_beta = [
         asdict(model_parameters_fittable_fixed)[key]
-        for key in asdict(model_parameters_fittable_ic).keys()
+        for key in asdict(model_parameters_fittable_ic)
     ]
 
     if odr_options is None:

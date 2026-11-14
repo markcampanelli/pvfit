@@ -6,21 +6,20 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from dataclasses import asdict
-from typing import Optional
 
 import numpy
 import odrpack
 from scipy.constants import convert_temperature
 
-from pvfit.common import T_degC_abs_zero, k_B_J_per_K, k_B_eV_per_K, q_C
+from pvfit.common import T_degC_abs_zero, k_B_eV_per_K, k_B_J_per_K, q_C
 from pvfit.measurement.iv.types import IVData
 from pvfit.modeling.dc.single_diode.model.simple.initial_conditions import (
     determine_operating_conditions_ic,
 )
 from pvfit.modeling.dc.single_diode.model.simple.types import (
-    OperatingConditionsFitResultODR,
     ModelParameters,
     OperatingConditions,
+    OperatingConditionsFitResultODR,
     OperatingConditionsFixed,
 )
 from pvfit.types import OdrOptions
@@ -30,9 +29,9 @@ def fit(
     *,
     iv_data: IVData,
     model_parameters: ModelParameters,
-    operating_conditions_ic: Optional[OperatingConditions] = None,
-    operating_conditions_fixed: Optional[OperatingConditionsFixed] = None,
-    odr_options: Optional[OdrOptions] = None,
+    operating_conditions_ic: OperatingConditions | None = None,
+    operating_conditions_fixed: OperatingConditionsFixed | None = None,
+    odr_options: OdrOptions | None = None,
 ) -> OperatingConditions:
     """
     Fit the effective irradiance ratio and temperature of a PV device with a calibrated
@@ -131,9 +130,7 @@ def fit(
         ]
     )
     bounds = (numpy.array((0.0, T_degC_abs_zero)), numpy.full_like(beta0, numpy.inf))
-    fix_beta = [
-        operating_conditions_fixed[key] for key in operating_conditions_ic.keys()
-    ]
+    fix_beta = [operating_conditions_fixed[key] for key in operating_conditions_ic]
 
     if odr_options is None:
         odr_options = OdrOptions()

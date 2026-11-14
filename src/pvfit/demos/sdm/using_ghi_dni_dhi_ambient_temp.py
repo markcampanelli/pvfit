@@ -34,7 +34,6 @@ import numpy
 import pandas
 import pvlib
 
-
 from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import FTData
 from pvfit.modeling.dc.common import iam_factory

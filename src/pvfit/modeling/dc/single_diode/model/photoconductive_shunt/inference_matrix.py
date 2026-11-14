@@ -6,26 +6,25 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from dataclasses import asdict
-from typing import Optional, Tuple
 
 import numpy
 import odrpack
 from scipy.constants import convert_temperature
 
-from pvfit.common import k_B_J_per_K, k_B_eV_per_K, q_C
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.auxiliary_equations as sdm_ps_ae
+from pvfit.common import k_B_eV_per_K, k_B_J_per_K, q_C
 from pvfit.measurement.iv.types import (
     FTData,
     IVCurveParametersArray,
     IVPerformanceMatrix,
 )
-import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
-import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.auxiliary_equations as sdm_ps_ae
 from pvfit.modeling.dc.single_diode.model.simple.initial_conditions import (
     determine_model_parameters_fittable_ic,
 )
 from pvfit.modeling.dc.single_diode.model.simple.types import (
-    ModelParametersFitResultODR,
     ModelParameters,
+    ModelParametersFitResultODR,
     ModelParametersFittable,
     ModelParametersFittableFixed,
     ModelParametersUnfittable,
@@ -36,10 +35,10 @@ from pvfit.types import NewtonOptions, OdrOptions
 def fit(
     *,
     iv_performance_matrix: IVPerformanceMatrix,
-    model_parameters_fittable_ic: Optional[ModelParametersFittable] = None,
-    model_parameters_fittable_fixed: Optional[ModelParametersFittableFixed] = None,
+    model_parameters_fittable_ic: ModelParametersFittable | None = None,
+    model_parameters_fittable_fixed: ModelParametersFittableFixed | None = None,
     normalize_iv_performance_matrix: bool = True,
-    odr_options: Optional[OdrOptions] = None,
+    odr_options: OdrOptions | None = None,
 ) -> ModelParametersFitResultODR:
     """
     Use orthogonal distance regression (ODR) to fit the implicit 6-parameter
@@ -189,7 +188,7 @@ def fit(
     bounds[0][0] = -numpy.inf  # Log of reverse saturation current.
     fix_beta = [
         asdict(model_parameters_fittable_fixed)[key]
-        for key in asdict(model_parameters_fittable_ic).keys()
+        for key in asdict(model_parameters_fittable_ic)
     ]
 
     if odr_options is None:
@@ -237,8 +236,8 @@ def fit(
 def compute_fit_quality(
     iv_performance_matrix: IVPerformanceMatrix,
     model_parameters: ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
-) -> Tuple[dict, IVCurveParametersArray]:
+    newton_options: NewtonOptions | None = None,
+) -> tuple[dict, IVCurveParametersArray]:
     """Compute quality metrics for the fit against the measured performance matrix."""
 
     iv_curve_parameters = sde_sim.iv_curve_parameters(

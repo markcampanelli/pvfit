@@ -7,10 +7,10 @@ Copyright 2023 Intelligent Measurement Systems LLC
 import numpy
 from scipy.constants import convert_temperature
 
+import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
 from pvfit.common import k_B_eV_per_K
 from pvfit.measurement.iv.types import FTData
 from pvfit.modeling.dc.common import get_scaled_thermal_voltage
-import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
 from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
 
 

@@ -7,22 +7,22 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import importlib.resources
 import os
+from collections import OrderedDict
 from pprint import pprint
-from typing import OrderedDict
 
-from matplotlib import pyplot
 import numpy
-from numpy.polynomial import Polynomial
 import pandas
+from matplotlib import pyplot
+from numpy.polynomial import Polynomial
 
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.auxiliary_equations as sdm_ps_ae
+import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.inference_matrix as sdm_ps_inf_matrix
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
+import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
 from pvfit.common import E_hemispherical_tilted_W_per_m2_stc, T_degC_stc
 from pvfit.measurement.iv.types import FTData, IVPerformanceMatrix, SpecSheetParameters
 from pvfit.modeling.dc.common import Material
-import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
-import pvfit.modeling.dc.single_diode.model.simple.inference_matrix as sdm_simple_inf_matrix
-import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.auxiliary_equations as sdm_ps_ae
-import pvfit.modeling.dc.single_diode.model.photoconductive_shunt.inference_matrix as sdm_ps_inf_matrix
 
 # By convention, variable names for numeric values include the units.
 

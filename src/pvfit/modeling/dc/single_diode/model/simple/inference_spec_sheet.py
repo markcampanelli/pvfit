@@ -6,13 +6,13 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from dataclasses import asdict
-from typing import Optional, Tuple
 
 import numpy
-from scipy.constants import convert_temperature
 import scipy.optimize
+from scipy.constants import convert_temperature
 
-
+import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
 from pvfit.common import k_B_eV_per_K
 from pvfit.measurement.iv.types import (
     FTData,
@@ -22,9 +22,7 @@ from pvfit.measurement.iv.types import (
     SpecSheetParameters,
 )
 from pvfit.modeling.dc.common import get_scaled_thermal_voltage
-import pvfit.modeling.dc.single_diode.equation.simple.simulation as sde_sim
 from pvfit.modeling.dc.single_diode.model.simple import types
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
 from pvfit.modeling.dc.single_diode.model.simple.initial_conditions import (
     determine_model_parameters_fittable_ic,
 )
@@ -278,8 +276,8 @@ def fit(
 def compute_fit_quality(
     iv_performance_matrix: IVPerformanceMatrix,
     model_parameters: types.ModelParameters,
-    newton_options: Optional[NewtonOptions] = None,
-) -> Tuple[dict, IVCurveParametersArray]:
+    newton_options: NewtonOptions | None = None,
+) -> tuple[dict, IVCurveParametersArray]:
     """Compute quality metrics for the fit against the measured performance matrix."""
 
     iv_curve_parameters = sde_sim.iv_curve_parameters(

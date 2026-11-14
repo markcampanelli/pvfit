@@ -4,7 +4,6 @@ PVfit: Spectral correction computations.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from typing import Optional, Union
 import warnings
 
 import numpy
@@ -201,9 +200,9 @@ def M(
 def extrapolate_spectral_irradiance(
     *,
     spectral_irradiance: SpectralIrradiance,
-    extrapolant: Union[SpectralIrradiance, SpectralIrradianceWithTail],
-    E_total_W_per_m2: Optional[FloatArray] = None,
-) -> Union[SpectralIrradiance, SpectralIrradianceWithTail]:
+    extrapolant: SpectralIrradiance | SpectralIrradianceWithTail,
+    E_total_W_per_m2: FloatArray | None = None,
+) -> SpectralIrradiance | SpectralIrradianceWithTail:
     """
     Extend the ends of a given spectral irradiance curve(s) by a given complete spectral
     irradiance curve scaled so that the specified total irradiance is acheived.

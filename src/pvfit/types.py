@@ -4,8 +4,8 @@ PVfit: Types.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from dataclasses import dataclass
 import typing
+from dataclasses import dataclass
 
 import numpy
 import numpy.typing
@@ -20,8 +20,8 @@ type IntArray = numpy.typing.NDArray[numpy.integer[typing.Any]]
 
 # Broadcastables indicate that they have broadcast compatibility in the usage context.
 # numpy scalar types deliberately excluded, due to inconsistent typing interoperability.
-type FloatBroadcastable = typing.Union[float, FloatArray]
-type IntBroadcastable = typing.Union[int, IntArray]
+type FloatBroadcastable = float | FloatArray
+type IntBroadcastable = int | IntArray
 
 
 @dataclass

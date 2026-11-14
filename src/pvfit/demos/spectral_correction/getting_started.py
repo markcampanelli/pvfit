@@ -6,7 +6,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import numpy
 
-import pvfit.measurement.spectral_correction.computation as computation
+from pvfit.measurement.spectral_correction import computation
 
 # By convention, variable names for numeric values include the units.
 
@@ -7056,4 +7056,4 @@ M = computation.M(
     S_RD_RC=S_RD_RC,
     E_RD_RC=E_RD_RC,
 )
-print("M = {}".format(M))
+print(f"M = {M}")

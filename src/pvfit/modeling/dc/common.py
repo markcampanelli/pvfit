@@ -11,7 +11,6 @@ from typing import Protocol
 import numpy
 import scipy.constants
 
-
 from pvfit.common import k_B_J_per_K, q_C
 from pvfit.types import FloatArray, FloatBroadcastable, IntBroadcastable
 

@@ -4,9 +4,8 @@ PVfit: Initial conditions (IC) for single-diode equation (SDE) inference.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from dataclasses import asdict
-from typing import Optional
 import warnings
+from dataclasses import asdict
 
 import numpy
 
@@ -21,13 +20,13 @@ from pvfit.modeling.dc.single_diode.equation.simple.types import (
 
 def determine_model_parameters_fittable_ic(
     *,
-    model_parameters_unfittable: Optional[ModelParametersUnfittable] = None,
-    iv_curve: Optional[IVCurve] = None,
-    I_ph_A: Optional[float] = None,
-    I_rs_A: Optional[float] = None,
-    n: Optional[float] = None,
-    R_s_Ohm: Optional[float] = None,
-    G_p_S: Optional[float] = None,
+    model_parameters_unfittable: ModelParametersUnfittable | None = None,
+    iv_curve: IVCurve | None = None,
+    I_ph_A: float | None = None,
+    I_rs_A: float | None = None,
+    n: float | None = None,
+    R_s_Ohm: float | None = None,
+    G_p_S: float | None = None,
 ) -> ModelParametersFittable:
     """
     Initial conditions for fittable model parameters for use in scalar model-parameter
