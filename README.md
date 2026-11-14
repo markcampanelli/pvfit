@@ -157,7 +157,7 @@ make html
 The root of the generated documentation is at `docs/_build/html/pvfit.html` (not
 committed). 
 
-### Distribute, inc. with Nuitka
+### Distribute
 
 PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to
 generate distributions using [setuptools](https://setuptools.pypa.io/en/latest/) as the
@@ -167,17 +167,6 @@ python -m build
 ```
 Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not
 committed).
-
-Alternatively, [nuitka](https://nuitka.net/index.html) can be used to transpile the
-Python source code into faster-executing, compiled C code with the same Python
-interface. With an appropriate setup for Nuitka (compilers, etc.), swap the
-`[build-system]` table in the `pyproject.toml`, then--
-```terminal
-python -m build
-```
-A platfrom-specific `*.whl` file is placed in the `dist` directory (not committed). The
-included Python extension module has the same interface. Users may wish to remove
-tests and demos before generating such wheel files.
 
 ### Dependencies
 

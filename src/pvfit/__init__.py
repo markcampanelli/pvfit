@@ -7,3 +7,9 @@ Copyright 2023 Intelligent Measurement Systems LLC
 import importlib.metadata
 
 __version__ = importlib.metadata.version("pvfit")
+
+
+def version() -> str:
+    """Return current package version."""
+
+    return __version__

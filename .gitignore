@@ -114,3 +114,6 @@ artifacts
 
 # Mac specific
 .DS_Store
+
+# uv
+uv.lock

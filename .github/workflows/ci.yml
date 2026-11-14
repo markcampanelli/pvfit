@@ -6,33 +6,35 @@ jobs:
   build:
     strategy:
       matrix:
-        # os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.12", "3.13", "3.14", "3.15"]
 
     runs-on:  ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v7
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v7
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install uv and Python ${{ matrix.python-version }}
+        uses: astral-sh/setup-uv@v8
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+          enable-cache: true
+      - name: Generate lock
         run: |
-          python -m pip install --progress-bar off --upgrade pip
-          python -m pip --version
-          python -m pip install --progress-bar off ".[all]"
-          python -m pip list
+          uv lock
+          cat uv.lock
       - name: Lint
         run: |
-          python -m ruff check --extend-exclude tests
+          uv run ruff check --extend-exclude tests
       - name: Check formatting
         run: |
-          python -m ruff format --check
-      - name: Test
+          uv run ruff format --check
+      - name: Test code
         run: |
-          python -m pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-results.xml -vv tests
+          uv run --frozen pytest --cov=pvfit --cov-report=html:artifacts/test/htmlcov --junitxml=artifacts/test/junit-results.xml -vv tests
+      - name: Test scripts
+        run: |
+          uv run pvfit-version
       - name: Archive results
         uses: actions/upload-artifact@v7
         with:
@@ -41,7 +43,7 @@ jobs:
         if: ${{ always() }}
       - name: Build pure-Python source and wheel disributions
         run: |
-          python -m build
+          uv build
       - name: Archive disributions
         uses: actions/upload-artifact@v7
         with:

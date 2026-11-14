@@ -8,4 +8,4 @@ import pvfit
 
 
 def test_package_version():
-    assert pvfit.__version__ != ""
+    assert pvfit.version() != ""
