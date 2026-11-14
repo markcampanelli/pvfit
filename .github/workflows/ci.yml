@@ -20,8 +20,9 @@ jobs:
           version: "0.13.8"
       - name: Set up Python ${{ matrix.python-version }}
         run: uv python install ${{ matrix.python-version }}
-      - name: Generate lock
+      - name: uv sync and display dependency tree
         run: |
+          uv sync --all-groups
           uv tree
       - name: Lint
         run: |
