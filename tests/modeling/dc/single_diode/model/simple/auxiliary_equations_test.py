@@ -9,11 +9,11 @@ from dataclasses import fields
 import numpy
 import pytest
 
+import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
+import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
 from pvfit.common import T_degC_stc
 from pvfit.measurement.iv.types import FTData
 from pvfit.modeling.dc.common import MATERIALS_INFO, Material
-import pvfit.modeling.dc.single_diode.equation.simple.types as sde_types
-import pvfit.modeling.dc.single_diode.model.simple.auxiliary_equations as sdm_simple_ae
 from pvfit.modeling.dc.single_diode.model.simple.types import ModelParameters
 
 

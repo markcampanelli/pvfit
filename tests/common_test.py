@@ -4,7 +4,7 @@ PVfit testing: Common items.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-import pvfit.common as common
+from pvfit import common
 
 
 def test_q_C():

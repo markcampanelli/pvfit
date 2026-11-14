@@ -2,4 +2,4 @@
 
 
 def test_package_import():
-    import pvfit.modeling.ac.sipm.simulation
+    import pvfit.modeling.ac.sipm.simulation  # noqa

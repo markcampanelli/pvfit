@@ -5,7 +5,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 from pvfit.measurement.spectral_correction.spectra import (
-    E_G173_hemispherical_tilted,
+    # E_G173_hemispherical_tilted,
     E_60904_3_hemispherical_tilted,
 )
 
@@ -13,8 +13,8 @@ from pvfit.measurement.spectral_correction.spectra import (
 
 # TODO Check E_60904_3_hemispherical_tilted.G_total_W_per_m2 == E_hemispherical_tilted_W_per_m2_stc
 
-E_60904_3_hemispherical_tilted.E_total_W_per_m2
-E_60904_3_hemispherical_tilted.E_tail_W_per_m2
+# E_60904_3_hemispherical_tilted.E_total_W_per_m2
+# E_60904_3_hemispherical_tilted.E_tail_W_per_m2
 
 # TODO Check E_60904_3_hemispherical_tilted on main interval == 997.47 (& formally define 997.47?)
 

@@ -4,9 +4,9 @@ PVfit testing: Single-diode equation (SDE) inference.
 Copyright 2023 Intelligent Measurement Systems LLC
 """
 
-from dataclasses import fields
 import json
 import os
+from dataclasses import fields
 from pathlib import Path
 
 import numpy
@@ -19,8 +19,8 @@ from pvfit.measurement.iv.types import IVCurve
 from pvfit.modeling.dc.single_diode.equation.simple import inference_iv_curve
 from pvfit.modeling.dc.single_diode.equation.simple.types import (
     ModelParameters,
-    ModelParametersFittableFixed,
     ModelParametersFittable,
+    ModelParametersFittableFixed,
     ModelParametersUnfittable,
 )
 from pvfit.types import OdrOptions
@@ -29,7 +29,7 @@ ARTIFACTS_PARENT_DIR_PATH = Path(os.path.dirname(os.path.dirname(pvfit.__file__)
 
 if ARTIFACTS_PARENT_DIR_PATH.name == "site-packages":
     # Covers use case where one is not developing locally or running in CI.
-    TEST_ARTIFACTS_PATH = Path().resolve()  # Current working directory.
+    TEST_ARTIFACTS_PATH = Path().cwd()  # Current working directory.
 else:
     TEST_ARTIFACTS_PATH = ARTIFACTS_PARENT_DIR_PATH.joinpath(
         "artifacts",

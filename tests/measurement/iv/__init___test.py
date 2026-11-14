@@ -6,4 +6,4 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 
 def test_package_import():
-    import pvfit.measurement.iv
+    import pvfit.measurement.iv  # noqa

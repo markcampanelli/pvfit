@@ -5,8 +5,8 @@ Copyright 2023 Intelligent Measurement Systems LLC
 """
 
 import importlib
-from pathlib import Path
 import runpy
+from pathlib import Path
 
 import matplotlib
 

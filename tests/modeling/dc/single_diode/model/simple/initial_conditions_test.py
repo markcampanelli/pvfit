@@ -6,7 +6,7 @@ Copyright 2023 Intelligent Measurement Systems LLC
 
 import pytest
 
-import pvfit.modeling.dc.single_diode.model.simple.initial_conditions
+import pvfit.modeling.dc.single_diode.model.simple.initial_conditions  # noqa
 
 
 @pytest.mark.skip("TODO")

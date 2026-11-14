@@ -10,10 +10,10 @@ import numpy
 import pytest
 from scipy.constants import convert_temperature
 
-from pvfit.common import T_K_stc, T_degC_stc, k_B_J_per_K, q_C
+from pvfit.common import T_degC_stc, T_K_stc, k_B_J_per_K, q_C
 from pvfit.measurement.iv.types import IVCurveParametersArray, IVData
 from pvfit.modeling.dc.common import get_scaled_thermal_voltage
-import pvfit.modeling.dc.single_diode.equation.simple.simulation as simulation
+from pvfit.modeling.dc.single_diode.equation.simple import simulation
 from pvfit.modeling.dc.single_diode.equation.simple.types import ModelParameters
 
 

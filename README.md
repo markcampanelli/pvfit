@@ -84,7 +84,7 @@ python -m pip install pvfit[demo]
 
 Verify your installation—
 ```terminal
-python -c "from pvfit import __version__; print(__version__)"
+pvfit-version
 ```
 which should print something similar to—
 ```terminal
@@ -116,19 +116,20 @@ python -m pip install --upgrade "pvfit[demo] @ git+https://github.com/markcampan
 Clone the repo at https://github.com/markcampanelli/pvfit using your preferred git
 method, and go to the repo's root directory.
 
-Install `pvfit` with all extras in editable (development) mode with `pip`—
+`pvfit` is compatible with a [`uv`](https://docs.astral.sh/uv/) development workflow.
+(The `uv.lock` file is not committed, because `pvfit` is a library package.) From the
+repo root, initialize using—
 ```terminal
-python -m pip install --upgrade pip
-python -m pip install -e .[all]
+uv sync --all-groups --extra all 
 ```
-This also installs the libraries needed to test, develop the code demonstrations, and
-build documentation and source and wheel distributions.
+This installs all the dependencies needed to test, develop the code demonstrations, and
+build documentation.
 
-Verify your installation—
+Verify your installation by running the installed version script—
 ```terminal
-python -c "from pvfit import __version__; print(__version__)"
+uv run pvfit-version
 ```
-which should print something similar to—
+The pvfit-version script should print something similar to—
 ```terminal
 0.1.dev9+gadf7f38.d20190812
 ```
@@ -139,34 +140,10 @@ Next, make sure that the tests are passing.
 
 From the root directory—
 ```terminal
-python -m pytest --doctest-modules --cov=pvfit --cov-report=html:htmlcov tests
+uv run pytest --doctest-modules --cov=pvfit --cov-report=html:htmlcov tests
 ```
 The root of the generated coverage report is at `artifacts/test/htmlcov/index.html` (not
 committed). 
-
-### Build Documentation
-
-From the [docs](docs) subdirectory—
-```terminal
-sphinx-apidoc -f -o . ../pvfit ../*_test.py
-```
-then—
-```terminal
-make html
-```
-The root of the generated documentation is at `docs/_build/html/pvfit.html` (not
-committed). 
-
-### Distribute
-
-PEP-517-compliant [build](https://pypa-build.readthedocs.io/en/latest/) is used to
-generate distributions using [setuptools](https://setuptools.pypa.io/en/latest/) as the
-build backend (specified in `pyproject.toml`). From the repo root, execute--
-```terminal
-python -m build
-```
-Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not
-committed).
 
 ### Dependencies
 
@@ -191,14 +168,39 @@ throughout (WIP).
 - [`ruff`](https://pypi.org/project/ruff/) is used for linting. Check before committing
 code using--
 ```terminal
-python -m ruff check --extend-exclude tests
+uv run ruff check
 ```
 Skip troublesome lines (sparingly) with the suffix `# noqa: <code>`.
 - [`ruff`](https://pypi.org/project/ruff/) is also used to autoformat code. Autoformat
 before committing code, using--
 ```terminal
-python -m ruff format
+uv run ruff format
 ```
+
+### Build Documentation
+
+From the [docs](docs) subdirectory—
+```terminal
+sphinx-apidoc -f -o . ../pvfit ../*_test.py
+```
+then—
+```terminal
+make html
+```
+The root of the generated documentation is at `docs/_build/html/pvfit.html` (not
+committed). 
+
+### Distribute
+
+PEP-517-compliant [`uv`](https://docs.astral.sh/uv/) is used to generate distributions
+using [`setuptools`](https://setuptools.pypa.io/en/latest/) with
+[`setuptools-scm`](https://setuptools-scm.readthedocs.io/latest/) as the build backend
+(specified in `pyproject.toml`). From the repo root, execute--
+```terminal
+uv build
+```
+Pure-Python `*.whl` and `*.tar.gz` files are placed in the `dist` directory (not
+committed).
 
 ## About the Author and Maintainer
 
