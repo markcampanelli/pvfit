@@ -22,7 +22,7 @@ jobs:
         run: |
           python -m pip install --progress-bar off --upgrade pip
           python -m pip --version
-          python -m pip install --progress-bar off .[all]
+          python -m pip install --progress-bar off ".[all]"
           python -m pip list
       - name: Lint
         run: |
